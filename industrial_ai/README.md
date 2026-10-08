@@ -11,7 +11,7 @@ serta [FFmpeg dan FFprobe](https://ffmpeg.org/download.html) pada PATH.
 Python 3.11 disiapkan uv bila belum tersedia. Gunakan PowerShell.
 
 ```powershell
-git clone --branch codex/video-tracking-chat https://github.com/Maliq-dlt/N-Gram.git
+git clone https://github.com/Maliq-dlt/N-Gram.git
 cd N-Gram/industrial_ai
 $env:npm_config_cache = Join-Path $PWD '.cache/npm'
 npm ci

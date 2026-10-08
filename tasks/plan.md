@@ -3,11 +3,11 @@
 Tanggal: 8 Oktober 2026. Target: **demonstrasi/portofolio lokal dulu**.
 Status: implementasi prototipe video + chat lokal diizinkan pengguna pada 8 Oktober 2026.
 Panduan aktual: [README aplikasi](../industrial_ai/README.md). Demo upload/tracking/chat/koreksi telah diuji; [verifikasi publik](../industrial_ai/reports/VERIFIKASI_PUBLIK.md) dan [status implementasi](todo.md#status-demo-lokal--8-oktober-2026) mencatat hasil. Gate formal roadmap tetap terpisah dari smoke test prototipe.
-Checklist eksekusi: [todo.md](todo.md).
+Progres demo: [todo.md](todo.md). Kriteria fase lengkap: [roadmap_checklist.md](roadmap_checklist.md).
 
 ## 1. Cara memakai dokumen
 
-Baca skenario, persiapan, lalu roadmap. Jalankan task pada todo.md sesuai dependensi;
+Baca skenario, persiapan, lalu roadmap. Jalankan task pada roadmap_checklist.md sesuai dependensi;
 beri centang setelah verifikasi dan simpan command aktual, exit code, output dan versi.
 Angka target di sini adalah usulan kriteria proyek, bukan hasil pengujian.
 
@@ -271,7 +271,7 @@ serta hasil lama tidak ditimpa.
 
 ## 11. Verifikasi dan artefak setiap fase
 
-Task di todo.md mempunyai kriteria dan metode verifikasi. Command aplikasi baru
+Task di roadmap_checklist.md mempunyai kriteria dan metode verifikasi. Command aplikasi baru
 baru berlaku setelah file/config terkait dibuat; dokumen ini bukan quickstart
 untuk aplikasi yang sudah tersedia hari ini.
 
