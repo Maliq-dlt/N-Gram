@@ -1,0 +1,7 @@
+include setup_lokal.ps1 jalankan.ps1 instal.ps1 training_chat.json uv.lock CHANGELOG.md
+recursive-include tests *.py *.cjs
+prune reports
+include reports/VERIFIKASI_PUBLIK.md reports/REFERENSI_GITHUB.md reports/DESAIN_DASHBOARD.md
+include dashboard.js ui.css package.json package-lock.json
+recursive-include assets *.css
+include assets/THIRD_PARTY_LICENSES.txt
