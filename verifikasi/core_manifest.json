@@ -1,0 +1,17 @@
+{
+  "core/ngram_lm.ipynb": "30f01d7d43aa587d8e78d2c9db925912c23ce1009d69d38e8eb6f23fd26b4084",
+  "core/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "core/results/corpus.png": "f891f5a373126f684fca8fc354dee588076b2c0dc02e401bfd5d55af32d6eb32",
+  "core/results/metrics.json": "dc05cb0db4acdfb21b9c289b68c21dbe87352727d6180c09d240f98934608973",
+  "core/results/perplexity.png": "b995207635c270451f8fbcf2e707750c86f97f544beb312449fccc27df3f230c",
+  "core/results/split.json": "0706c019987a99f10753c4c07f6d5974b511b675d3670ed967c63eb4a117f1c4",
+  "core/results/SUMMARY.md": "e65dc8e31d46343652b60693c2b71b6feeef409d4bb7e151c12680ae2844d1e9",
+  "core/src/data.py": "d5cf64abcf4fb816cfe1dad831e3a029699648276ffbfa782933dd5b8cf432a1",
+  "core/src/evaluate.py": "50c33ecf86ce88ba9173888ab546ff9eaed7ce6719f3379fa7d03a3b42b61072",
+  "core/src/generate.py": "d80d3f5df708b6bcc05d3ab2180e46ca1e1fb2ce984888cbff0df59df88bb5c3",
+  "core/src/models.py": "3e5899b2b25cb4053f73d5e71700dc921fb486eb047e7f7c29499a6e91d33973",
+  "core/src/ngram.py": "eb6b887412a0e30353e9193e5d84816b6c5d79b80ad177d9a4885e2bc048d1bf",
+  "core/src/preprocess.py": "c61964dd1fe7e5b65bad89cebbd047e1905e2b8c0fdcb7c562b2a4a395c4ac31",
+  "core/src/__init__.py": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+  "core/tests/test_core.py": "d5106506c2ac91de5bc77c8d20ef39585aace49af5b1f5ad247d31239e46aecb"
+}

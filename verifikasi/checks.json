@@ -1,0 +1,91 @@
+{
+  "note": "Recorded from successful command executions in this session; no speculative pass results.",
+  "commands": [
+    {
+      "command": "uv run pytest -q",
+      "exit_code": 0,
+      "observed_output": "46 passed in 3.19s"
+    },
+    {
+      "command": "uv run python run_notebook.py",
+      "exit_code": 0,
+      "observed_output": "Run All OK: 18 code cells"
+    },
+    {
+      "command": "uv run ruff check core extensions run_notebook.py",
+      "exit_code": 0,
+      "observed_output": "All checks passed!"
+    },
+    {
+      "command": "uv run ruff format --check core extensions run_notebook.py",
+      "exit_code": 0,
+      "observed_output": "30 files already formatted"
+    },
+    {
+      "command": "uv run ty check core/src extensions/src extensions/experiments run_notebook.py",
+      "exit_code": 0,
+      "observed_output": "All checks passed!"
+    },
+    {
+      "command": "uv build",
+      "exit_code": 0,
+      "observed_output": "Wheel and sdist built successfully"
+    },
+    {
+      "command": "uv run ngram-lm train --config extensions/config.yaml --model .tmp/cli_model.json.gz",
+      "exit_code": 0,
+      "observed_output": "V=22356; dev_loss=5.788405138065078; train-only fitting, dev-only tuning"
+    },
+    {
+      "command": "uv run ngram-lm evaluate --model .tmp/cli_model.json.gz",
+      "exit_code": 0,
+      "observed_output": "perplexity=330.70465650070474; predicted_tokens=102538"
+    },
+    {
+      "command": "uv run ngram-lm generate --model .tmp/cli_model.json.gz --seed 42 --count 5 --max-length 30",
+      "exit_code": 0,
+      "observed_output": "5 sentences generated"
+    },
+    {
+      "command": "uv pip install --target .tmp/wheel-site --no-deps dist/ngram_assignment-0.1.0-py3-none-any.whl",
+      "exit_code": 0,
+      "observed_output": "Installed ngram-assignment==0.1.0"
+    },
+    {
+      "command": "uv run python .tmp/wheel_smoke.py",
+      "exit_code": 0,
+      "observed_output": "Imported wheel code, checkpoint round-trip matched, 3 samples and CLI help succeeded"
+    },
+    {
+      "command": "git diff --check",
+      "exit_code": 0,
+      "observed_output": "No whitespace errors"
+    }
+  ],
+  "notebook_code_cells": 18,
+  "experiment_configurations": 120,
+  "dev_tuning_logs": 120,
+  "core_sha256_unchanged_during_extensions": true,
+  "source_diff_reviewed": ".tmp/source.diff",
+  "scope_audit": {
+    "started_empty": true,
+    "only_requested_paths_changed": true,
+    "runtime_artifacts_git_ignored": true
+  },
+  "code_review_graph": {
+    "files_parsed": 30,
+    "nodes": 121,
+    "errors": [],
+    "limitation": "Structural impact/test-gap heuristics do not prove coverage or correctness."
+  },
+  "distributions": {
+    "ngram_assignment-0.1.0-py3-none-any.whl": {
+      "bytes": 25596,
+      "sha256": "8ad276abe887efc8f6ca58ad63b22456bc30a8fde7ba517c9278099e674e12af"
+    },
+    "ngram_assignment-0.1.0.tar.gz": {
+      "bytes": 21916,
+      "sha256": "920e7f874b9b651ec591db344dba583a62be131c3d0cfdff9a0e9ee91689cbb3"
+    }
+  }
+}

@@ -1,0 +1,6 @@
+# Vocabulary learned from train. Hyperparameters selected on dev by CLI train.
+corpus: brown
+seed: 42
+n: 3
+method: kneser_ney
+min_count: 2

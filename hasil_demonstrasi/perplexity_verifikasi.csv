@@ -1,0 +1,5 @@
+model,PP,N,bukti
+Bigram MLE,inf,208096,evaluasi ulang model tetap
+Unigram Laplace,845.8456795019986,208096,rumus dari hasil beku
+Bigram Laplace,2633.393139505012,208096,evaluasi ulang model tetap
+Trigram Laplace,10977.926776000251,208096,evaluasi ulang model tetap

@@ -1,0 +1,20 @@
+[
+  {
+    "parameters": {
+      "discount": 0.5
+    },
+    "dev_loss": 6.025020649067619
+  },
+  {
+    "parameters": {
+      "discount": 0.75
+    },
+    "dev_loss": 5.828750913535198
+  },
+  {
+    "parameters": {
+      "discount": 0.9
+    },
+    "dev_loss": 5.788405138065078
+  }
+]

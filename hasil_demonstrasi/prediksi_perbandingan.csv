@@ -1,0 +1,61 @@
+n,model,case,context_asli,context_model,context_count,rank,word,P,status
+2,MLE,dikenal,the,the,55780,1,<UNK>,0.030530656149157405,positif
+2,MLE,dikenal,the,the,55780,2,first,0.009591251344567946,positif
+2,MLE,dikenal,the,the,55780,3,same,0.009250627465041234,positif
+2,MLE,dikenal,the,the,55780,4,other,0.006113302258874149,positif
+2,MLE,dikenal,the,the,55780,5,most,0.0060236643958408035,positif
+2,Laplace,dikenal,the,the,55780,1,<UNK>,0.021808129415378314,positif
+2,Laplace,dikenal,the,the,55780,2,first,0.0068598341353537425,positif
+2,Laplace,dikenal,the,the,55780,3,same,0.006616668373093069,positif
+2,Laplace,dikenal,the,the,55780,4,other,0.004376983720692127,positif
+2,Laplace,dikenal,the,the,55780,5,most,0.0043129927306235286,positif
+2,MLE,tanpa count konteks,</s>,</s>,0,1,</s>,0.0,nol; tidak ada dukungan MLE
+2,MLE,tanpa count konteks,</s>,</s>,0,2,<UNK>,0.0,nol; tidak ada dukungan MLE
+2,MLE,tanpa count konteks,</s>,</s>,0,3,a,0.0,nol; tidak ada dukungan MLE
+2,MLE,tanpa count konteks,</s>,</s>,0,4,aaron,0.0,nol; tidak ada dukungan MLE
+2,MLE,tanpa count konteks,</s>,</s>,0,5,ab,0.0,nol; tidak ada dukungan MLE
+2,Laplace,tanpa count konteks,</s>,</s>,0,1,</s>,4.473072105922347e-05,positif
+2,Laplace,tanpa count konteks,</s>,</s>,0,2,<UNK>,4.473072105922347e-05,positif
+2,Laplace,tanpa count konteks,</s>,</s>,0,3,a,4.473072105922347e-05,positif
+2,Laplace,tanpa count konteks,</s>,</s>,0,4,aaron,4.473072105922347e-05,positif
+2,Laplace,tanpa count konteks,</s>,</s>,0,5,ab,4.473072105922347e-05,positif
+2,MLE,kata OOV,navigable,<UNK>,14533,1,</s>,0.11628707080437625,positif
+2,MLE,kata OOV,navigable,<UNK>,14533,2,and,0.0838780705979495,positif
+2,MLE,kata OOV,navigable,<UNK>,14533,3,of,0.054634280602766115,positif
+2,MLE,kata OOV,navigable,<UNK>,14533,4,<UNK>,0.050780981215165485,positif
+2,MLE,kata OOV,navigable,<UNK>,14533,5,the,0.035918255005848755,positif
+2,Laplace,kata OOV,navigable,<UNK>,14533,1,</s>,0.04584022337282117,positif
+2,Laplace,kata OOV,navigable,<UNK>,14533,2,and,0.03307218954159777,positif
+2,Laplace,kata OOV,navigable,<UNK>,14533,3,of,0.0215511399062051,positif
+2,Laplace,kata OOV,navigable,<UNK>,14533,4,<UNK>,0.020033072189541597,positif
+2,Laplace,kata OOV,navigable,<UNK>,14533,5,the,0.014177668139553797,positif
+3,MLE,dikenal,in the,in the,4880,1,<UNK>,0.02151639344262295,positif
+3,MLE,dikenal,in the,in the,4880,2,world,0.014549180327868852,positif
+3,MLE,dikenal,in the,in the,4880,3,first,0.01331967213114754,positif
+3,MLE,dikenal,in the,in the,4880,4,united,0.012704918032786885,positif
+3,MLE,dikenal,in the,in the,4880,5,same,0.0125,positif
+3,Laplace,dikenal,in the,in the,4880,1,<UNK>,0.0038919077691290938,positif
+3,Laplace,dikenal,in the,in the,4880,2,world,0.0026435599941254224,positif
+3,Laplace,dikenal,in the,in the,4880,3,first,0.0024232633279483036,positif
+3,Laplace,dikenal,in the,in the,4880,4,united,0.0023131149948597443,positif
+3,Laplace,dikenal,in the,in the,4880,5,same,0.0022763988838302245,positif
+3,MLE,tanpa count konteks,americans unless,americans unless,0,1,</s>,0.0,nol; tidak ada dukungan MLE
+3,MLE,tanpa count konteks,americans unless,americans unless,0,2,<UNK>,0.0,nol; tidak ada dukungan MLE
+3,MLE,tanpa count konteks,americans unless,americans unless,0,3,a,0.0,nol; tidak ada dukungan MLE
+3,MLE,tanpa count konteks,americans unless,americans unless,0,4,aaron,0.0,nol; tidak ada dukungan MLE
+3,MLE,tanpa count konteks,americans unless,americans unless,0,5,ab,0.0,nol; tidak ada dukungan MLE
+3,Laplace,tanpa count konteks,americans unless,americans unless,0,1,</s>,4.473072105922347e-05,positif
+3,Laplace,tanpa count konteks,americans unless,americans unless,0,2,<UNK>,4.473072105922347e-05,positif
+3,Laplace,tanpa count konteks,americans unless,americans unless,0,3,a,4.473072105922347e-05,positif
+3,Laplace,tanpa count konteks,americans unless,americans unless,0,4,aaron,4.473072105922347e-05,positif
+3,Laplace,tanpa count konteks,americans unless,americans unless,0,5,ab,4.473072105922347e-05,positif
+3,MLE,kata OOV,the navigable,the <UNK>,1703,1,of,0.15267175572519084,positif
+3,MLE,kata OOV,the navigable,the <UNK>,1703,2,</s>,0.08220786846741045,positif
+3,MLE,kata OOV,the navigable,the <UNK>,1703,3,and,0.06987668819729888,positif
+3,MLE,kata OOV,the navigable,the <UNK>,1703,4,<UNK>,0.04580152671755725,positif
+3,MLE,kata OOV,the navigable,the <UNK>,1703,5,in,0.018790369935408103,positif
+3,Laplace,kata OOV,the navigable,the <UNK>,1703,1,of,0.010848331185834822,positif
+3,Laplace,kata OOV,the navigable,the <UNK>,1703,2,</s>,0.005860592709588927,positif
+3,Laplace,kata OOV,the navigable,the <UNK>,1703,3,and,0.004987738476245895,positif
+3,Laplace,kata OOV,the navigable,the <UNK>,1703,4,<UNK>,0.0032835944968618814,positif
+3,Laplace,kata OOV,the navigable,the <UNK>,1703,5,in,0.0013716280809676212,positif

@@ -1,0 +1,509 @@
+{
+  "seed": 42,
+  "versions": {
+    "nltk": "3.10.3",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "matplotlib": "3.11.2",
+    "pytest": "9.1.1"
+  },
+  "python": "3.11.15",
+  "corpus": "brown",
+  "corpus_sha256": "9b275f9b3b95d7bd66ccfb7cd259f445a13bbe5d1f4107aba09fd3e8364bafa6",
+  "raw": {
+    "sentences": 57340,
+    "tokens": 1161192,
+    "vocabulary": 56057,
+    "mean_length": 20.250994070456922
+  },
+  "processed": {
+    "sentences": 56766,
+    "tokens": 981716,
+    "empty_dropped": 574
+  },
+  "split": {
+    "train_sentences": 45412,
+    "test_sentences": 11354
+  },
+  "oov": {
+    "raw_train_vocab_rate": 0.018719947952140367,
+    "threshold_vocab_rate": 0.032407925099877,
+    "after_mapping_rate": 0.0,
+    "V_targets": 22356,
+    "train_UNK_tokens": 14533
+  },
+  "predictions": [
+    {
+      "n": 2,
+      "context": "the",
+      "word": "<UNK>",
+      "probability": 0.030530656149157405
+    },
+    {
+      "n": 2,
+      "context": "the",
+      "word": "first",
+      "probability": 0.009591251344567946
+    },
+    {
+      "n": 2,
+      "context": "the",
+      "word": "same",
+      "probability": 0.009250627465041234
+    },
+    {
+      "n": 2,
+      "context": "the",
+      "word": "other",
+      "probability": 0.006113302258874149
+    },
+    {
+      "n": 2,
+      "context": "the",
+      "word": "most",
+      "probability": 0.0060236643958408035
+    },
+    {
+      "n": 2,
+      "context": "in the",
+      "word": "<UNK>",
+      "probability": 0.030530656149157405
+    },
+    {
+      "n": 2,
+      "context": "in the",
+      "word": "first",
+      "probability": 0.009591251344567946
+    },
+    {
+      "n": 2,
+      "context": "in the",
+      "word": "same",
+      "probability": 0.009250627465041234
+    },
+    {
+      "n": 2,
+      "context": "in the",
+      "word": "other",
+      "probability": 0.006113302258874149
+    },
+    {
+      "n": 2,
+      "context": "in the",
+      "word": "most",
+      "probability": 0.0060236643958408035
+    },
+    {
+      "n": 2,
+      "context": "of the",
+      "word": "<UNK>",
+      "probability": 0.030530656149157405
+    },
+    {
+      "n": 2,
+      "context": "of the",
+      "word": "first",
+      "probability": 0.009591251344567946
+    },
+    {
+      "n": 2,
+      "context": "of the",
+      "word": "same",
+      "probability": 0.009250627465041234
+    },
+    {
+      "n": 2,
+      "context": "of the",
+      "word": "other",
+      "probability": 0.006113302258874149
+    },
+    {
+      "n": 2,
+      "context": "of the",
+      "word": "most",
+      "probability": 0.0060236643958408035
+    },
+    {
+      "n": 3,
+      "context": "the",
+      "word": "<UNK>",
+      "probability": 0.025681618293755495
+    },
+    {
+      "n": 3,
+      "context": "the",
+      "word": "first",
+      "probability": 0.014072119613016711
+    },
+    {
+      "n": 3,
+      "context": "the",
+      "word": "new",
+      "probability": 0.009674582233948988
+    },
+    {
+      "n": 3,
+      "context": "the",
+      "word": "only",
+      "probability": 0.0079155672823219
+    },
+    {
+      "n": 3,
+      "context": "the",
+      "word": "man",
+      "probability": 0.007036059806508356
+    },
+    {
+      "n": 3,
+      "context": "in the",
+      "word": "<UNK>",
+      "probability": 0.02151639344262295
+    },
+    {
+      "n": 3,
+      "context": "in the",
+      "word": "world",
+      "probability": 0.014549180327868852
+    },
+    {
+      "n": 3,
+      "context": "in the",
+      "word": "first",
+      "probability": 0.01331967213114754
+    },
+    {
+      "n": 3,
+      "context": "in the",
+      "word": "united",
+      "probability": 0.012704918032786885
+    },
+    {
+      "n": 3,
+      "context": "in the",
+      "word": "same",
+      "probability": 0.0125
+    },
+    {
+      "n": 3,
+      "context": "of the",
+      "word": "<UNK>",
+      "probability": 0.033147740515343777
+    },
+    {
+      "n": 3,
+      "context": "of the",
+      "word": "united",
+      "probability": 0.013207302861582287
+    },
+    {
+      "n": 3,
+      "context": "of the",
+      "word": "new",
+      "probability": 0.010488152272432992
+    },
+    {
+      "n": 3,
+      "context": "of the",
+      "word": "most",
+      "probability": 0.010099702188268807
+    },
+    {
+      "n": 3,
+      "context": "of the",
+      "word": "world",
+      "probability": 0.008157451767447883
+    }
+  ],
+  "underflow": {
+    "tokens": 1200,
+    "product": 0.0,
+    "log_probability": -9826.710276870215
+  },
+  "unseen_bigrams": {
+    "occurrence_rate": 0.26699215746578503,
+    "type_rate": 0.4966815708164923,
+    "example": [
+      "americans",
+      "unless"
+    ]
+  },
+  "normalization_contexts": {
+    "1": 1,
+    "2": 22356,
+    "3": 313594
+  },
+  "perplexity": [
+    {
+      "model": "Bigram MLE",
+      "perplexity": "inf",
+      "predicted_tokens": 208096,
+      "log_likelihood": "-inf"
+    },
+    {
+      "model": "Unigram Laplace",
+      "perplexity": 845.8456795019986,
+      "predicted_tokens": 208096,
+      "log_likelihood": -1402637.1539998208
+    },
+    {
+      "model": "Bigram Laplace",
+      "perplexity": 2633.393139505012,
+      "predicted_tokens": 208096,
+      "log_likelihood": -1638970.0185648073
+    },
+    {
+      "model": "Trigram Laplace",
+      "perplexity": 10977.926776000251,
+      "predicted_tokens": 208096,
+      "log_likelihood": -1936050.6604565887
+    }
+  ],
+  "generation": {
+    "2": [
+      [
+        "it",
+        "was",
+        "before",
+        "the",
+        "<UNK>",
+        "level",
+        "in",
+        "both",
+        "miss",
+        "schwarzkopf",
+        "and",
+        "<UNK>",
+        "<UNK>",
+        "and",
+        "left",
+        "foot",
+        "traveler",
+        "and",
+        "repair",
+        "facilities",
+        "for",
+        "a",
+        "joint",
+        "committee",
+        "of",
+        "the",
+        "stint",
+        "of",
+        "christendom"
+      ],
+      [
+        "somewhere",
+        "behind",
+        "that",
+        "we",
+        "seldom",
+        "moved",
+        "a",
+        "blind",
+        "alley",
+        "for",
+        "an",
+        "extraordinary",
+        "effort",
+        "to",
+        "behave",
+        "in",
+        "that",
+        "point",
+        "charles",
+        "<UNK>",
+        "rapidly",
+        "from",
+        "squeezing",
+        "a",
+        "big",
+        "one",
+        "another",
+        "car",
+        "with",
+        "dependable",
+        "universe",
+        "is",
+        "not",
+        "very",
+        "troubled",
+        "time"
+      ],
+      [
+        "a",
+        "sudden",
+        "wave",
+        "of",
+        "men",
+        "like",
+        "a",
+        "child",
+        "continues",
+        "to",
+        "the",
+        "united",
+        "in"
+      ],
+      [
+        "for",
+        "him",
+        "by",
+        "the",
+        "contemporary",
+        "scene",
+        "but",
+        "that",
+        "curious"
+      ],
+      [
+        "although",
+        "bob",
+        "fogg",
+        "made"
+      ]
+    ],
+    "3": [
+      [
+        "it",
+        "was",
+        "close",
+        "to",
+        "being",
+        "social",
+        "leaders",
+        "and",
+        "in",
+        "the",
+        "biography",
+        "diffuse",
+        "help",
+        "to",
+        "his",
+        "italian",
+        "<UNK>"
+      ],
+      [
+        "somewhere",
+        "birds",
+        "were",
+        "<UNK>",
+        "by",
+        "lighting"
+      ],
+      [
+        "a",
+        "change",
+        "in",
+        "the",
+        "rear",
+        "end",
+        "was",
+        "as",
+        "if",
+        "they",
+        "were",
+        "doing",
+        "our",
+        "best",
+        "new",
+        "england",
+        "but",
+        "roughly",
+        "only",
+        "a",
+        "few",
+        "moments",
+        "before",
+        "and",
+        "the",
+        "moral",
+        "and",
+        "spiritual",
+        "awakening",
+        "of",
+        "an",
+        "autistic",
+        "child",
+        "who",
+        "is",
+        "this"
+      ],
+      [
+        "for",
+        "if",
+        "i",
+        "had",
+        "plenty",
+        "status",
+        "at",
+        "the",
+        "floor",
+        "these",
+        "can",
+        "be",
+        "changed",
+        "without",
+        "<UNK>",
+        "rupture",
+        "intermittently",
+        "occurs",
+        "along",
+        "the",
+        "roof",
+        "of",
+        "the",
+        "house",
+        "ahead",
+        "of",
+        "him",
+        "or",
+        "speak",
+        "to",
+        "whitey"
+      ],
+      [
+        "although",
+        "no",
+        "national",
+        "norms",
+        "exist",
+        "for",
+        "achieving",
+        "his",
+        "aim",
+        "was",
+        "to",
+        "take",
+        "place",
+        "in",
+        "its",
+        "entirety",
+        "at",
+        "a",
+        "new",
+        "henry",
+        "james",
+        "the",
+        "<UNK>",
+        "of",
+        "<UNK>",
+        "an",
+        "admirable",
+        "georgian",
+        "whose",
+        "delightful",
+        "correspondence",
+        "is",
+        "preserved",
+        "in",
+        "the",
+        "georgia",
+        "department",
+        "of",
+        "defense",
+        "appropriation"
+      ]
+    ]
+  },
+  "tests": "...............                                                          [100%]\n15 passed in 0.10s"
+}

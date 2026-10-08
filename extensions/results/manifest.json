@@ -1,0 +1,32 @@
+{
+  "corpus": "brown",
+  "sentences": 56766,
+  "empty_dropped": 574,
+  "corpus_sha256": "9b275f9b3b95d7bd66ccfb7cd259f445a13bbe5d1f4107aba09fd3e8364bafa6",
+  "python": "3.11.15",
+  "versions": {
+    "nltk": "3.10.3",
+    "numpy": "2.4.6",
+    "pandas": "3.0.6",
+    "matplotlib": "3.11.2"
+  },
+  "seeds": [
+    42,
+    43,
+    44
+  ],
+  "thresholds": [
+    2,
+    3
+  ],
+  "orders": [
+    1,
+    2,
+    3,
+    4
+  ],
+  "train_ratio": 0.8,
+  "dev_ratio": 0.1,
+  "test_ratio": 0.1,
+  "test_policy": "One evaluation per dev-selected configuration; pilot rows reused."
+}

@@ -1,0 +1,38 @@
+{
+  "clean_run_all": {
+    "command": "python jalankan_notebook.py (salinan paket bersih)",
+    "exit_code": 0,
+    "staging_path": "D:\\Dokumen\\Semester 5\\Pemrosesan Bahasa Alami\\N gram\\.tmp\\paket_uji\\Tugas_Ngram_Language_Model",
+    "files_staged": 203
+  },
+  "verification": {
+    "pytest": "48 passed in 2.76s",
+    "lint": "All checks passed",
+    "typecheck": "All checks passed",
+    "format": "31 files already formatted",
+    "build": "wheel and sdist in hasil_build/setelah_perapihan",
+    "preserved_original_result_files": 157,
+    "core_notebook_unchanged": true,
+    "brown_zip_offline": true,
+    "duplicate_corpus_files_verified": 503
+  },
+  "physical_cleanup": {
+    "status": "blocked_by_automatic_policy",
+    "detail": "Both bulk cleanup and explicit-path recursive deletion rejected; no deletion executed."
+  },
+  "archive_exclusions": [
+    ".git",
+    ".kilo",
+    ".tmp",
+    ".cache",
+    ".uv-cache",
+    ".venv",
+    ".code-review-graph",
+    "__pycache__",
+    ".ipynb_checkpoints",
+    "ngram_assignment.egg-info",
+    "build",
+    "extracted Brown duplicate"
+  ],
+  "results_policy": "All original research results, logs, models and build artifacts retained. Only deliverable files enter ZIP."
+}

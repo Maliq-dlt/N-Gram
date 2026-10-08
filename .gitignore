@@ -1,0 +1,30 @@
+# Virtual environment & package managers
+.venv/
+.uv-cache/
+
+# Temporary & cache files
+.cache/
+.tmp/
+.ruff_cache/
+.kilo/
+.code-review-graph/
+__pycache__/
+*.pyc
+.ipynb_checkpoints/
+*.log
+
+# Data & datasets (downloaded automatically)
+data/
+
+# Build & packaging artifacts
+dist/
+build/
+hasil_build/
+*.egg-info/
+
+# Assignment export archives & duplicate submission folders
+Tugas_Ngram_Language_Model/
+Tugas_Ngram_Language_Model.zip
+
+# Verification logs
+verifikasi/logs/

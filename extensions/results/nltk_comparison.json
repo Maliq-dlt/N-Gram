@@ -1,0 +1,24 @@
+{
+  "training_sentences": 1000,
+  "discount": 0.75,
+  "padding": "independent events for each order; no BOS target counts",
+  "epsilon": "0 for exact comparison; 1e-8 measured separately",
+  "rows": [
+    {
+      "n": 2,
+      "queries": 2000,
+      "max_absolute_difference": 0.0,
+      "mean_absolute_difference": 0.0,
+      "default_epsilon_max_difference": 8.02010680089893e-11,
+      "V_targets": 1644
+    },
+    {
+      "n": 3,
+      "queries": 2000,
+      "max_absolute_difference": 0.0,
+      "mean_absolute_difference": 0.0,
+      "default_epsilon_max_difference": 6.015080100674197e-11,
+      "V_targets": 1644
+    }
+  ]
+}

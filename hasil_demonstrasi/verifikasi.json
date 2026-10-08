@@ -1,0 +1,9 @@
+{
+  "langkah_lulus": 16,
+  "sanity_check_manual": true,
+  "hasil_lama_identik": 157,
+  "core_identik": true,
+  "generasi": 20,
+  "prediksi": 60,
+  "scope": "16 langkah; n=1..3, MLE dan Laplace; tanpa tuning"
+}

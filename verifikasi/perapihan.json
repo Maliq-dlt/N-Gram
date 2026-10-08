@@ -1,0 +1,926 @@
+{
+  "moves": {
+    "REPORT.md": "LAPORAN.md",
+    "REQUEST.md": "SPESIFIKASI_TUGAS.md",
+    "run_notebook.py": "jalankan_notebook.py",
+    "env.ps1": "setup_lokal.ps1",
+    "verification": "verifikasi",
+    "dist": "hasil_build/sebelum_perapihan",
+    ".tmp/cli_model.json.gz": "extensions/results/models/ngram_trigram_kneser_ney.json.gz",
+    ".tmp/wheel-site/smoke_model.json.gz": "extensions/results/models/ngram_mini_smoke_test.json.gz",
+    "extensions/results/tuning_42_2_1_add_k.json": "extensions/results/tuning/tuning_42_2_1_add_k.json",
+    "extensions/results/tuning_42_2_1_interpolation.json": "extensions/results/tuning/tuning_42_2_1_interpolation.json",
+    "extensions/results/tuning_42_2_1_kneser_ney.json": "extensions/results/tuning/tuning_42_2_1_kneser_ney.json",
+    "extensions/results/tuning_42_2_1_laplace.json": "extensions/results/tuning/tuning_42_2_1_laplace.json",
+    "extensions/results/tuning_42_2_1_stupid_backoff.json": "extensions/results/tuning/tuning_42_2_1_stupid_backoff.json",
+    "extensions/results/tuning_42_2_2_add_k.json": "extensions/results/tuning/tuning_42_2_2_add_k.json",
+    "extensions/results/tuning_42_2_2_interpolation.json": "extensions/results/tuning/tuning_42_2_2_interpolation.json",
+    "extensions/results/tuning_42_2_2_kneser_ney.json": "extensions/results/tuning/tuning_42_2_2_kneser_ney.json",
+    "extensions/results/tuning_42_2_2_laplace.json": "extensions/results/tuning/tuning_42_2_2_laplace.json",
+    "extensions/results/tuning_42_2_2_stupid_backoff.json": "extensions/results/tuning/tuning_42_2_2_stupid_backoff.json",
+    "extensions/results/tuning_42_2_3_add_k.json": "extensions/results/tuning/tuning_42_2_3_add_k.json",
+    "extensions/results/tuning_42_2_3_interpolation.json": "extensions/results/tuning/tuning_42_2_3_interpolation.json",
+    "extensions/results/tuning_42_2_3_kneser_ney.json": "extensions/results/tuning/tuning_42_2_3_kneser_ney.json",
+    "extensions/results/tuning_42_2_3_laplace.json": "extensions/results/tuning/tuning_42_2_3_laplace.json",
+    "extensions/results/tuning_42_2_3_stupid_backoff.json": "extensions/results/tuning/tuning_42_2_3_stupid_backoff.json",
+    "extensions/results/tuning_42_2_4_add_k.json": "extensions/results/tuning/tuning_42_2_4_add_k.json",
+    "extensions/results/tuning_42_2_4_interpolation.json": "extensions/results/tuning/tuning_42_2_4_interpolation.json",
+    "extensions/results/tuning_42_2_4_kneser_ney.json": "extensions/results/tuning/tuning_42_2_4_kneser_ney.json",
+    "extensions/results/tuning_42_2_4_laplace.json": "extensions/results/tuning/tuning_42_2_4_laplace.json",
+    "extensions/results/tuning_42_2_4_stupid_backoff.json": "extensions/results/tuning/tuning_42_2_4_stupid_backoff.json",
+    "extensions/results/tuning_42_3_1_add_k.json": "extensions/results/tuning/tuning_42_3_1_add_k.json",
+    "extensions/results/tuning_42_3_1_interpolation.json": "extensions/results/tuning/tuning_42_3_1_interpolation.json",
+    "extensions/results/tuning_42_3_1_kneser_ney.json": "extensions/results/tuning/tuning_42_3_1_kneser_ney.json",
+    "extensions/results/tuning_42_3_1_laplace.json": "extensions/results/tuning/tuning_42_3_1_laplace.json",
+    "extensions/results/tuning_42_3_1_stupid_backoff.json": "extensions/results/tuning/tuning_42_3_1_stupid_backoff.json",
+    "extensions/results/tuning_42_3_2_add_k.json": "extensions/results/tuning/tuning_42_3_2_add_k.json",
+    "extensions/results/tuning_42_3_2_interpolation.json": "extensions/results/tuning/tuning_42_3_2_interpolation.json",
+    "extensions/results/tuning_42_3_2_kneser_ney.json": "extensions/results/tuning/tuning_42_3_2_kneser_ney.json",
+    "extensions/results/tuning_42_3_2_laplace.json": "extensions/results/tuning/tuning_42_3_2_laplace.json",
+    "extensions/results/tuning_42_3_2_stupid_backoff.json": "extensions/results/tuning/tuning_42_3_2_stupid_backoff.json",
+    "extensions/results/tuning_42_3_3_add_k.json": "extensions/results/tuning/tuning_42_3_3_add_k.json",
+    "extensions/results/tuning_42_3_3_interpolation.json": "extensions/results/tuning/tuning_42_3_3_interpolation.json",
+    "extensions/results/tuning_42_3_3_kneser_ney.json": "extensions/results/tuning/tuning_42_3_3_kneser_ney.json",
+    "extensions/results/tuning_42_3_3_laplace.json": "extensions/results/tuning/tuning_42_3_3_laplace.json",
+    "extensions/results/tuning_42_3_3_stupid_backoff.json": "extensions/results/tuning/tuning_42_3_3_stupid_backoff.json",
+    "extensions/results/tuning_42_3_4_add_k.json": "extensions/results/tuning/tuning_42_3_4_add_k.json",
+    "extensions/results/tuning_42_3_4_interpolation.json": "extensions/results/tuning/tuning_42_3_4_interpolation.json",
+    "extensions/results/tuning_42_3_4_kneser_ney.json": "extensions/results/tuning/tuning_42_3_4_kneser_ney.json",
+    "extensions/results/tuning_42_3_4_laplace.json": "extensions/results/tuning/tuning_42_3_4_laplace.json",
+    "extensions/results/tuning_42_3_4_stupid_backoff.json": "extensions/results/tuning/tuning_42_3_4_stupid_backoff.json",
+    "extensions/results/tuning_43_2_1_add_k.json": "extensions/results/tuning/tuning_43_2_1_add_k.json",
+    "extensions/results/tuning_43_2_1_interpolation.json": "extensions/results/tuning/tuning_43_2_1_interpolation.json",
+    "extensions/results/tuning_43_2_1_kneser_ney.json": "extensions/results/tuning/tuning_43_2_1_kneser_ney.json",
+    "extensions/results/tuning_43_2_1_laplace.json": "extensions/results/tuning/tuning_43_2_1_laplace.json",
+    "extensions/results/tuning_43_2_1_stupid_backoff.json": "extensions/results/tuning/tuning_43_2_1_stupid_backoff.json",
+    "extensions/results/tuning_43_2_2_add_k.json": "extensions/results/tuning/tuning_43_2_2_add_k.json",
+    "extensions/results/tuning_43_2_2_interpolation.json": "extensions/results/tuning/tuning_43_2_2_interpolation.json",
+    "extensions/results/tuning_43_2_2_kneser_ney.json": "extensions/results/tuning/tuning_43_2_2_kneser_ney.json",
+    "extensions/results/tuning_43_2_2_laplace.json": "extensions/results/tuning/tuning_43_2_2_laplace.json",
+    "extensions/results/tuning_43_2_2_stupid_backoff.json": "extensions/results/tuning/tuning_43_2_2_stupid_backoff.json",
+    "extensions/results/tuning_43_2_3_add_k.json": "extensions/results/tuning/tuning_43_2_3_add_k.json",
+    "extensions/results/tuning_43_2_3_interpolation.json": "extensions/results/tuning/tuning_43_2_3_interpolation.json",
+    "extensions/results/tuning_43_2_3_kneser_ney.json": "extensions/results/tuning/tuning_43_2_3_kneser_ney.json",
+    "extensions/results/tuning_43_2_3_laplace.json": "extensions/results/tuning/tuning_43_2_3_laplace.json",
+    "extensions/results/tuning_43_2_3_stupid_backoff.json": "extensions/results/tuning/tuning_43_2_3_stupid_backoff.json",
+    "extensions/results/tuning_43_2_4_add_k.json": "extensions/results/tuning/tuning_43_2_4_add_k.json",
+    "extensions/results/tuning_43_2_4_interpolation.json": "extensions/results/tuning/tuning_43_2_4_interpolation.json",
+    "extensions/results/tuning_43_2_4_kneser_ney.json": "extensions/results/tuning/tuning_43_2_4_kneser_ney.json",
+    "extensions/results/tuning_43_2_4_laplace.json": "extensions/results/tuning/tuning_43_2_4_laplace.json",
+    "extensions/results/tuning_43_2_4_stupid_backoff.json": "extensions/results/tuning/tuning_43_2_4_stupid_backoff.json",
+    "extensions/results/tuning_43_3_1_add_k.json": "extensions/results/tuning/tuning_43_3_1_add_k.json",
+    "extensions/results/tuning_43_3_1_interpolation.json": "extensions/results/tuning/tuning_43_3_1_interpolation.json",
+    "extensions/results/tuning_43_3_1_kneser_ney.json": "extensions/results/tuning/tuning_43_3_1_kneser_ney.json",
+    "extensions/results/tuning_43_3_1_laplace.json": "extensions/results/tuning/tuning_43_3_1_laplace.json",
+    "extensions/results/tuning_43_3_1_stupid_backoff.json": "extensions/results/tuning/tuning_43_3_1_stupid_backoff.json",
+    "extensions/results/tuning_43_3_2_add_k.json": "extensions/results/tuning/tuning_43_3_2_add_k.json",
+    "extensions/results/tuning_43_3_2_interpolation.json": "extensions/results/tuning/tuning_43_3_2_interpolation.json",
+    "extensions/results/tuning_43_3_2_kneser_ney.json": "extensions/results/tuning/tuning_43_3_2_kneser_ney.json",
+    "extensions/results/tuning_43_3_2_laplace.json": "extensions/results/tuning/tuning_43_3_2_laplace.json",
+    "extensions/results/tuning_43_3_2_stupid_backoff.json": "extensions/results/tuning/tuning_43_3_2_stupid_backoff.json",
+    "extensions/results/tuning_43_3_3_add_k.json": "extensions/results/tuning/tuning_43_3_3_add_k.json",
+    "extensions/results/tuning_43_3_3_interpolation.json": "extensions/results/tuning/tuning_43_3_3_interpolation.json",
+    "extensions/results/tuning_43_3_3_kneser_ney.json": "extensions/results/tuning/tuning_43_3_3_kneser_ney.json",
+    "extensions/results/tuning_43_3_3_laplace.json": "extensions/results/tuning/tuning_43_3_3_laplace.json",
+    "extensions/results/tuning_43_3_3_stupid_backoff.json": "extensions/results/tuning/tuning_43_3_3_stupid_backoff.json",
+    "extensions/results/tuning_43_3_4_add_k.json": "extensions/results/tuning/tuning_43_3_4_add_k.json",
+    "extensions/results/tuning_43_3_4_interpolation.json": "extensions/results/tuning/tuning_43_3_4_interpolation.json",
+    "extensions/results/tuning_43_3_4_kneser_ney.json": "extensions/results/tuning/tuning_43_3_4_kneser_ney.json",
+    "extensions/results/tuning_43_3_4_laplace.json": "extensions/results/tuning/tuning_43_3_4_laplace.json",
+    "extensions/results/tuning_43_3_4_stupid_backoff.json": "extensions/results/tuning/tuning_43_3_4_stupid_backoff.json",
+    "extensions/results/tuning_44_2_1_add_k.json": "extensions/results/tuning/tuning_44_2_1_add_k.json",
+    "extensions/results/tuning_44_2_1_interpolation.json": "extensions/results/tuning/tuning_44_2_1_interpolation.json",
+    "extensions/results/tuning_44_2_1_kneser_ney.json": "extensions/results/tuning/tuning_44_2_1_kneser_ney.json",
+    "extensions/results/tuning_44_2_1_laplace.json": "extensions/results/tuning/tuning_44_2_1_laplace.json",
+    "extensions/results/tuning_44_2_1_stupid_backoff.json": "extensions/results/tuning/tuning_44_2_1_stupid_backoff.json",
+    "extensions/results/tuning_44_2_2_add_k.json": "extensions/results/tuning/tuning_44_2_2_add_k.json",
+    "extensions/results/tuning_44_2_2_interpolation.json": "extensions/results/tuning/tuning_44_2_2_interpolation.json",
+    "extensions/results/tuning_44_2_2_kneser_ney.json": "extensions/results/tuning/tuning_44_2_2_kneser_ney.json",
+    "extensions/results/tuning_44_2_2_laplace.json": "extensions/results/tuning/tuning_44_2_2_laplace.json",
+    "extensions/results/tuning_44_2_2_stupid_backoff.json": "extensions/results/tuning/tuning_44_2_2_stupid_backoff.json",
+    "extensions/results/tuning_44_2_3_add_k.json": "extensions/results/tuning/tuning_44_2_3_add_k.json",
+    "extensions/results/tuning_44_2_3_interpolation.json": "extensions/results/tuning/tuning_44_2_3_interpolation.json",
+    "extensions/results/tuning_44_2_3_kneser_ney.json": "extensions/results/tuning/tuning_44_2_3_kneser_ney.json",
+    "extensions/results/tuning_44_2_3_laplace.json": "extensions/results/tuning/tuning_44_2_3_laplace.json",
+    "extensions/results/tuning_44_2_3_stupid_backoff.json": "extensions/results/tuning/tuning_44_2_3_stupid_backoff.json",
+    "extensions/results/tuning_44_2_4_add_k.json": "extensions/results/tuning/tuning_44_2_4_add_k.json",
+    "extensions/results/tuning_44_2_4_interpolation.json": "extensions/results/tuning/tuning_44_2_4_interpolation.json",
+    "extensions/results/tuning_44_2_4_kneser_ney.json": "extensions/results/tuning/tuning_44_2_4_kneser_ney.json",
+    "extensions/results/tuning_44_2_4_laplace.json": "extensions/results/tuning/tuning_44_2_4_laplace.json",
+    "extensions/results/tuning_44_2_4_stupid_backoff.json": "extensions/results/tuning/tuning_44_2_4_stupid_backoff.json",
+    "extensions/results/tuning_44_3_1_add_k.json": "extensions/results/tuning/tuning_44_3_1_add_k.json",
+    "extensions/results/tuning_44_3_1_interpolation.json": "extensions/results/tuning/tuning_44_3_1_interpolation.json",
+    "extensions/results/tuning_44_3_1_kneser_ney.json": "extensions/results/tuning/tuning_44_3_1_kneser_ney.json",
+    "extensions/results/tuning_44_3_1_laplace.json": "extensions/results/tuning/tuning_44_3_1_laplace.json",
+    "extensions/results/tuning_44_3_1_stupid_backoff.json": "extensions/results/tuning/tuning_44_3_1_stupid_backoff.json",
+    "extensions/results/tuning_44_3_2_add_k.json": "extensions/results/tuning/tuning_44_3_2_add_k.json",
+    "extensions/results/tuning_44_3_2_interpolation.json": "extensions/results/tuning/tuning_44_3_2_interpolation.json",
+    "extensions/results/tuning_44_3_2_kneser_ney.json": "extensions/results/tuning/tuning_44_3_2_kneser_ney.json",
+    "extensions/results/tuning_44_3_2_laplace.json": "extensions/results/tuning/tuning_44_3_2_laplace.json",
+    "extensions/results/tuning_44_3_2_stupid_backoff.json": "extensions/results/tuning/tuning_44_3_2_stupid_backoff.json",
+    "extensions/results/tuning_44_3_3_add_k.json": "extensions/results/tuning/tuning_44_3_3_add_k.json",
+    "extensions/results/tuning_44_3_3_interpolation.json": "extensions/results/tuning/tuning_44_3_3_interpolation.json",
+    "extensions/results/tuning_44_3_3_kneser_ney.json": "extensions/results/tuning/tuning_44_3_3_kneser_ney.json",
+    "extensions/results/tuning_44_3_3_laplace.json": "extensions/results/tuning/tuning_44_3_3_laplace.json",
+    "extensions/results/tuning_44_3_3_stupid_backoff.json": "extensions/results/tuning/tuning_44_3_3_stupid_backoff.json",
+    "extensions/results/tuning_44_3_4_add_k.json": "extensions/results/tuning/tuning_44_3_4_add_k.json",
+    "extensions/results/tuning_44_3_4_interpolation.json": "extensions/results/tuning/tuning_44_3_4_interpolation.json",
+    "extensions/results/tuning_44_3_4_kneser_ney.json": "extensions/results/tuning/tuning_44_3_4_kneser_ney.json",
+    "extensions/results/tuning_44_3_4_laplace.json": "extensions/results/tuning/tuning_44_3_4_laplace.json",
+    "extensions/results/tuning_44_3_4_stupid_backoff.json": "extensions/results/tuning/tuning_44_3_4_stupid_backoff.json",
+    "extensions/results/split_42.json": "extensions/results/splits/split_42.json",
+    "extensions/results/split_43.json": "extensions/results/splits/split_43.json",
+    "extensions/results/split_44.json": "extensions/results/splits/split_44.json",
+    ".tmp/build.log": "verifikasi/logs/build.log",
+    ".tmp/git-diff-check.log": "verifikasi/logs/git-diff-check.log",
+    ".tmp/git-final.log": "verifikasi/logs/git-final.log",
+    ".tmp/source.diff": "verifikasi/logs/source.diff"
+  },
+  "preserved_results": [
+    {
+      "original": "core/results/corpus.png",
+      "current": "core/results/corpus.png",
+      "sha256": "f891f5a373126f684fca8fc354dee588076b2c0dc02e401bfd5d55af32d6eb32"
+    },
+    {
+      "original": "core/results/metrics.json",
+      "current": "core/results/metrics.json",
+      "sha256": "dc05cb0db4acdfb21b9c289b68c21dbe87352727d6180c09d240f98934608973"
+    },
+    {
+      "original": "core/results/perplexity.png",
+      "current": "core/results/perplexity.png",
+      "sha256": "b995207635c270451f8fbcf2e707750c86f97f544beb312449fccc27df3f230c"
+    },
+    {
+      "original": "core/results/split.json",
+      "current": "core/results/split.json",
+      "sha256": "0706c019987a99f10753c4c07f6d5974b511b675d3670ed967c63eb4a117f1c4"
+    },
+    {
+      "original": "core/results/SUMMARY.md",
+      "current": "core/results/SUMMARY.md",
+      "sha256": "e65dc8e31d46343652b60693c2b71b6feeef409d4bb7e151c12680ae2844d1e9"
+    },
+    {
+      "original": "extensions/results/analysis_model.json",
+      "current": "extensions/results/analysis_model.json",
+      "sha256": "4c8218e5d47c72ade9f61be704b144318f774d1a11310f37b4afc043cfc927ee"
+    },
+    {
+      "original": "extensions/results/error_ngram.csv",
+      "current": "extensions/results/error_ngram.csv",
+      "sha256": "c2e5296b528fde423cd7649efdadc63aa452dc6439939a857a194bc6e0fa5442"
+    },
+    {
+      "original": "extensions/results/error_token.csv",
+      "current": "extensions/results/error_token.csv",
+      "sha256": "02c4c09cc7c451837734566dfd44a4008d50472448b3211ac40d63bdcf583dbb"
+    },
+    {
+      "original": "extensions/results/experiments.csv",
+      "current": "extensions/results/experiments.csv",
+      "sha256": "1eb91c0b45c3436bc11bc07c028a34c65c6d7251eaf29039d4e52d8574f363ba"
+    },
+    {
+      "original": "extensions/results/generated.json",
+      "current": "extensions/results/generated.json",
+      "sha256": "9b505e99a6f9355de146046690e687995fd251ecf374a931cca004b8db78cf6e"
+    },
+    {
+      "original": "extensions/results/generation.png",
+      "current": "extensions/results/generation.png",
+      "sha256": "5890609fa2473bc3c6ba58d59b27fad46b6c5fdcfd3dc61a46d7e284c13a9acc"
+    },
+    {
+      "original": "extensions/results/generation_metrics.csv",
+      "current": "extensions/results/generation_metrics.csv",
+      "sha256": "3c4d9ee57401b3e1b0d4a15fcd1962fd1e084953a599eb091fb904a2d4777732"
+    },
+    {
+      "original": "extensions/results/heatmap.png",
+      "current": "extensions/results/heatmap.png",
+      "sha256": "0d52751ebc25e7b853b9e137e81b327ae09b2741b2ca71c6ae1830fc455d62b9"
+    },
+    {
+      "original": "extensions/results/length_perplexity.csv",
+      "current": "extensions/results/length_perplexity.csv",
+      "sha256": "9a2e55354368f1ed6e5571866e6c3ff1e7c0e9fedb279a4c4d10a500edc194ac"
+    },
+    {
+      "original": "extensions/results/length_perplexity.png",
+      "current": "extensions/results/length_perplexity.png",
+      "sha256": "27cd2fc9c0d4362a6e86b0f7e1896a620ec25a04153acc2f7b08eda1f4e6350d"
+    },
+    {
+      "original": "extensions/results/manifest.json",
+      "current": "extensions/results/manifest.json",
+      "sha256": "2442337d0e0657b6a839177d0b894f0e64107d23330fa325c8f6f30b181c14c8"
+    },
+    {
+      "original": "extensions/results/nltk_comparison.json",
+      "current": "extensions/results/nltk_comparison.json",
+      "sha256": "3a215a62d546c2e440a752533523cb82d6f2cdf42d44ce143f542a2617f70262"
+    },
+    {
+      "original": "extensions/results/phase21.csv",
+      "current": "extensions/results/phase21.csv",
+      "sha256": "09174fb8733d97bc7fc55b5832efabd823fd058606363e9a9c0dc8501a862e2d"
+    },
+    {
+      "original": "extensions/results/profile.csv",
+      "current": "extensions/results/profile.csv",
+      "sha256": "062f54a3199ff6ceba8a628df83bf25324a3d14d49826fec13faff06ada1847a"
+    },
+    {
+      "original": "extensions/results/profile.png",
+      "current": "extensions/results/profile.png",
+      "sha256": "5b33f384eb2a2b81d79bddb02d87d330df061eb6d10f08269005303410bf6757"
+    },
+    {
+      "original": "extensions/results/sentence_perplexity.csv",
+      "current": "extensions/results/sentence_perplexity.csv",
+      "sha256": "6a2c34887a643c4e061508a4db4d282e7ff54070946760a6dc424a7346af8301"
+    },
+    {
+      "original": "extensions/results/split_42.json",
+      "current": "extensions/results/splits/split_42.json",
+      "sha256": "bc8c193ca92cd968af7cbbae4c6c59c89f1291bb411ab5fef87b29a73a89e007"
+    },
+    {
+      "original": "extensions/results/split_43.json",
+      "current": "extensions/results/splits/split_43.json",
+      "sha256": "227f7358b46076ec23c72097a7e0c9e8d345b7ac3b4e925b441274dbe82911bf"
+    },
+    {
+      "original": "extensions/results/split_44.json",
+      "current": "extensions/results/splits/split_44.json",
+      "sha256": "0f50e61db36d90005176eff14fdef4706f877ab278768e2b7cb1dfd237067f0a"
+    },
+    {
+      "original": "extensions/results/summary.csv",
+      "current": "extensions/results/summary.csv",
+      "sha256": "a58b84625aa6a92429e4f6ecd36421cf97257934ecd58f1c2b8cfc001bdaf5c1"
+    },
+    {
+      "original": "extensions/results/top20_clean_words.csv",
+      "current": "extensions/results/top20_clean_words.csv",
+      "sha256": "ea3a0f7cfdcf861a06ef6a60404bf29f373523e004ca3aeba7adc2684f0cadcd"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_1_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_2_1_add_k.json",
+      "sha256": "864f40d0100c99d776126c40ef67c54bbcc80bc916ade0686d3263a94dc9e551"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_1_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_2_1_interpolation.json",
+      "sha256": "800b3bc61ca0a0f0481a725d1c089d447802af4abea33170de095f290b96a13c"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_1_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_2_1_kneser_ney.json",
+      "sha256": "b58bbade3769fdc278b654b39b68897c582dc538090474f9b6da3d5e6453f9fa"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_1_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_2_1_laplace.json",
+      "sha256": "8e284e9514b9a88bd3061d9ba4ccbacfd751128ed73bfdab9c026311e2e24677"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_1_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_2_1_stupid_backoff.json",
+      "sha256": "ddac834045b11639e8ee50fd69e2bdfc60c396b3407cff143c000580305ae036"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_2_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_2_2_add_k.json",
+      "sha256": "98a98fb5508e186c532b312bde9efc35d768df297731b12cb53bf6bf71c4a8a8"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_2_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_2_2_interpolation.json",
+      "sha256": "62bc4bdab636f03f8557c33ed72673021b629b499fc2034d08a5a550dfefc75a"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_2_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_2_2_kneser_ney.json",
+      "sha256": "14c5964247f5c7bed92a6372ca13f904b38284ab92118414f7eed9ba0b9243bd"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_2_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_2_2_laplace.json",
+      "sha256": "24d5c56687218f1840bce810e27b074aa31215e58280c99f6235e6225d6ac9bc"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_2_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_2_2_stupid_backoff.json",
+      "sha256": "e3b7fe687d4e6e52224178945c201f13571ced767999959c4d04dce68f2ad0f6"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_3_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_2_3_add_k.json",
+      "sha256": "0ab8f92f42eb6b2e10e31a75cbaa3c72181b1aafb7b3f16186bdfa731259e053"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_3_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_2_3_interpolation.json",
+      "sha256": "2d5f2a0c77af6db888e2fe174cca45a3fa7fec49aae8398a8b250fc812b2e6a3"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_3_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_2_3_kneser_ney.json",
+      "sha256": "f411b3f488f4627a22f1e4610d3099ea1c79b51f4308fe0fe3d76775606979f4"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_3_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_2_3_laplace.json",
+      "sha256": "50bc89a0e6092172c14763c5180649ad5e4fe5cb0501d278cde7b410c992347a"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_3_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_2_3_stupid_backoff.json",
+      "sha256": "615fdc23d1aeb70318d299b07acf500c7afdc95875f26106af761cbd16a1add5"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_4_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_2_4_add_k.json",
+      "sha256": "02a7aa12baabfda1065344c64e7f89c2971ce5220d074205124284d0fd13007b"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_4_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_2_4_interpolation.json",
+      "sha256": "b45f2a6f7d58dfa64b46ff07d7600c2bc980180a1b71a8e83f470f9ff41f7021"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_4_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_2_4_kneser_ney.json",
+      "sha256": "f2846a34c5357bab3095575df7f9cc303ec5edd3e251cb2fc7e4538d37ad581a"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_4_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_2_4_laplace.json",
+      "sha256": "a251a68bc15dc44439dcf08a6b3801d9bd8071a7f11e43d177e40509addbaad5"
+    },
+    {
+      "original": "extensions/results/tuning_42_2_4_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_2_4_stupid_backoff.json",
+      "sha256": "3119fd307ad933dd66d037bfc403b9600f9feddb8d681c60fb41347323790249"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_1_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_3_1_add_k.json",
+      "sha256": "4ac3bf946bfb38973e63ff57e8e1dfe36037a53f332c2c78d7e4a311752185a5"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_1_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_3_1_interpolation.json",
+      "sha256": "9c0d8fab30ec17b0e93d362b1b58130bf3d03448213887e74c2d1fc464274d3d"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_1_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_3_1_kneser_ney.json",
+      "sha256": "c7ba2c9625e638ecf6b22cb3f1e05a2f270fdba4694c4bedcc2db8d6947b99bf"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_1_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_3_1_laplace.json",
+      "sha256": "5166005d8c341b714c17fd7879a3d7781c5a57e5310cbbf1ec8889ca2c93b81e"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_1_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_3_1_stupid_backoff.json",
+      "sha256": "c980d46f1848d6e21e5d5dd339671a9fbf3ecf9ad60da31bebc8701fc97d2089"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_2_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_3_2_add_k.json",
+      "sha256": "962ce53539bdbbca0e1022eabb3a4712de885ac0ec44dc12a22c1f007300fc8a"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_2_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_3_2_interpolation.json",
+      "sha256": "1848b82c3f947aeebfa2122c8c6bef027e1e620f893fa8b780341e8c593dd265"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_2_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_3_2_kneser_ney.json",
+      "sha256": "c4f8d47fa0a48e1b862435484abd4d52d696698dde8d7635bb90adaf1ab67f4d"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_2_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_3_2_laplace.json",
+      "sha256": "212661c37b6e48cda0c4c1aa94039b3c7572b8570ccf97576bdc97f765cebd8d"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_2_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_3_2_stupid_backoff.json",
+      "sha256": "6d451b6f7d8b439ae1f156e7c5aed06a0aa359b90f96f9e37d9d8a1f657c82c4"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_3_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_3_3_add_k.json",
+      "sha256": "8fa7a92b14c985d395b25fa90cbba214e9dfd4bacba7ddde4acdf31743a9282a"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_3_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_3_3_interpolation.json",
+      "sha256": "03bfa953e2f365c044b999c8b9ed741d18f8e00647b9f0895d8a5a71fd1c6e3c"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_3_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_3_3_kneser_ney.json",
+      "sha256": "483b6d626ff7af650b89f67d1af2825399e17d966eb4c78f1422ecb6864a5808"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_3_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_3_3_laplace.json",
+      "sha256": "febaf8ba9833802d3502c9889e539ce4f7664c448df620974c2586db9a464ec2"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_3_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_3_3_stupid_backoff.json",
+      "sha256": "bf58b9f3435cb0c09c10aa36aac606ee0f12d29df270c06ad15f98258555b00a"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_4_add_k.json",
+      "current": "extensions/results/tuning/tuning_42_3_4_add_k.json",
+      "sha256": "c624c32403b274c28aec7b26edc7ed55c55563f756058b6cb2d01824d056f9a1"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_4_interpolation.json",
+      "current": "extensions/results/tuning/tuning_42_3_4_interpolation.json",
+      "sha256": "c3244f1f10739f999d92ae0ce4ea851eba48b0fe8cb9704fea51feebd16e80ab"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_4_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_42_3_4_kneser_ney.json",
+      "sha256": "e83678579592c49b6bbd455e339117e86e57e263cfb5b9ae1e9eafa40c9055ad"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_4_laplace.json",
+      "current": "extensions/results/tuning/tuning_42_3_4_laplace.json",
+      "sha256": "7daa17b73b4a879fdca54b5e0c6892c08230886a2ce3ca2543507221b9ed6fe2"
+    },
+    {
+      "original": "extensions/results/tuning_42_3_4_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_42_3_4_stupid_backoff.json",
+      "sha256": "3ecb3214558e64ccffbf9305896ea3b80515dde79b20b100f7c2203c311ab722"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_1_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_2_1_add_k.json",
+      "sha256": "14a0d1343f8ffedd07e8ec01ef54825e7f450367293cae306d72ebf105732ccb"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_1_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_2_1_interpolation.json",
+      "sha256": "436959e2ff2d691ce054a7179ea5de3c974eb376288ed10356fe1fa41cebaf9e"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_1_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_2_1_kneser_ney.json",
+      "sha256": "c981340986b0ec9681cc1348e404de351bda9c4fba1a6645cb103d1e7abced7d"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_1_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_2_1_laplace.json",
+      "sha256": "4c3e76dc180ad48cd844747074d69d13e17dad0368df03f2c225a18543920bf5"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_1_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_2_1_stupid_backoff.json",
+      "sha256": "2643f28e85a80ab89b806b9b8c84737aa4fcb0d287a168e1978cd7fac4a0d891"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_2_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_2_2_add_k.json",
+      "sha256": "a36712c0e625a0af9c352964d95be1b73463343dc619a87ab93d423c0ea751ea"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_2_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_2_2_interpolation.json",
+      "sha256": "2d657ff67d8738d0a17bed25781c21f6f0bcfecf28495991ab359bd724152dad"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_2_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_2_2_kneser_ney.json",
+      "sha256": "fffae2012185285ab70f188f085c2b42da6297f9b94cf69d97b2974829a52e05"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_2_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_2_2_laplace.json",
+      "sha256": "33e376d2541ef92ddfc77250e8eb924c7dd6b23f25c8f69bef25273c635468e5"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_2_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_2_2_stupid_backoff.json",
+      "sha256": "37e5160de7f93c8476f031680eb246c0e34e89aa19f8fe82dceccf323646e4c1"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_3_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_2_3_add_k.json",
+      "sha256": "8c633fe65486bb7a85dbd524ab689e3d4db77726f42757e1c1390d716781f215"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_3_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_2_3_interpolation.json",
+      "sha256": "48626bc279a42706e1e79cae3be15c2323c6a175b2a5b6c5abbdb5198eb1b808"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_3_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_2_3_kneser_ney.json",
+      "sha256": "a2f2efb82731d329724f2e69832bd93bb866e1b70cb1cb09e2df05a43b37decc"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_3_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_2_3_laplace.json",
+      "sha256": "7b2ff6d80b756fc034d419a84bb79aad1cfcfe8d27e6982bed37e8ec4a802dbd"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_3_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_2_3_stupid_backoff.json",
+      "sha256": "c339d6e51c229b1d2a0c8e6302ce23ae8c4f7b1cdd5391265746c8d5058da107"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_4_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_2_4_add_k.json",
+      "sha256": "939987547b297197622f3d82eb9f45e0920daafe5a38c78caceccd2c4ed1eecd"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_4_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_2_4_interpolation.json",
+      "sha256": "23347d545168a3860e19d9b6c75345cc91bef33f34ced9a47edb708e9af12e47"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_4_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_2_4_kneser_ney.json",
+      "sha256": "a7d7ba6295caf6f6cb481570c0d87d9538306ea9724093e5336e6d13c2b8ccbc"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_4_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_2_4_laplace.json",
+      "sha256": "857b4cce01af4570202c2321c9ad2583795b01995b9765f67b69db30214be746"
+    },
+    {
+      "original": "extensions/results/tuning_43_2_4_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_2_4_stupid_backoff.json",
+      "sha256": "29a298c9926890daabbf33b098db1f1c55d244e0666d1c8912c163bd50f5aa7e"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_1_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_3_1_add_k.json",
+      "sha256": "0b916cdeb88988ee4aa804a3b5f9509bb095355cada5981e36de27b4a733a893"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_1_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_3_1_interpolation.json",
+      "sha256": "6de3019144c6824e879e1bdbb51c27a0db79f45899e5c33feada1014e04d6015"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_1_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_3_1_kneser_ney.json",
+      "sha256": "6c7f9a416e1193891912e6d332387fd23cae17bad2d44583522a23326aed2f09"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_1_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_3_1_laplace.json",
+      "sha256": "735134335521a591090d3fb550146ecd89d9fb4eeae210c1a2f92a091b140866"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_1_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_3_1_stupid_backoff.json",
+      "sha256": "a471eecb020b1a60aa9c1ab2e49af6724598a4b6a60d3e1ddf8af5f296f358f3"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_2_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_3_2_add_k.json",
+      "sha256": "5968dc58e73f4bc4cc275cb6f5210dcc92e02ff03475c4a69162df2cfde8c807"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_2_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_3_2_interpolation.json",
+      "sha256": "0b5732ecf396be8dc545c6f8d2fa14b7064b2edd36945d9717dfce3f9b222327"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_2_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_3_2_kneser_ney.json",
+      "sha256": "c4d596383ac240dee2ddfcf6343f6151a0e8be188d2e823c57632da42dbb4aad"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_2_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_3_2_laplace.json",
+      "sha256": "1aafbd2304962556d312c265fa76897465d40dbb775237bd6b09288dabd8dc1e"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_2_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_3_2_stupid_backoff.json",
+      "sha256": "0cd468056d9fefd42014cc8e86b6336da73fb78d8d43f791da45908a94d6f4d0"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_3_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_3_3_add_k.json",
+      "sha256": "79b390d59193cafa27f47bac660985ab438bb712c1ce799f93fb1c711e3908de"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_3_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_3_3_interpolation.json",
+      "sha256": "94b24501d556129623d694eba34ecf5f7de7b2b8ecf55bc19a9822dc5d87b748"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_3_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_3_3_kneser_ney.json",
+      "sha256": "fbb8b4ca18b7b158ceb0e12b797ece7e28b856e00c2c42d90f04d0a563f9fa58"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_3_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_3_3_laplace.json",
+      "sha256": "918d44115b61dafb904c8ccf051116b1b336ac3ac7007e57a64f9319405d482e"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_3_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_3_3_stupid_backoff.json",
+      "sha256": "e366cdf053c19bee7da75d37a85b0f2f66785c25278f594220ca8a66db5b8d0c"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_4_add_k.json",
+      "current": "extensions/results/tuning/tuning_43_3_4_add_k.json",
+      "sha256": "af24d580a8e1ef93d83fd1a6afae586de05752a4beae258c269c139432a8a8c9"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_4_interpolation.json",
+      "current": "extensions/results/tuning/tuning_43_3_4_interpolation.json",
+      "sha256": "bc07cbb6c238911699c5beff210e229095cb7de07779b46f0afa47732ca2030b"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_4_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_43_3_4_kneser_ney.json",
+      "sha256": "4d8b86e5740da9d7d3903bf46b9b64a64e414e6402a5e9ae953ae02f5c8319c7"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_4_laplace.json",
+      "current": "extensions/results/tuning/tuning_43_3_4_laplace.json",
+      "sha256": "ca55392e7086e9b1a88431d1578aed953b0f7a05c2925c82064ccb8ef3b407bc"
+    },
+    {
+      "original": "extensions/results/tuning_43_3_4_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_43_3_4_stupid_backoff.json",
+      "sha256": "48b8625e2eeabe145e0945fb1fc1f25c1606ed82a5266f3e7c3ac08fe19d6dc3"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_1_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_2_1_add_k.json",
+      "sha256": "1a3eed6988bca73677c969b1fae3916085f2025782bb5f9c962c1a89139ac98d"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_1_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_2_1_interpolation.json",
+      "sha256": "92fd832e74f61f20c846342d233b1de6c031672d274402b6abc7a069bb61b408"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_1_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_2_1_kneser_ney.json",
+      "sha256": "e38728880f20b0e272b9401b71cbc76842b28595e8d464c270962bd7e28670ef"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_1_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_2_1_laplace.json",
+      "sha256": "f2de278b4c70c87ccfb1f17c38f21c382f94f01c8915a1c63f7a996c4b798ece"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_1_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_2_1_stupid_backoff.json",
+      "sha256": "8073128cdaeceee4f2c331a5f7e19822213faec7e9c5252514eb664b82289e9e"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_2_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_2_2_add_k.json",
+      "sha256": "1c1244632287881619fde2408aee01d2ad115fa05c328f924d9d391654574a0e"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_2_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_2_2_interpolation.json",
+      "sha256": "525c58fb9966ecabbdc711dcb3c4e46ab765b31fb070bb8aa7ffb386729392a4"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_2_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_2_2_kneser_ney.json",
+      "sha256": "e23d3391c2bbf98afd8982ada315fa34e8621a0970dbab46aba5c4acac25104d"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_2_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_2_2_laplace.json",
+      "sha256": "85dc0d331e8e3b9fba2f1e6bdc1dd90853b6c85711740e8f0bf4b120d19dfbae"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_2_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_2_2_stupid_backoff.json",
+      "sha256": "44b54e9893fa8264c16f867144833d712027ad9d603023a69c99f89799648ec8"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_3_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_2_3_add_k.json",
+      "sha256": "0c7634675442bca5bcbb6334bb099940a0d5caeef45c5765c14e4bd84eb4aad5"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_3_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_2_3_interpolation.json",
+      "sha256": "aa5e406a651d80de7cd3a97f85f158e4397da36157e271a69aa76cc670f7aa75"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_3_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_2_3_kneser_ney.json",
+      "sha256": "35620383d03176069fafc26d99b2eac4ff3eeedc354a5bf53a87fb1d9b223856"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_3_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_2_3_laplace.json",
+      "sha256": "1b1cde15fb4e95bdcb465400a1282d9d0df89c92a22adae56270b9b98fd0c099"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_3_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_2_3_stupid_backoff.json",
+      "sha256": "fb460ee1130a199ab657fad0312ebd42f320a5568eb9f6ce7515e126b84359fc"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_4_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_2_4_add_k.json",
+      "sha256": "2a38859a87a370598c7fae2dbd2f7255f7b0ed11221fa7139de541d9e2ee24bc"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_4_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_2_4_interpolation.json",
+      "sha256": "c48fbd3d13e729928bacb863463bc67a396e9be6cd0a7237515b9aacdd6748f6"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_4_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_2_4_kneser_ney.json",
+      "sha256": "f6750cc96196be11b9690efdfc0d6db98460deb2884a28ae3c7f79811af8cd2f"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_4_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_2_4_laplace.json",
+      "sha256": "e74a90d2a42747b3b13d4a9ceeef352f68883e4c8fb975088fd104a4188f0421"
+    },
+    {
+      "original": "extensions/results/tuning_44_2_4_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_2_4_stupid_backoff.json",
+      "sha256": "ee7a36f8ef7d64ef8a65b0e3a9ad8fec46f1a3526b7fc4062a54a00fb464e042"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_1_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_3_1_add_k.json",
+      "sha256": "f2245fd0e3d3893aee6624d1cd634e09019094e7e9ab46eb455e4691daf5b3e9"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_1_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_3_1_interpolation.json",
+      "sha256": "b76d1b06b59b153d1b435271e677b51fbf05fae2fb2d58856d03c682c5712f7c"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_1_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_3_1_kneser_ney.json",
+      "sha256": "490eb4d931827cf3177c93130badffa315f0f4d2d7f1510c3072535fd005c239"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_1_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_3_1_laplace.json",
+      "sha256": "bd075cddb7eeddc30502bc8121d00857b3d2c6a34fe78571ede68d129b4a4033"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_1_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_3_1_stupid_backoff.json",
+      "sha256": "30e3c131435da195b31d82b7519f18cb5b5b8d994cbda4bd8f15c158a09286d0"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_2_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_3_2_add_k.json",
+      "sha256": "f17db9f1da23e8c8a0d89aba523130c9667966e66ba9eec1c4be5af6bd4c8e86"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_2_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_3_2_interpolation.json",
+      "sha256": "450ae92c4a82c991bc046fb99bea29d99621db5a2b4399e3cb53e573cea64f1f"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_2_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_3_2_kneser_ney.json",
+      "sha256": "555b6acb626a3a53f61c34f4aa4e5b27837d2c9f494dd26204d0c1012f1e87b2"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_2_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_3_2_laplace.json",
+      "sha256": "4458d944e27eae397e48aa4b13b38061bb5fcfeff337dd4f9883bacc8133372a"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_2_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_3_2_stupid_backoff.json",
+      "sha256": "8ea54ba00ad416d32ddc6fcf405da7925a41f614d258447bcd25acf8760d7f79"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_3_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_3_3_add_k.json",
+      "sha256": "37c643bb0628630941a0eaaf0b6a203cc6eb979d9d5dd114265797829c369e89"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_3_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_3_3_interpolation.json",
+      "sha256": "1451422260721c408281da130533c422de0d45bedc0df4c0eba5901067908126"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_3_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_3_3_kneser_ney.json",
+      "sha256": "cf3b68f3e97aab648b1dc25f4c7a236b096a728463612fb7f6e0253d5fcdfd96"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_3_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_3_3_laplace.json",
+      "sha256": "c68ed9e0408dba0ea799444965458d9b47aef6508e35b3cc7282c4d2c0622652"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_3_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_3_3_stupid_backoff.json",
+      "sha256": "467240d5cf3c6401db01c395fe2c4f72fc3f3e08c2d170da55f092535db19f5f"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_4_add_k.json",
+      "current": "extensions/results/tuning/tuning_44_3_4_add_k.json",
+      "sha256": "867d6f1a3c2afa74c76abc9e2120a3a939b9bdaeb3d36dfeff57fb319199f2a6"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_4_interpolation.json",
+      "current": "extensions/results/tuning/tuning_44_3_4_interpolation.json",
+      "sha256": "fbe1463a9e597f4894891e5661c2aa2f56c182ffb59f806469ab57e47f0515c5"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_4_kneser_ney.json",
+      "current": "extensions/results/tuning/tuning_44_3_4_kneser_ney.json",
+      "sha256": "58cf0676f332b9f19588d7e89c63fdb9df2f430bbc268596c0c115160c2ebd69"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_4_laplace.json",
+      "current": "extensions/results/tuning/tuning_44_3_4_laplace.json",
+      "sha256": "3c590bd87f6f540adb849339df37b3256f69dabe88027aaad86ae03c410a055d"
+    },
+    {
+      "original": "extensions/results/tuning_44_3_4_stupid_backoff.json",
+      "current": "extensions/results/tuning/tuning_44_3_4_stupid_backoff.json",
+      "sha256": "b0a052a90da3e85a9acce464db2055a745ff45121a84fb7885a5548b2a72c3f5"
+    },
+    {
+      "original": "core/ngram_lm.ipynb",
+      "current": "core/ngram_lm.ipynb",
+      "sha256": "30f01d7d43aa587d8e78d2c9db925912c23ce1009d69d38e8eb6f23fd26b4084"
+    },
+    {
+      "original": "dist/ngram_assignment-0.1.0-py3-none-any.whl",
+      "current": "hasil_build/sebelum_perapihan/ngram_assignment-0.1.0-py3-none-any.whl",
+      "sha256": "8ad276abe887efc8f6ca58ad63b22456bc30a8fde7ba517c9278099e674e12af"
+    },
+    {
+      "original": "dist/ngram_assignment-0.1.0.tar.gz",
+      "current": "hasil_build/sebelum_perapihan/ngram_assignment-0.1.0.tar.gz",
+      "sha256": "920e7f874b9b651ec591db344dba583a62be131c3d0cfdff9a0e9ee91689cbb3"
+    },
+    {
+      "original": "verification/checks.json",
+      "current": "verifikasi/checks.json",
+      "sha256": "3f98ac0daa2e768afe923344dd724a957dbabe72407424df2d5623bbbbd76dc6"
+    },
+    {
+      "original": "verification/core_manifest.json",
+      "current": "verifikasi/core_manifest.json",
+      "sha256": "daa1d8a9f2dc6fc23e5ecb68dd39e66e3a9c850ede6a14f4c88354b0f3e45f62"
+    },
+    {
+      "original": ".tmp/cli_model.json.gz",
+      "current": "extensions/results/models/ngram_trigram_kneser_ney.json.gz",
+      "sha256": "74c623b547bd5b67a6e3ac14d2fc41d7a608883e0845619970abf01781bbd55f"
+    },
+    {
+      "original": ".tmp/wheel-site/smoke_model.json.gz",
+      "current": "extensions/results/models/ngram_mini_smoke_test.json.gz",
+      "sha256": "8cad2d6101a4bc63265493f80fe3f7d5910e04b550a2edda70e9f5f449f3b7ae"
+    },
+    {
+      "original": ".tmp/build.log",
+      "current": "verifikasi/logs/build.log",
+      "sha256": "44834a58425830df25fa9575394349732ef9e6ce6888d8175b1e221fba5e1c3d"
+    },
+    {
+      "original": ".tmp/git-diff-check.log",
+      "current": "verifikasi/logs/git-diff-check.log",
+      "sha256": "49f37afe81b158825e9593bb61cf097bf8cf363b16d5ae5ba890ecf85c31a95f"
+    },
+    {
+      "original": ".tmp/git-final.log",
+      "current": "verifikasi/logs/git-final.log",
+      "sha256": "49f37afe81b158825e9593bb61cf097bf8cf363b16d5ae5ba890ecf85c31a95f"
+    },
+    {
+      "original": ".tmp/source.diff",
+      "current": "verifikasi/logs/source.diff",
+      "sha256": "beb748537db7d3c548cbcf378b94623e4bc315e48780d1a78b3aba66d16384bb"
+    }
+  ]
+}

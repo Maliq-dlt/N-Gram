@@ -1,0 +1,3 @@
+jenis,indeks_kalimat,kata_asli,count_train,sebelum,sesudah
+singleton train,4262,meddle,1,every opportunity to meddle in the congo,every opportunity to <UNK> in the congo
+OOV test,11503,navigable,0,a body of navigable water boats were,a body of <UNK> water boats were

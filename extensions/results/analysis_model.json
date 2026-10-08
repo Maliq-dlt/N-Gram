@@ -1,0 +1,10 @@
+{
+  "selection": "minimum dev_loss, seed=42/min_count=2, normalized methods only",
+  "n": 4,
+  "method": "kneser_ney",
+  "parameters": {
+    "discount": 0.9
+  },
+  "dev_loss": 5.7792647297663,
+  "test_pp_from_final_table": 327.772930919238
+}

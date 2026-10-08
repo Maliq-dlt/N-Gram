@@ -1,0 +1,17 @@
+langkah,topik,status,bukti,sel_kode_utama
+1,Load corpus,LULUS,Corpus dan hash,2
+2,Explore corpus,LULUS,Statistik/top-20/histogram/Zipf utama,3
+3,Preprocessing,LULUS,Contoh preprocessing utama,4
+4,Split,LULUS,Indeks split identik,5
+5,Boundary,LULUS,Padding model dan corpus mini,6
+6,Unknown words,LULUS,contoh_unk.csv,7
+7,Generate n-grams,LULUS,Contoh n-gram utama dan assert,8
+8,Count n-grams,LULUS,Counter event train,9
+9,MLE,LULUS,perhitungan_token.csv,10
+10,Next-word prediction,LULUS,prediksi_perbandingan.csv,11
+11,Sentence probability,LULUS,perhitungan_kalimat.csv,12
+12,Log probability,LULUS,underflow_token.csv,13
+13,Zero frequency,LULUS,Unseen rate dan count nol,14
+14,Laplace,LULUS,Normalisasi penuh dan numerator/denominator,15
+15,Perplexity,LULUS,perplexity_verifikasi.csv,16
+16,Text generation,LULUS,generasi_perbandingan.csv dan generasi_token.csv,17

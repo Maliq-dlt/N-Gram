@@ -1,0 +1,56 @@
+[project]
+name = "ngram-assignment"
+version = "0.1.0"
+description = "N-gram language modeling assignment and reproducible smoothing experiments"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = [
+    "matplotlib>=3.11.2",
+    "nltk>=3.10.3",
+    "numpy>=2.4.6",
+    "pandas>=3.0.6",
+    "pyyaml>=6.0.3",
+]
+
+[tool.pytest.ini_options]
+pythonpath = ["."]
+testpaths = ["core/tests", "extensions/tests"]
+cache_dir = ".cache/pytest"
+addopts = "--basetemp=.tmp/pytest"
+
+[tool.ruff]
+line-length = 100
+cache-dir = ".cache/ruff"
+
+[tool.ruff.lint]
+select = ["E", "F", "I"]
+
+[dependency-groups]
+dev = [
+    "build>=1.6.1",
+    "ipykernel>=7.4.0",
+    "nbclient>=0.11.0",
+    "nbformat>=5.11.1",
+    "pytest>=9.1.1",
+    "ruff>=0.16.10",
+    "setuptools>=84.0.0",
+    "ty>=0.0.84",
+]
+
+[tool.ruff.lint.per-file-ignores]
+# Notebook bootstrap sets cache paths before scientific imports.
+"*.ipynb" = ["E501", "E402"]
+
+[build-system]
+requires = ["setuptools>=68"]
+build-backend = "setuptools.build_meta"
+
+[project.scripts]
+ngram-lm = "extensions.src.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["."]
+include = ["core", "core.src", "extensions", "extensions.src", "extensions.experiments"]
+
+[tool.setuptools.package-data]
+extensions = ["config.yaml"]
