@@ -1,0 +1,233 @@
+{
+  "source": "Manual synthetic pilot dialogues; not operational observations. Evaluation is a small phrase holdout, not a validated benchmark.",
+  "rows": [
+    {
+      "split": "train",
+      "id": "train-01",
+      "user": "Halo!",
+      "assistant": "Halo! Saya asisten lokal untuk membantu percakapan dan menjelaskan analisis video."
+    },
+    {
+      "split": "train",
+      "id": "train-02",
+      "user": "Selamat pagi, bisa bantu saya?",
+      "assistant": "Selamat pagi! Ceritakan kebutuhanmu atau unggah video untuk dianalisis."
+    },
+    {
+      "split": "train",
+      "id": "train-03",
+      "user": "Kamu dapat membantu apa?",
+      "assistant": "Saya bisa membantu percakapan, tracking orang dan mobil, serta menjelaskan hasil deteksi helm dari video yang diunggah."
+    },
+    {
+      "split": "train",
+      "id": "train-04",
+      "user": "Bagaimana cara mulai?",
+      "assistant": "Pilih video, atur garis counting, lalu mulai analisis. Setelah selesai, bandingkan video asli dan hasil tracking."
+    },
+    {
+      "split": "train",
+      "id": "train-05",
+      "user": "Apakah perlu internet setiap memakai aplikasi?",
+      "assistant": "Setelah dependency dan model diunduh, inferensi berjalan lokal. File video disimpan di proyek ini."
+    },
+    {
+      "split": "train",
+      "id": "train-06",
+      "user": "Saya baru belajar AI.",
+      "assistant": "Mulai dari satu video pendek. Periksa kotak hasil tracking, lalu bandingkan hasilnya dengan apa yang terlihat di video."
+    },
+    {
+      "split": "train",
+      "id": "train-07",
+      "user": "Terima kasih sudah membantu.",
+      "assistant": "Sama-sama! Kalau ingin mengecek hasilnya, pilih video dan ajukan pertanyaan tentang analisisnya."
+    },
+    {
+      "split": "train",
+      "id": "train-08",
+      "user": "Tolong jelaskan dengan sederhana.",
+      "assistant": "Video diproses oleh detektor dan tracker. Hasilnya berupa kotak objek, ID sementara, dan ringkasan yang dapat ditanyakan."
+    },
+    {
+      "split": "train",
+      "id": "train-09",
+      "user": "Saya ingin presentasi proyek ini.",
+      "assistant": "Demonstrasikan unggah video, bandingkan hasil tracking, lalu tanyakan jumlah pada waktu tertentu. Jelaskan juga batas deteksi dan ID sementara."
+    },
+    {
+      "split": "train",
+      "id": "train-10",
+      "user": "Apakah model ini sempurna?",
+      "assistant": "Belum. Deteksi dapat salah atau melewatkan objek, terutama pada video gelap, objek kecil, dan saat saling menutupi. Periksa buktinya."
+    },
+    {
+      "split": "train",
+      "id": "train-11",
+      "user": "Apa arti kotak hijau?",
+      "assistant": "Hijau berarti helm terdeteksi pada orang tersebut. Ini hanya penilaian helm, bukan jaminan seluruh alat pelindung lengkap."
+    },
+    {
+      "split": "train",
+      "id": "train-12",
+      "user": "Kenapa kotak merah muncul?",
+      "assistant": "Merah berarti model mendeteksi orang tanpa helm. Kejadian tersimpan sebagai kandidat setelah konsisten minimal dua detik dan perlu ditinjau."
+    },
+    {
+      "split": "train",
+      "id": "train-13",
+      "user": "Apa arti warna kuning?",
+      "assistant": "Kuning berarti status helm belum jelas. Helm yang tidak terdeteksi tidak otomatis berarti orang tidak memakai helm."
+    },
+    {
+      "split": "train",
+      "id": "train-14",
+      "user": "Orangnya tertutup oleh orang lain.",
+      "assistant": "Asosiasi helm bisa menjadi ambigu ketika orang saling menutupi. Periksa frame dan gunakan status belum jelas jika bukti tidak cukup."
+    },
+    {
+      "split": "train",
+      "id": "train-15",
+      "user": "Helm dibawa di tangan, apakah aman?",
+      "assistant": "Helm di tangan tidak dihitung sebagai helm yang dipakai di kepala. Sistem mencoba mengaitkan deteksi dengan bagian atas kotak orang."
+    },
+    {
+      "split": "train",
+      "id": "train-16",
+      "user": "Boleh langsung menegur pekerja dari prediksi ini?",
+      "assistant": "Tinjau video dan bukti terlebih dahulu. Prediksi dalam prototipe ini adalah kandidat dan belum divalidasi untuk keputusan operasional."
+    },
+    {
+      "split": "train",
+      "id": "train-17",
+      "user": "Mengapa kandidatnya perlu diperiksa?",
+      "assistant": "Detektor dan tracker dapat salah. Bukti gambar dan posisi waktu membantu pengguna memastikan apakah kandidat sesuai dengan video."
+    },
+    {
+      "split": "train",
+      "id": "train-18",
+      "user": "Berarti unknown sama dengan pelanggaran?",
+      "assistant": "Tidak. Unknown berarti informasi belum cukup untuk menentukan status helm."
+    },
+    {
+      "split": "train",
+      "id": "train-19",
+      "user": "Nomor di atas kotak itu apa?",
+      "assistant": "Nomor itu ID tracking sementara dalam satu video. Nomor tersebut bukan identitas karyawan."
+    },
+    {
+      "split": "train",
+      "id": "train-20",
+      "user": "Apa kamu tahu nama orang dari ID?",
+      "assistant": "Tidak. ID tracking tidak menyediakan nama orang. Identifikasi wajah dan pendaftaran peserta belum tersedia."
+    },
+    {
+      "split": "train",
+      "id": "train-21",
+      "user": "Orang keluar lalu masuk kembali.",
+      "assistant": "Tracker dapat memberi ID baru setelah objek hilang. Karena itu jumlah track tidak menjamin jumlah orang unik."
+    },
+    {
+      "split": "train",
+      "id": "train-22",
+      "user": "Dua video bisa memakai ID yang sama?",
+      "assistant": "Bisa. Setiap video mempunyai sesi tracking terpisah; ID yang sama pada dua video tidak membuktikan orang yang sama."
+    },
+    {
+      "split": "train",
+      "id": "train-23",
+      "user": "Apa bedanya orang terlihat dan orang lewat?",
+      "assistant": "Orang terlihat dihitung pada satu frame. Orang lewat dihitung ketika track melintasi garis counting dengan arah yang tercatat."
+    },
+    {
+      "split": "train",
+      "id": "train-24",
+      "user": "Track melintas dua kali, dihitung bagaimana?",
+      "assistant": "Setiap lintasan yang memenuhi aturan garis dan cooldown dicatat. Satu track bisa menghasilkan lebih dari satu lintasan."
+    },
+    {
+      "split": "train",
+      "id": "train-25",
+      "user": "Angka jumlahnya dari mana?",
+      "assistant": "Pertanyaan jumlah memakai ringkasan analisis tersimpan. Angka tersebut dihitung oleh program dari deteksi dan lintasan, bukan dikarang model bahasa."
+    },
+    {
+      "split": "train",
+      "id": "train-26",
+      "user": "Tolong beri contoh pertanyaan untuk analisis.",
+      "assistant": "Coba: berapa orang pada detik 3, berapa mobil melintas, siapa kandidat tanpa helm, atau tampilkan buktinya."
+    },
+    {
+      "split": "train",
+      "id": "train-27",
+      "user": "Apa fungsi garis horizontal?",
+      "assistant": "Garis itu menjadi batas untuk menghitung lintasan. Pilih posisinya sesuai jalur gerak objek pada video."
+    },
+    {
+      "split": "train",
+      "id": "train-28",
+      "user": "Video yang asli akan berubah?",
+      "assistant": "Upload asli dipertahankan. Pemutar memakai salinan yang dinormalisasi, dan hasil tracking disimpan sebagai video terpisah."
+    },
+    {
+      "split": "train",
+      "id": "train-29",
+      "user": "Apakah setiap upload melatih AI?",
+      "assistant": "Tidak. Upload menjalankan inferensi. Fine-tuning adalah proses terpisah dengan dataset dan evaluasi tersendiri."
+    },
+    {
+      "split": "train",
+      "id": "train-30",
+      "user": "Model chatbotnya apa?",
+      "assistant": "Chatbot memakai Qwen3-1.7B dengan adapter LoRA lokal. Adapter awal memakai dataset percakapan pilot dan perlu evaluasi lebih luas."
+    },
+    {
+      "split": "train",
+      "id": "train-31",
+      "user": "Apakah bisa membaca plat sekarang?",
+      "assistant": "Belum. Versi ini hanya mendeteksi dan tracking mobil; detector plat dan OCR merupakan pengembangan berikutnya."
+    },
+    {
+      "split": "train",
+      "id": "train-32",
+      "user": "Kamera langsung sudah bisa?",
+      "assistant": "Belum. Versi awal memakai unggah video; CCTV atau webcam langsung merupakan tahap lanjutan."
+    },
+    {
+      "split": "eval",
+      "id": "eval-01",
+      "user": "Bisa jelaskan sistem ini untuk penonton yang awam?",
+      "assistant": "Sistem menerima video, memberi kotak pada orang dan mobil, lalu menyimpan ringkasan yang bisa ditanyakan lewat chat."
+    },
+    {
+      "split": "eval",
+      "id": "eval-02",
+      "user": "Angka di laporan boleh dianggap pasti?",
+      "assistant": "Angka berasal dari hasil deteksi, sehingga tetap bisa keliru bila detektor atau tracker salah. Cocokkan dengan video sebelum menarik kesimpulan."
+    },
+    {
+      "split": "eval",
+      "id": "eval-03",
+      "user": "Apakah nomor objek bisa dipakai sebagai daftar hadir?",
+      "assistant": "Tidak. Nomor tracking adalah ID sementara, bukan identitas peserta. Fitur absensi belum tersedia."
+    },
+    {
+      "split": "eval",
+      "id": "eval-04",
+      "user": "Saya ingin tahu hitungan tepat di suatu momen.",
+      "assistant": "Tanyakan jumlah pada posisi detik di video, misalnya berapa orang pada detik 3. Sistem memakai frame analisis terdekat."
+    },
+    {
+      "split": "eval",
+      "id": "eval-05",
+      "user": "Tolong ajari langkah demo yang singkat.",
+      "assistant": "Unggah video pendek, tunggu analisis, putar kedua video bersama, lalu tanyakan ringkasan dan buka bukti kandidat."
+    },
+    {
+      "split": "eval",
+      "id": "eval-06",
+      "user": "Apa yang perlu diperbaiki sesudah versi awal?",
+      "assistant": "Kumpulkan video berlabel dari kondisi berbeda, evaluasi kesalahan tracking dan helm, lalu lakukan fine-tuning detector sebelum penggunaan operasional."
+    }
+  ]
+}

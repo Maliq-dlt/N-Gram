@@ -1,0 +1,182 @@
+# Video Insight Lokal
+
+Demo/portofolio untuk unggah video, bandingkan rekaman asli dengan tracking AI,
+koreksi objek, dan tanya hasilnya lewat chatbot lokal. Subproyek `industrial_ai`
+terpisah dari artefak akademik N-gram di root repository.
+
+## Instalasi di Windows
+
+Prasyarat: Node.js 20+, npm, [uv](https://docs.astral.sh/uv/getting-started/installation/),
+serta [FFmpeg dan FFprobe](https://ffmpeg.org/download.html) pada PATH.
+Python 3.11 disiapkan uv bila belum tersedia. Gunakan PowerShell.
+
+```powershell
+git clone https://github.com/Maliq-dlt/N-Gram.git
+cd N-Gram/industrial_ai
+$env:npm_config_cache = Join-Path $PWD '.cache/npm'
+npm ci
+npm run setup
+npm start
+```
+
+Buka <http://127.0.0.1:8765>. Ctrl+C menghentikan server. Jalankan satu proses,
+tanpa `--reload`/beberapa worker karena model memakai RAM/VRAM.
+
+| Perintah | Yang disiapkan |
+| --- | --- |
+| `npm ci` / `npm install` | Dependency UI dari package.json/package-lock.json |
+| `npm run setup` | Library Python dari pyproject.toml/uv.lock, lalu model YOLO/Qwen |
+| `npm start` | Server lokal dan dashboard yang terhubung ke model lokal |
+
+**npm install sendiri belum memasang Python atau model AI.** Tidak ada download
+besar tersembunyi di postinstall. Setup awal membutuhkan internet dan beberapa GB
+ruang untuk Torch, Qwen dan cache. Bobot di `models/` tidak masuk GitHub;
+revision/checksum dikunci di `setup_models.py`. Untuk library saja:
+`npm run setup -- -SkipModels`.
+
+CSS build sudah disertakan. `npm run build` membangun HeroUI/Tailwind; dashboard
+memakai HTML/JavaScript native tanpa React. Inferensi setelah setup memakai model
+lokal tanpa API key/cloud chat. Cache/temp/upload/hasil berada dalam subproyek.
+
+## Alur penggunaan
+
+1. **Video baru**: pilih MP4/MOV/AVI/MKV/WEBM/M4V maksimal 250 MB, dua menit dan 4K.
+   Pilih garis counting/perangkat AI, lalu **Analisis video**.
+2. Putar/jeda/geser video asli dan tracking bersama; lihat ringkasan, bukti,
+   unduhan MP4/JSON. Riwayat bertahan setelah restart.
+3. Tanya **berapa orang pada detik 3**, **berapa mobil melintas**, **ringkasan video**,
+   atau **tampilkan bukti orang**. Jumlah membaca hasil tersimpan, percakapan umum
+   memakai Qwen. Label jawaban menunjukkan sumbernya.
+4. **Anotasi manual**: jeda, edit kotak AI atau gambar dengan klik kiri tarik/dua titik.
+   Klik kanan/Escape membatalkan interaksi aktif/kotak baru yang belum disimpan.
+   Form koordinat tersedia. Overlay terlihat, piksel sumber tracking/dataset tetap bersih.
+5. Label bawaan mencakup orang, mobil, bus, truk, motor, sepeda, helm dan kepala
+   tanpa helm. Label khusus seperti `karung` bisa ditambahkan. Warna otomatis
+   bisa diganti; nama/warna adalah metadata, bukan pengenal wajah.
+6. **Putar & ikuti kotak** mengikuti gerak dari posisi sekarang. Jeda/tandai ulang
+   jika target hilang. Tidak ada fine-tuning saat play/simpan/query.
+7. **Simpan koreksi** setelah seluruh objek dalam kelompok pada posisi itu diperiksa.
+   Dashboard/chat/JSON memakai hitungan koreksi; putar/geser/tutup menyimpan draft.
+   Draft belum menjadi hitungan atau dataset.
+
+Tema **Sistem/Terang/Gelap** tersimpan di browser.
+Review **Semua objek** dan **Kepala & helm** terpisah.
+
+## Makna hasil
+
+- **Terlihat**: jumlah pada frame. Koreksi lengkap mengganti hitungan hanya pada
+  timestamp yang disahkan. Posisi berbeda tidak dijumlahkan sebagai individu unik.
+  Puncak naik bila koreksi melampaui puncak sebelumnya. Pertanyaan
+  **berapa orang AI pada detik 3** tetap membaca deteksi awal.
+- **Lintasan**: pusat kotak melewati garis horizontal. Arah atas/bawah adalah arah
+  gambar, belum berarti masuk/keluar pabrik. ID berlaku per video; occlusion/re-entry
+  bisa memecah satu orang menjadi beberapa track.
+- Hijau berarti helm terdeteksi; merah tanpa helm; kuning belum jelas. Ini belum
+  menilai seluruh APD. Kandidat tanpa helm memerlukan deteksi konsisten dua detik
+  dan tinjauan manusia.
+- Jawaban fakta cocok dengan data tersimpan, belum membuktikan deteksi benar.
+  Chat umum dapat keliru. Waktu adalah detik video, bukan jam/tanggal perekaman.
+- Pemutar asli memakai salinan normalisasi maksimal 720p/10 FPS. Byte upload
+  asli di `data/jobs/<id>/upload.bin` dan hasil AI lama tidak ditimpa koreksi.
+- JSON berisi `occupancy` awal, `reviewed_occupancy` dan `review_status`.
+  Track/lintasan tetap dari analisis awal; preview manual belum mengubahnya.
+
+## Model, GPU dan fine-tuning
+
+| Fungsi | Model |
+| --- | --- |
+| Orang dan lima kelas kendaraan | YOLO26n COCO + ByteTrack |
+| Helm | keremberke YOLOv8n hard-hat, detector terpisah |
+| Percakapan | Qwen3-1.7B, adapter LoRA lokal bila tersedia |
+
+Clone baru memakai **Qwen dasar** karena adapter fine-tuning tidak diunggah.
+Untuk membuat adapter pilot dari `training_chat.json`, hentikan server lalu:
+
+```powershell
+. .\setup_lokal.ps1
+uv run --frozen python fine_tune_chat.py --device auto
+npm start
+```
+
+Training chat terpisah/opsional. Dataset: 32 dialog sintetis manual dan enam contoh
+evaluasi pilot; belum membuktikan kualitas percakapan luas. Jika adapter aktif
+sudah ada, training membuat kandidat tanpa menimpanya. Kandidat tidak otomatis
+diaktifkan. Pilihan CLI `--device cpu` / `--device cuda` tersedia.
+
+**Auto** mengutamakan RTX 4060 bila CUDA/VRAM cukup. **CPU** selalu memakai CPU.
+**GPU** mencoba CUDA dengan fallback CPU saat tidak tersedia, VRAM kurang atau
+CUDA OOM. Alasan dicatat pada hasil. Torch CUDA dari index resmi PyTorch dikunci
+di uv.lock dan juga dapat menjalankan CPU. AMD/Intel GPU belum dipakai.
+GPU membantu kecepatan; model/data menentukan akurasi.
+
+Untuk belajar bentuk/kelas di video lain: **Belajar untuk video lain → Latih untuk
+video lain**, dengan review lengkap minimal dua upload sumber berbeda. Split
+menurut sumber video; potongan footage sama bukan evaluasi independen.
+Training menyimpan snapshot/provenance/metrics/checkpoint di `data/trainings/`
+dan analisis ulang sebagai job baru. Kandidat tidak mengganti default upload.
+
+**Ekspor dataset YOLO**: gambar tanpa border, label/bbox ternormalisasi,
+classes.txt, metadata review dan SHA256 sumber. Objek/helm terpisah; hanya kelompok
+lengkap masuk dataset. Nama/warna tidak melatih detector.
+
+## Verifikasi
+
+Dari industrial_ai setelah setup:
+
+```powershell
+. .\setup_lokal.ps1
+$env:npm_config_cache = Join-Path $PWD '.cache/npm'
+npm run check
+npm run build
+npm audit --audit-level=high
+uv run --frozen python tests/self_check.py
+uv run --frozen python tests/review_counts_check.py
+uv run --frozen python tests/tracking_check.py
+uv run --frozen ruff check . --exclude .code-review-graph
+uv run --frozen ruff format --check . --exclude .code-review-graph
+uv run --frozen ty check --exclude .tmp --exclude .venv --exclude .cache --exclude .uv-cache --exclude .code-review-graph --exclude node_modules --exclude models --exclude data
+uv run --frozen python -m build --no-isolation --outdir .tmp/dist
+```
+
+Uji HTTP/model nyata perlu server aktif dan clip OpenCV 12 detik. Siapkan sekali:
+
+```powershell
+New-Item -ItemType Directory -Force .tmp/real_smoke | Out-Null
+Invoke-WebRequest 'https://raw.githubusercontent.com/opencv/opencv/master/samples/data/vtest.avi' -OutFile '.tmp/real_smoke/vtest.avi'
+ffmpeg -n -i .tmp/real_smoke/vtest.avi -t 12 -an -c:v libx264 -f mp4 .tmp/real_smoke/upload.bin
+uv run --frozen python tests/e2e.py
+```
+
+FFmpeg menolak menimpa clip lama. E2E menambah job valid/error; kotak fixture
+menguji API/ekspor, bukan ground truth. [Verifikasi publik](reports/VERIFIKASI_PUBLIK.md)
+merangkum bukti. Laporan rinci, screenshot CCTV, model dan data runtime tetap lokal.
+
+## Batas dan prioritas berikutnya
+
+Layak dibagikan sebagai demo/portofolio. Kerumunan/occlusion/objek kecil/background
+mirip masih bisa membuat target hilang, drift atau ID tertukar. Kotak tanpa penuntun
+detector berukuran tetap, input tracker maksimal 640px. Preview manual belum
+menjadi koreksi seluruh video/MP4 baru atau lintasan persisten. Belum ada ground
+truth independen untuk klaim akurasi/kesiapan keselamatan pabrik.
+
+Prioritas: ukur ID switch/IDF1 serta FP/FN di video independen, perluas label helm/APD,
+lalu polish anotasi. Bandingkan YOLO satu tingkat lebih besar/ReID setelah baseline
+terukur. CCTV langsung, OCR plat, pengenalan wajah dan absensi belum tersedia.
+
+## Sumber dan lisensi
+
+- [Ultralytics](https://docs.ultralytics.com/): ikuti ketentuan AGPL-3.0/lisensi
+  enterprise yang berlaku untuk library/checkpoint.
+- [Helmet model](https://huggingface.co/keremberke/yolov8n-hard-hat-detection):
+  revision `287bafa2feb311ee45d21f9e9b33315ff6ff955d`; model card belum menyebut
+  lisensi bobot eksplisit. Periksa ketentuan sebelum redistribusi/penggunaan komersial.
+- [Qwen3-1.7B](https://huggingface.co/Qwen/Qwen3-1.7B): Apache-2.0, revision
+  `70d244cc86ccca08cf5af4e1e306ecf908b1ad5e`.
+- [HeroUI](https://heroui.com/) styles 3.2.6: metadata MIT, file LICENSE bawaan
+  Apache-2.0. Perbedaan dicatat tanpa dianggap selesai. Tailwind memakai MIT.
+  Teks asli: [THIRD_PARTY_LICENSES.txt](assets/THIRD_PARTY_LICENSES.txt).
+- [OpenCV test footage](https://github.com/opencv/opencv/blob/master/samples/data/vtest.avi)
+  adalah smoke test, bukan dataset evaluasi pabrik.
+
+[Referensi GitHub](reports/REFERENSI_GITHUB.md) ·
+[Desain dashboard](reports/DESAIN_DASHBOARD.md) · [Changelog](CHANGELOG.md).
