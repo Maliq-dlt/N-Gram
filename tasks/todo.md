@@ -24,6 +24,7 @@ Bukti publik: [VERIFIKASI_PUBLIK.md](../industrial_ai/reports/VERIFIKASI_PUBLIK.
 - [x] Ekspor YOLO dengan provenance; training kandidat dari review sumber terpisah.
 - [x] Tema sistem/terang/gelap dan alur dashboard; regresi playback/buffer/stale response.
 - [x] Setup Python lewat npm, dokumentasi unduh model lokal dan start server.
+- [x] Source penting diunggah ke GitHub; SHA branch remote cocok dengan commit lokal.
 - [x] 71 pemeriksaan HTTP/video/chat nyata, 31 tracker checks, self-check, Ruff/Ty,
   npm check/build/audit lulus pada verifikasi publikasi.
 - [ ] Evaluasi kerumunan independen: ID switch/IDF1 serta akurasi jumlah orang.
@@ -34,7 +35,7 @@ Bukti publik: [VERIFIKASI_PUBLIK.md](../industrial_ai/reports/VERIFIKASI_PUBLIK.
 - [ ] Input foto, SOP/RAG, CCTV aktif, OCR plat, absensi dan identitas wajah.
 
 Paket source/wheel/sdist dan 36 berkas publik telah diaudit; 1.583 hash hasil/model
-lama identik. Publikasi GitHub dicatat setelah push diverifikasi. Bobot/video/hasil
+lama identik. Publikasi [branch GitHub](https://github.com/Maliq-dlt/N-Gram/tree/codex/video-tracking-chat/industrial_ai) berhasil; commit source `7af34a0` cocok dengan SHA branch remote. Bobot/video/hasil
 lama berada lokal dan tidak dihapus. Setup dependency-only diuji, unduh ulang seluruh
 model ke environment kosong belum diuji pada publikasi ini.
 
