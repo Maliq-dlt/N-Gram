@@ -17,6 +17,7 @@ async function setView(view) {
   if(reviewBusy || uploading) return;
   if(currentView==='annotation' && !(await persistReview(false))) return;
   if(view==='annotation' && !summary) {showError('uploadError','Pilih rekaman yang selesai dianalisis untuk membuat anotasi.'); return;}
+  if(document.fullscreenElement===$('reviewPanel')) await document.exitFullscreen();
   cancelDrawing(); pauseComparison();
   await stopReviewTracking(); currentView=view; reviewVideo.pause();
   $('analysisPane').hidden=view!=='analysis'; $('evidencePane').hidden=view!=='evidence'; $('reviewPanel').hidden=view!=='annotation';
@@ -238,7 +239,7 @@ for(const id of ['reviewLabel','customLabel','reviewName','reviewColorMode','rev
 function reviewBusyState(value) {
   reviewBusy=value; for(const button of $('boxList').querySelectorAll('button')) button.disabled=value;
   for(const id of ['reviewControls','boxControls','metadataControls']) $(id).disabled=value;
-  for(const id of ['saveReview','reloadReview','exportDataset','closeReview','suggestBoxes','reviewGroup','applyBoxButton','cancelEditButton','reviewPlayback','reviewTimeline','learnDetector']) $(id).disabled=value;
+  for(const id of ['saveReview','reloadReview','exportDataset','exportCorrectedVideo','closeReview','suggestBoxes','reviewGroup','applyBoxButton','cancelEditButton','reviewPlayback','reviewTimeline','learnDetector']) $(id).disabled=value;
   syncMetadata(); syncControls();
 }
 function cancelDrawing() {
@@ -297,14 +298,15 @@ function cancelInteraction() {
 const reviewVideo=$('reviewVideo');
 for(const button of document.querySelectorAll('[data-label]')) button.onclick=()=>{$('reviewLabel').value=button.dataset.label;syncMetadata();};
 reviewVideo.ontimeupdate=()=>{$('reviewTimeline').value=reviewVideo.currentTime; $('reviewPlayTime').textContent=timestamp(reviewVideo.currentTime);};
-let reviewPlaybackEpoch=0, trackingSession=null, trackingJob=null, trackingFrames=new Map(), trackingCursor=0, trackingEnd=false, trackingWanted=false, trackingBuffering=false, trackingFetch=null, analyzedFrames=new Map(), overlayJob=null, trackingSuppressed=new Set();
+let reviewPlaybackEpoch=0, trackingSession=null, trackingJob=null, trackingFrames=new Map(), trackingCursor=0, trackingEnd=false, trackingWanted=false, trackingBuffering=false, trackingFetch=null, analyzedFrames=new Map(), overlayJob=null, trackingSuppressed=new Set(), savedTrackingFrames=new Map(), trackingRevision=0;
 function currentReviewFrame() {return Math.min(summary.frames-1,Math.floor(reviewVideo.currentTime*summary.fps+.0001));}
 function overlap(a,b) {
   const w=Math.max(0,Math.min(a[2],b[2])-Math.max(a[0],b[0])), h=Math.max(0,Math.min(a[3],b[3])-Math.max(a[1],b[1]));
   return w*h/((a[2]-a[0])*(a[3]-a[1])+(b[2]-b[0])*(b[3]-b[1])-w*h || 1);
 }
 function overlayAt(index) {
-  const row=trackingJob===job.id ? trackingFrames.get(index) : null;
+  const row=(trackingWanted && trackingJob===job.id ? trackingFrames.get(index) : null) || savedTrackingFrames.get(index);
+  if(row?.merged)return row;
   const prompts=row?.boxes || [], detected=(analyzedFrames.get(index)?.boxes || []).filter(b=>!row || !trackingSuppressed.has(b.track_id));
   return row ? {boxes:[...prompts,...detected.filter(b=>!prompts.some(p=>p.label===b.label && overlap(p.bbox,b.bbox)>.3))],lost:row.lost} : analyzedFrames.get(index);
 }
@@ -326,6 +328,7 @@ async function prefetchTracking(epoch) {
     const data=await pending;
     if(epoch!==reviewPlaybackEpoch || id!==trackingSession)return;
     for(const row of data.frames)trackingFrames.set(row.frame_index,row);
+    if(Number.isInteger(data.revision))trackingRevision=data.revision;
     trackingCursor=data.next_frame; trackingEnd=data.ended || trackingCursor>=summary.frames-1;
     if(trackingWanted && trackingBuffering && reviewVideo.paused && trackingFrames.has(currentReviewFrame())) {
       trackingBuffering=false; $('drawingStatus').textContent='Mengikuti kotak · jeda untuk koreksi.';
@@ -361,20 +364,21 @@ $('reviewPlayback').onclick=async()=>{
   await stopReviewTracking();
   const epoch=++reviewPlaybackEpoch; reviewBusyState(true); showError('reviewError','');
   try {
-    const data=await api(`/api/jobs/${job.id}/tracking`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_index:reviewFrame,boxes:analyzedFrames.size ? reviewBoxes.filter(b=>b.source!=='detector') : reviewBoxes})});
-    if(epoch!==reviewPlaybackEpoch)return;
     const unchanged=new Set(reviewBoxes.filter(b=>b.source==='detector').map(b=>b.track_id));
     trackingSuppressed=new Set((analyzedFrames.get(reviewFrame)?.boxes || []).filter(b=>b.track_id!=null && !unchanged.has(b.track_id)).map(b=>b.track_id));
+    const data=await api(`/api/jobs/${job.id}/tracking`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({frame_index:reviewFrame,boxes:analyzedFrames.size ? reviewBoxes.filter(b=>b.source!=='detector') : reviewBoxes,revision:trackingRevision,suppressed_ids:[...trackingSuppressed]})});
+    if(epoch!==reviewPlaybackEpoch)return;
+    trackingRevision=data.revision;
     trackingSession=data.id;trackingJob=job.id;trackingFrames=new Map([[reviewFrame,data.frame]]);trackingCursor=reviewFrame;trackingEnd=reviewFrame>=summary.frames-1;trackingWanted=true;trackingBuffering=false;
     reviewReady=false;cancelDrawing();reviewSvg.hidden=false;
     await prefetchTracking(epoch);
     if(epoch!==reviewPlaybackEpoch || !trackingWanted)return;
     await reviewVideo.play();scheduleTrackingPaint(epoch);
-    $('reviewStatus').textContent='Tracker mengikuti kotak mulai posisi ini. Bobot YOLO tidak berubah; kotak hasil tracker masih perlu diperiksa.';
+    $('reviewStatus').textContent='Tracking koreksi otomatis tersimpan saat frame disiapkan. Jeda untuk ekspor video; kotak masih perlu diperiksa sebelum masuk dataset.';
   }catch(error){if(epoch!==reviewPlaybackEpoch || error.name==='AbortError')return;trackingWanted=false;showError('reviewError',error.message);await stopReviewTracking();}
   finally {
     reviewBusyState(false);
-    if(trackingWanted){for(const id of ['metadataControls','boxControls','reviewControls','saveReview','suggestBoxes','reloadReview','exportDataset','learnDetector'])$(id).disabled=true;for(const button of $('boxList').querySelectorAll('button'))button.disabled=true;$('reviewPlayback').textContent='Jeda & anotasi';$('drawingStatus').textContent='Mengikuti kotak · jeda untuk koreksi.';}
+    if(trackingWanted){for(const id of ['metadataControls','boxControls','reviewControls','saveReview','suggestBoxes','reloadReview','exportDataset','exportCorrectedVideo','learnDetector'])$(id).disabled=true;for(const button of $('boxList').querySelectorAll('button'))button.disabled=true;$('reviewPlayback').textContent='Jeda & anotasi';$('drawingStatus').textContent='Mengikuti kotak · jeda untuk koreksi.';}
     else reviewReady=true;
   }
 };
@@ -394,6 +398,8 @@ async function loadManualFrame(index,discard=false) {
   try {
     await stopReviewTracking(); reviewVideo.pause();
     if(overlayJob!==job.id){const data=await api(`/api/jobs/${job.id}/overlays`);analyzedFrames=new Map(data.frames.map(f=>[f.frame_index,f]));overlayJob=job.id;trackingSuppressed=new Set();}
+    const corrections=await api(`/api/jobs/${job.id}/corrections`);
+    savedTrackingFrames=new Map(corrections.frames.map(f=>[f.frame_index,f]));trackingRevision=corrections.revision;
     reviewData=await api(`/api/jobs/${job.id}/annotations`); reviewFrame=index;
     if(reviewVideo.getAttribute('src')!==mediaUrl('original.mp4')) {
       await new Promise((resolve,reject)=>{reviewVideo.onloadedmetadata=resolve; reviewVideo.onerror=()=>reject(new Error('Video anotasi gagal dimuat.')); reviewVideo.src=mediaUrl('original.mp4');});
@@ -418,7 +424,7 @@ async function loadManualFrame(index,discard=false) {
     }
     reviewBaseline=structuredClone(reviewBoxes);reviewDirty=false; unsavedAdds=[]; cancelDrawing(); $('reviewSeconds').value=(index/summary.fps).toFixed(2); $('reviewSeconds').max=(summary.duration-1/summary.fps).toFixed(2);
     original.currentTime=index/summary.fps; tracked.currentTime=original.currentTime; reviewReady=true; $('reviewPlayback').textContent='Putar & ikuti kotak'; $('reviewStage').hidden=false; reviewSvg.toggleAttribute('hidden',false); drawManualBoxes();
-    $('reviewStatus').textContent=`Frame ${index} · detik ${(index/summary.fps).toFixed(2)} · ${saved ? 'koreksi tersimpan dimuat' : predicted?.lost?.length ? 'hilang: '+lostTracks(predicted)+'; tandai ulang' : 'kotak AI/tracker sebagai saran; koreksi sebelum disimpan'}`;
+    $('reviewStatus').textContent=`Frame ${index} · detik ${(index/summary.fps).toFixed(2)} · ${saved ? 'koreksi tersimpan dimuat' : predicted?.lost?.length ? 'hilang: '+lostTracks(predicted)+'; tandai ulang' : predicted?.merged ? 'tracking tersimpan dimuat; periksa sebelum Simpan koreksi' : 'kotak AI/tracker sebagai saran; koreksi sebelum disimpan'}`;
     return true;
   } catch(error) {showError('reviewError',error.message);} finally {reviewBusyState(false);}
 }
@@ -429,6 +435,19 @@ $('nextReviewFrame').onclick=()=>loadManualFrame(reviewFrame+1);
 $('reloadReview').onclick=()=>loadManualFrame(reviewFrame,true);
 window.addEventListener('beforeunload',event=>{if(reviewDirty){event.preventDefault();event.returnValue='';}});
 $('closeReview').onclick=()=>setView('analysis');
+$('fullscreenReview').onclick=async()=>{
+  showError('reviewError','');
+  try {
+    if(document.fullscreenElement===$('reviewPanel')) await document.exitFullscreen();
+    else await $('reviewPanel').requestFullscreen();
+  }catch {showError('reviewError','Browser menolak layar penuh. Anotasi tetap bisa dipakai pada tampilan biasa.');}
+};
+document.addEventListener('fullscreenchange',()=>{
+  const active=document.fullscreenElement===$('reviewPanel'), button=$('fullscreenReview');
+  button.textContent=active ? 'Keluar layar penuh' : 'Layar penuh';
+  button.setAttribute('aria-pressed',String(active));
+  button.focus({preventScroll:true});
+});
 function commitManualBox(box) {
   if (!reviewReady || reviewBusy) return;
   const [x1,y1,x2,y2]=box.bbox;
@@ -505,6 +524,17 @@ $('suggestBoxes').onclick=async()=>{
   }catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);drawManualBoxes();}
 };
 $('exportDataset').onclick=async()=>{if(reviewDirty){showError('reviewError','Simpan koreksi terlebih dahulu.');return;} reviewBusyState(true); showError('reviewError',''); try{const response=await fetch(`/api/jobs/${job.id}/dataset`); if(!response.ok){const data=await response.json();throw new Error(data.detail);} const url=URL.createObjectURL(await response.blob()), a=document.createElement('a'); a.href=url;a.download=`koreksi_${job.id}.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); $('reviewStatus').textContent='Dataset YOLO diekspor. Pisahkan train/val/test berdasarkan video sebelum training.';}catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}};
+$('exportCorrectedVideo').onclick=async()=>{
+  if(reviewBusy || trackingWanted || !(await persistReview(false)))return;
+  reviewBusyState(true);showError('reviewError','');$('reviewStatus').textContent='Mengekspor video koreksi…';
+  try {
+    const response=await fetch(`/api/jobs/${job.id}/corrected-video`,{method:'POST'});
+    if(!response.ok){const data=await response.json();throw new Error(data.detail);}
+    const url=URL.createObjectURL(await response.blob()), a=document.createElement('a');
+    a.href=url;a.download=`koreksi_video_${job.id}.mp4`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
+    $('reviewStatus').textContent='MP4 koreksi diekspor. Posisi tanpa koreksi memakai kotak AI awal; hasil tracker masih perlu diperiksa.';
+  }catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}
+};
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
 try {$('themeSelect').value=localStorage.getItem('video-theme') || 'system';} catch {}
 function applyTheme() {const choice=$('themeSelect').value; document.documentElement.dataset.theme=choice==='system' ? (themeMedia.matches ? 'dark' : 'light') : choice; try {localStorage.setItem('video-theme',choice);} catch {}}

@@ -21,6 +21,7 @@ from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field, model_validator
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+from corrections import merge_overlay, read_corrections, render_video
 from vision import OBJECT_NAMES, process_video, reviewed_summary
 
 MAX_UPLOAD = 250 * 1024 * 1024
@@ -135,7 +136,7 @@ async def lifespan(_app: FastAPI):
     yield
     executor.shutdown(wait=True)
     with tracking_lock:
-        for _, tracker in tracking_sessions.values():
+        for _, tracker, _ in tracking_sessions.values():
             tracker.close()
         tracking_sessions.clear()
 
@@ -424,6 +425,8 @@ def suggest_boxes(job_id: str, frame_index: int, group: Literal["objects", "helm
 class TrackingPrompt(BaseModel):
     frame_index: int = Field(ge=0)
     boxes: list[ManualBox] = Field(max_length=100)
+    revision: int | None = Field(default=None, ge=0)
+    suppressed_ids: list[Annotated[int, Field(ge=0)]] = Field(default_factory=list, max_length=100)
 
 
 class TrackingStep(BaseModel):
@@ -433,6 +436,36 @@ class TrackingStep(BaseModel):
 
 tracking_lock = threading.RLock()
 tracking_sessions: dict = {}
+
+
+@app.get("/api/jobs/{job_id}/corrections")
+def get_corrections(job_id: str):
+    folder, _ = completed_folder(job_id)
+    with state_lock:
+        return read_corrections(folder)
+
+
+def persist_tracking(folder: Path, tracker, metadata: dict, frames: list) -> dict:
+    data = read_corrections(folder)
+    if data["revision"] != metadata["revision"]:
+        raise HTTPException(
+            409, "Tracking koreksi berubah di tab lain. Muat ulang sebelum memutar."
+        )
+    if frames:
+        rows = [
+            merge_overlay(f, tracker.overlays.get(f["frame_index"], []), metadata["suppressed"])
+            for f in frames
+        ]
+        by_frame = {f["frame_index"]: f for f in data["frames"]}
+        by_frame.update({f["frame_index"]: f for f in rows})
+        data = {
+            "revision": data["revision"] + 1,
+            "frames": sorted(by_frame.values(), key=lambda f: f["frame_index"]),
+        }
+        write_json(folder / "tracking_corrections.json", data)
+        metadata["revision"] = data["revision"]
+        return {"frames": rows, "revision": data["revision"]}
+    return {"frames": [], "revision": data["revision"]}
 
 
 @app.get("/api/jobs/{job_id}/overlays")
@@ -451,13 +484,18 @@ def start_tracking(job_id: str, request: TrackingPrompt):
     folder, summary = completed_folder(job_id)
     if request.frame_index >= summary["frames"]:
         raise HTTPException(422, "Frame di luar video.")
-    with tracking_lock:
-        for key, (owner, tracker) in list(tracking_sessions.items()):
+    with tracking_lock, state_lock:
+        for key, (owner, tracker, _) in list(tracking_sessions.items()):
             if time.monotonic() - tracker.touched > 120:
                 tracker.close()
                 del tracking_sessions[key]
         if len(tracking_sessions) >= 4:
             raise HTTPException(409, "Empat sesi tracker aktif. Tutup anotasi pada tab lain.")
+        revision = read_corrections(folder)["revision"]
+        if request.revision is not None and request.revision != revision:
+            raise HTTPException(
+                409, "Tracking koreksi berubah di tab lain. Muat ulang sebelum memutar."
+            )
         try:
             tracker = PromptTracker(
                 folder / "original.mp4",
@@ -467,11 +505,18 @@ def start_tracking(job_id: str, request: TrackingPrompt):
             )
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
+        metadata = {"revision": revision, "suppressed": set(request.suppressed_ids)}
+        try:
+            saved = persist_tracking(folder, tracker, metadata, [tracker.snapshot()])
+        except BaseException:
+            tracker.close()
+            raise
         key = str(uuid4())
-        tracking_sessions[key] = (job_id, tracker)
+        tracking_sessions[key] = (job_id, tracker, metadata)
         return {
             "id": key,
-            "frame": tracker.snapshot(),
+            "frame": saved["frames"][0],
+            "revision": saved["revision"],
             "method": "cached_detector_and_optical_flow",
             "message": "Mengikuti kotak pada video ini; bobot YOLO tidak berubah.",
         }
@@ -479,23 +524,51 @@ def start_tracking(job_id: str, request: TrackingPrompt):
 
 @app.post("/api/jobs/{job_id}/tracking/{session_id}/step")
 def advance_tracking(job_id: str, session_id: str, request: TrackingStep):
-    with tracking_lock:
-        owner, tracker = tracking_sessions.get(session_id, (None, None))
+    with tracking_lock, state_lock:
+        owner, tracker, metadata = tracking_sessions.get(session_id, (None, None, None))
         if owner != job_id or tracker is None:
             raise HTTPException(404, "Sesi tracker berakhir. Jeda dan putar lagi.")
         if request.after_frame != tracker.index:
             raise HTTPException(409, "Posisi tracker berubah. Jeda dan putar lagi.")
-        return tracker.advance(request.count)
+        folder = job_folder(job_id)
+        persist_tracking(folder, tracker, metadata, [])  # Check revision before advancing pixels.
+        result = tracker.advance(request.count)
+        return {**result, **persist_tracking(folder, tracker, metadata, result["frames"])}
 
 
 @app.post("/api/jobs/{job_id}/tracking/{session_id}/stop")
 def stop_tracking(job_id: str, session_id: str):
     with tracking_lock:
-        owner, tracker = tracking_sessions.get(session_id, (None, None))
+        owner, tracker, _ = tracking_sessions.get(session_id, (None, None, None))
         if owner == job_id and tracker is not None:
             tracker.close()
             del tracking_sessions[session_id]
     return {"stopped": True}
+
+
+@app.post("/api/jobs/{job_id}/corrected-video")
+def export_corrected_video(job_id: str):
+    folder, summary = completed_folder(job_id)
+    with state_lock:
+        corrections, annotations = read_corrections(folder), read_annotations(folder)
+    if not corrections["frames"] and not annotations["frames"]:
+        raise HTTPException(409, "Belum ada tracking/kotak koreksi yang tersimpan.")
+    target = folder / f"corrected_c{corrections['revision']}_a{annotations['revision']}.mp4"
+    if not target.is_file():
+        if not compute_lock.acquire(blocking=False):
+            raise HTTPException(409, "AI sedang bekerja. Ekspor setelah proses selesai.")
+        try:
+            if not target.is_file():
+                render_video(folder, target, summary, corrections, annotations)
+        except Exception as exc:
+            logger.exception("Corrected video export failed: %s", job_id)
+            raise HTTPException(
+                500,
+                "Ekspor video koreksi gagal. Hasil awal tetap tersimpan; periksa FFmpeg/log server.",
+            ) from exc
+        finally:
+            compute_lock.release()
+    return FileResponse(target, media_type="video/mp4", filename=target.name)
 
 
 @app.get("/api/jobs/{job_id}/annotations")
@@ -952,7 +1025,10 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
     target.mkdir()
     previous = read_state(source)
     shutil.copyfile(source / "upload.bin", target / "upload.bin")
-    for correction in [source / "annotations.json", *source.glob("annotation_*.jpg")]:
+    for correction in [
+        source / "annotations.json",
+        *source.glob("annotation_*.jpg"),
+    ]:
         if correction.is_file():
             shutil.copyfile(correction, target / correction.name)
     state = {
