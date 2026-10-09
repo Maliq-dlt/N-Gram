@@ -7,8 +7,6 @@ from pathlib import Path
 from unittest.mock import patch
 from uuid import uuid4
 
-from operations import working_directory
-
 sys.path.insert(0, str(Path(__file__).resolve().parents[1]))
 import runtime  # isort: skip  # Set workspace-local caches before library imports.
 
@@ -18,6 +16,7 @@ from access_fixture import authorize
 from fastapi.testclient import TestClient
 
 import app
+from operations import working_directory
 from prompt_tracking import PromptTracker
 
 checks = []

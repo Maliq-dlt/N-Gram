@@ -201,6 +201,12 @@ jobs:
           assert request('/api/jobs')[0] == 401
           print('PASS: published HTTPS, verified Caddy CA, login, Secure/HttpOnly cookie, CSRF and logout')
           PY
+      - name: Diagnose deployment smoke failure
+        if: failure()
+        working-directory: industrial_ai
+        run: |
+          docker compose -p studio-ci ps --all
+          docker compose -p studio-ci logs --no-color --tail 150
       - name: Clean deployment smoke resources
         if: always()
         working-directory: industrial_ai
