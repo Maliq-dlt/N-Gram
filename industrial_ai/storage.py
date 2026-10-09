@@ -341,18 +341,57 @@ class Store:
             "logout",
         )
 
-    def change_password(self, user_id, password, keep_token=None):
+    def change_password(self, user_id, password, current_password=None, token=None):
+        if (current_password is None) != (token is None):
+            raise ValueError("Current password and session are required together.")
+        expected = None
+        if token is not None:
+            with self.connection() as db:
+                row = db.execute(
+                    "SELECT password FROM users WHERE id=? AND active=1", (user_id,)
+                ).fetchone()
+            if row is None or not self._matches(current_password, row[0]):
+                return None
+            expected = row[0]
         encoded = self._password(password)
+        new_token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
+        expires_at = int(time.time()) + 28800
 
         def operation(db):
-            if not db.execute(
-                "UPDATE users SET password=? WHERE id=?", (encoded, user_id)
-            ).rowcount:
+            current = db.execute(
+                "SELECT * FROM users WHERE id=? AND active=1", (user_id,)
+            ).fetchone()
+            if current is None:
                 raise ValueError("User not found.")
-            digest = hashlib.sha256(keep_token.encode()).hexdigest() if keep_token else ""
-            db.execute("DELETE FROM sessions WHERE user_id=? AND digest<>?", (user_id, digest))
+            if token is not None:
+                digest = hashlib.sha256(token.encode()).hexdigest()
+                session = db.execute(
+                    "SELECT 1 FROM sessions WHERE digest=? AND user_id=? AND expires_at>?",
+                    (digest, user_id, int(time.time())),
+                ).fetchone()
+                if current["password"] != expected or session is None:
+                    return None
+            db.execute("UPDATE users SET password=? WHERE id=?", (encoded, user_id))
+            db.execute("DELETE FROM sessions WHERE user_id=?", (user_id,))
+            if token is None:
+                return None
+            db.execute(
+                "INSERT INTO sessions VALUES(?,?,?,?)",
+                (hashlib.sha256(new_token.encode()).hexdigest(), user_id, csrf, expires_at),
+            )
+            return {
+                "token": new_token,
+                "csrf": csrf,
+                "expires_at": expires_at,
+                "user": {
+                    **self._public(current),
+                    "tenant_name": db.execute(
+                        "SELECT name FROM workspaces WHERE id=?", (current["workspace_id"],)
+                    ).fetchone()[0],
+                },
+            }
 
-        self._write(operation, "password.change", user_id=user_id)
+        return self._write(operation, "password.change", user_id=user_id)
 
     def workspace(self, workspace="Local"):
         with self.lock, self.connection() as db:
