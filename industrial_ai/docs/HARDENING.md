@@ -19,6 +19,12 @@
 - Sesi server SQLite memakai cookie HttpOnly/SameSite. HTTPS menentukan Secure cookie.
   Login memeriksa Origin; seluruh endpoint unsafe lain memerlukan token CSRF sesi.
   Rate limit login dan API diterapkan di backend.
+- Profil menampilkan username/peran/workspace sesi secara readonly. Ganti password
+  memeriksa password saat ini, memvalidasi ulang hash/sesi dalam transaksi, mencabut seluruh
+  sesi lama, lalu menerbitkan cookie dan token CSRF baru untuk browser peminta.
+  Hash scrypt bersalt bukan enkripsi; password lama tidak dapat dibaca dari hash.
+  Video/anotasi/riwayat tidak dihapus. Hapus `first-access.txt` setelah akses awal
+  berhasil diganti; berkas itu tidak disinkronkan dengan password baru.
 - Satu workspace per pengguna; admin, reviewer, viewer. Resource dicakup workspace.
   Viewer hanya membaca hasil/chat fakta; admin mengelola daftar/pembuatan akun dan
   pencabutan sesi melalui API. CLI menambahkan pengguna/workspace.

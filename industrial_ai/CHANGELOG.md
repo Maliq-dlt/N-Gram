@@ -2,12 +2,17 @@
 
 ## 2026-10-09
 
+- Profil inline menampilkan identitas akun/workspace nyata secara readonly.
+  Ganti password merotasi cookie/CSRF, mencabut seluruh sesi lama dan mempertahankan
+  video/anotasi; password memakai hash scrypt, bukan enkripsi.
+- Avatar/pengelompokan aksi akun mengadaptasi Origin UI dropdown-menu #393;
+  mode hasil mengadaptasi segmented-control #23552 ke radio native tanpa runtime React/Radix/Motion.
 - Fondasi akses: login tanpa password default, admin/reviewer/viewer, isolasi
   workspace, cookie server/CSRF, pembatasan permintaan dan audit HMAC.
 - Metadata SQLite dengan migrasi idempotent; JSON menjadi snapshot kompatibel,
   dan video/model lama tetap tersedia. Backup database serta manifest artefak.
 - Auth TypeScript strict, menu akun dan viewer hanya baca; pemutar/editor native
-  tetap dipertahankan. Docker CPU, Compose/Caddy opsional dan CI deployment.
+  tetap dipertahankan. Docker CPU, Compose dengan proxy Caddy HTTPS dan CI deployment.
 - Absensi wajah/enrollment/PAD didokumentasikan sebagai fase lanjutan.
 
 - Antrean review objek/helm, approval terpisah, dan training otomatis setelah

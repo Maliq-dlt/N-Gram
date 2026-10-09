@@ -1,0 +1,25 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+(async()=>{
+ const source=fs.readFileSync('dashboard.js','utf8'),elements={},timers=[],calls=[];
+ const $=id=>elements[id]??={value:'',checked:false,disabled:false,dataset:{},hidden:true,removeAttribute(){}};
+ $('resultMode').value='ai';$('resultAi').value='ai';$('resultCorrections').value='corrections';$('correctedOption').disabled=true;
+ const responses=[{id:'export1'},{status:'processing',progress:30,message:'Exporting'},{status:'done',progress:100,message:'Done',media_url:'/corrections.mp4'}];
+ const context={$,summary:{model_id:''},job:{id:'job1'},generation:1,uploading:false,sending:false,reviewBusy:false,exporting:false,original:{currentTime:7},tracked:{src:'ai.mp4',addEventListener(){}},pauseComparison(){},mediaUrl(){return 'ai.mp4';},api:async(url,options)=>{calls.push({url,options});return responses.shift();},setTimeout(fn){timers.push(fn);return timers.length;},clearTimeout(){},document:{createElement(){throw new Error('No download expected');}}};
+ vm.createContext(context);
+ vm.runInContext(source.slice(source.indexOf('function syncResultSwitch()'),source.indexOf('function syncControls()')),context);
+ vm.runInContext(source.slice(source.indexOf('let exportPoll='),source.indexOf('let queueData=')),context);
+ context.syncResultSwitch();assert.equal($('resultAi').checked,true);assert.equal($('resultCorrections').disabled,false);
+ $('resultCorrections').checked=true;$('resultCorrections').onchange();
+ assert.equal($('resultMode').value,'ai','AI remains actual mode until correction artifact exists');assert.equal($('resultAi').checked,true);assert.equal($('resultAi').disabled,true,'export locks switches immediately');
+ await new Promise(resolve=>setImmediate(resolve));assert.equal(calls.length,2);assert.equal(context.exporting,true);
+ await timers.shift()();assert.equal($('resultMode').value,'corrections');assert.equal($('resultCorrections').checked,true);assert.equal(context.tracked.src,'/corrections.mp4');assert.equal($('resultAi').disabled,false);
+ $('resultAi').checked=true;$('resultAi').onchange();assert.equal($('resultMode').value,'ai');assert.equal(context.tracked.src,'ai.mp4');
+ for(const key of ['uploading','sending','reviewBusy','exporting']){context[key]=true;context.syncResultSwitch();assert.equal($('resultCorrections').disabled,true,key);context[key]=false;}
+ context.summary=null;context.syncResultSwitch();assert.equal($('resultAi').disabled,true);assert.equal($('resultCorrections').disabled,true);
+ Object.assign(context.original,{removeAttribute(){},load(){}});Object.assign(context.tracked,{removeAttribute(){},load(){}});
+ vm.runInContext(source.slice(source.indexOf('function clearResults()'),source.indexOf('async function refreshHistory(')),context);
+ $('resultMode').value='corrections';context.clearResults();assert.equal($('resultMode').value,'ai');assert.equal($('resultAi').checked,true);assert.equal($('correctedOption').disabled,true);assert.equal($('resultCorrections').disabled,true);
+ assert.match(source,/function displayResults\(data\) \{\s*\$\('progressArea'\)\.hidden=true;/,'completed display hides progress');
+ console.log('PASS: native result radios, pending export authority, completion, switching and busy/empty locks.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

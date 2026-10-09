@@ -52,6 +52,25 @@ strict dan HeroUI/Tailwind; `npm run typecheck` memeriksa kontrak auth. Dashboar
 DOM native tanpa React; playback/editor lama masih JavaScript dan diuji terpisah. Inferensi setelah setup memakai model
 lokal tanpa API key/cloud chat. Cache/temp/upload/hasil berada dalam subproyek.
 
+## Profil dan password
+
+Menu akun membuka profil dengan username, peran dan workspace dari sesi server;
+identitas ditampilkan hanya baca. Form **Ubah password** meminta password saat ini,
+password baru minimal 12 karakter dan konfirmasi. Password disimpan sebagai hash
+scrypt bersalt, bukan enkripsi yang dapat dibuka kembali.
+
+Perubahan berhasil mencabut seluruh sesi lama, termasuk cookie sebelumnya pada
+browser ini, lalu memberikan cookie dan token CSRF baru agar pengguna tetap masuk.
+Video, anotasi dan riwayat workspace tetap tersedia. Salinan akses awal
+`data/security/first-access.txt` tidak diperbarui otomatis; hapus setelah password
+berhasil diganti.
+
+Dashboard mempertahankan pemutar dan inspector native. Susunan avatar/aksi akun
+mengadaptasi [Origin UI dropdown-menu, 21st.dev #393](https://21st.dev/@originui/components/dropdown-menu)
+ke profil inline; pilihan mode hasil mengadaptasi
+[segmented-control #23552](https://21st.dev/@ddoemonn/components/segmented-control)
+ke radio native. Tidak diperlukan runtime React/Radix/Motion untuk kedua adaptasi.
+
 ## Akses dan deployment
 
 Setiap pengguna berada dalam satu workspace: admin mengelola akses, reviewer membuat

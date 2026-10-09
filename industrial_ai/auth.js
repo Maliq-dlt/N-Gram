@@ -12,9 +12,9 @@ const workspaceAuth = (() => {
     } }, true);
     function showLogin() { session = null; gate.hidden = false; document.body.classList.add('signed-out'); el('loginUsername', HTMLInputElement).focus(); }
     function applyRole() { if (session?.user.role !== 'viewer')
-        return; document.getElementById('reviewSvg')?.setAttribute('aria-label', 'Kotak anotasi tersimpan. Akun viewer hanya dapat melihat.'); for (const id of ['newVideoButton', 'emptyUploadButton', 'uploadButton', 'reanalyzeButton', 'retryJob', 'cancelJob', 'saveReview', 'suggestBoxes', 'applyBoxButton', 'learnDetector', 'exportCorrectedVideo', 'cancelExport', 'cancelLearning', 'startTraining', 'openReview', 'prepareCorrections', 'reviewPlayback', 'boxControls', 'metadataControls']) {
+        return; document.getElementById('reviewSvg')?.setAttribute('aria-label', 'Kotak anotasi tersimpan. Akun viewer hanya dapat melihat.'); for (const id of ['newVideoButton', 'emptyUploadButton', 'uploadButton', 'reanalyzeButton', 'retryJob', 'cancelJob', 'saveReview', 'suggestBoxes', 'applyBoxButton', 'learnDetector', 'exportCorrectedVideo', 'cancelExport', 'cancelLearning', 'startTraining', 'openReview', 'prepareCorrections', 'resultCorrections', 'reviewPlayback', 'boxControls', 'metadataControls']) {
         const node = document.getElementById(id);
-        if ((node instanceof HTMLButtonElement || node instanceof HTMLFieldSetElement) && !node.disabled)
+        if ((node instanceof HTMLButtonElement || node instanceof HTMLFieldSetElement || node instanceof HTMLInputElement) && !node.disabled)
             node.disabled = true;
     } for (const node of document.querySelectorAll('[data-view=annotation]')) {
         if (!node.disabled)
@@ -40,10 +40,21 @@ const workspaceAuth = (() => {
         throw new Error('Respons sesi tidak valid.'); for (const field of ['id', 'username', 'tenant_id', 'tenant_name'])
         if (!(field in user) || typeof Reflect.get(user, field) !== 'string')
             throw new Error('Respons akun tidak valid.'); return data; }
+    function renderProfile() {
+        if (!session)
+            return;
+        const user = session.user, initials = Array.from(user.username.trim()).slice(0, 2).join('').toLocaleUpperCase('id');
+        for (const id of ['profileAvatar', 'accountAvatar'])
+            el(id, HTMLElement).textContent = initials;
+        el('accountIdentity', HTMLElement).textContent = user.username;
+        el('profileUsername', HTMLElement).textContent = user.username;
+        el('profileWorkspace', HTMLElement).textContent = user.tenant_name;
+        el('profileRole', HTMLElement).textContent = { admin: 'Administrator', reviewer: 'Reviewer', viewer: 'Viewer' }[user.role];
+    }
     function signedIn(value) { if (entered) {
         location.reload();
         return;
-    } entered = true; session = value; gate.hidden = true; document.body.classList.remove('signed-out'); el('accountIdentity', HTMLElement).textContent = `${value.user.tenant_name} · ${value.user.username} (${value.user.role})`; applyRole(); }
+    } entered = true; session = value; gate.hidden = true; document.body.classList.remove('signed-out'); renderProfile(); applyRole(); }
     const ready = (async () => { try {
         signedIn(await readSession(await nativeFetch('/api/auth/session', { credentials: 'same-origin' })));
     }
@@ -70,24 +81,60 @@ const workspaceAuth = (() => {
         location.reload();
     }
     catch (reason) {
-        el('systemStatus', HTMLElement).textContent = reason instanceof Error ? reason.message : 'Gagal keluar.';
+        const alert = el('authError', HTMLElement);
+        alert.textContent = reason instanceof Error ? reason.message : 'Gagal keluar.';
+        alert.hidden = false;
     } };
-    const dialog = el('passwordDialog', HTMLDialogElement);
-    el('passwordButton', HTMLButtonElement).onclick = () => dialog.showModal();
-    el('closePassword', HTMLButtonElement).onclick = () => dialog.close();
-    el('passwordForm', HTMLFormElement).onsubmit = async (event) => { event.preventDefault(); const status = el('passwordStatus', HTMLElement); try {
-        const response = await request('/api/auth/password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_password: el('currentPassword', HTMLInputElement).value, new_password: el('newPassword', HTMLInputElement).value }) });
-        if (!response.ok) {
-            const data = await response.json();
-            throw new Error(typeof data === 'object' && data !== null && 'detail' in data ? String(data.detail) : 'Gagal mengubah password.');
-        }
-        el('passwordForm', HTMLFormElement).reset();
-        status.textContent = 'Password diperbarui.';
+    const passwordForm = el('passwordForm', HTMLFormElement);
+    const passwordSubmit = el('passwordSubmit', HTMLButtonElement);
+    let passwordPending = false;
+    function resetPasswordForm() {
+        passwordForm.reset();
+        el('confirmPassword', HTMLInputElement).setCustomValidity('');
+        el('passwordStatus', HTMLElement).textContent = '';
     }
-    catch (reason) {
-        status.textContent = reason instanceof Error ? reason.message : 'Gagal mengubah password.';
-    } };
+    el('profileButton', HTMLButtonElement).onclick = async () => {
+        if (!(await setView('profile')))
+            return;
+        resetPasswordForm();
+        renderProfile();
+        el('profileTitle', HTMLElement).focus();
+    };
+    el('confirmPassword', HTMLInputElement).oninput = () => el('confirmPassword', HTMLInputElement).setCustomValidity('');
+    passwordForm.onsubmit = async (event) => {
+        event.preventDefault();
+        if (passwordPending)
+            return;
+        const status = el('passwordStatus', HTMLElement), confirmation = el('confirmPassword', HTMLInputElement);
+        const newPassword = el('newPassword', HTMLInputElement).value;
+        status.textContent = '';
+        if (newPassword !== confirmation.value) {
+            confirmation.setCustomValidity('Konfirmasi password tidak cocok.');
+            status.textContent = 'Konfirmasi password tidak cocok.';
+            confirmation.reportValidity();
+            return;
+        }
+        confirmation.setCustomValidity('');
+        if (!passwordForm.reportValidity())
+            return;
+        passwordPending = true;
+        passwordSubmit.disabled = true;
+        try {
+            const response = await request('/api/auth/password', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ current_password: el('currentPassword', HTMLInputElement).value, new_password: newPassword }) });
+            const nextSession = await readSession(response);
+            session = nextSession;
+            resetPasswordForm();
+            status.textContent = 'Password diperbarui. Sesi lain telah keluar; Anda tetap masuk di sini.';
+        }
+        catch (reason) {
+            status.textContent = reason instanceof Error ? reason.message : 'Gagal mengubah password.';
+        }
+        finally {
+            passwordPending = false;
+            passwordSubmit.disabled = false;
+        }
+    };
     new MutationObserver(applyRole).observe(document.body, { subtree: true, attributes: true, attributeFilter: ['disabled'], childList: true });
     // ponytail: playback/editor remains JavaScript; migrate feature contracts when they change.
-    return { ready, request, applyRole };
+    return { ready, request, applyRole, resetPasswordForm, renderProfile };
 })();

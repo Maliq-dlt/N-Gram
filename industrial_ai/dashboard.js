@@ -1,9 +1,17 @@
 'use strict';
 const $ = id => document.getElementById(id);
 let job = null, summary = null, pollTimer = null, history = [], generation = 0;
-let currentView='analysis', uploading=false;
+let currentView='analysis', previousWorkspaceView='analysis', uploading=false, exporting=false;
 const objectNames={karung:'Karung',person:'Orang',car:'Mobil',bus:'Bus',truck:'Truk',motorcycle:'Motor',bicycle:'Sepeda'};
 const vehicles = frame => Object.keys(frame).filter(k=>!['person','seconds'].includes(k)).reduce((n,k)=>n+(frame[k] || 0),0);
+function syncResultSwitch() {
+  const mode=$('resultMode').value;
+  $('trackingPaneTitle').textContent=mode==='corrections' ? 'Koreksi saya' : 'Model AI';
+  for(const [id,value] of [['resultAi','ai'],['resultCorrections','corrections']]) {
+    $(id).checked=mode===value;
+    $(id).disabled=!summary || uploading || sending || reviewBusy || exporting;
+  }
+}
 function syncControls() {
   const blocked=uploading || sending || reviewBusy || currentView==='annotation' || ['uploading','queued','processing','cancelling'].includes(job?.status);
   for(const id of ['newVideoButton','emptyUploadButton','uploadButton']) $(id).disabled=blocked;
@@ -14,20 +22,27 @@ function syncControls() {
   $('cancelJob').hidden=!['queued','processing','cancelling'].includes(job?.status);
   $('cancelJob').disabled=job?.status==='cancelling';
   for(const button of document.querySelectorAll('[data-view]')) button.disabled=uploading || reviewBusy;
+  $('profileButton').disabled=uploading || sending || reviewBusy;
+  syncResultSwitch();
 }
 async function setView(view) {
-  if(view===currentView) return;
-  if(reviewBusy || uploading) return;
-  if(currentView==='annotation' && !(await persistReview(false))) return;
-  if(view==='annotation' && !summary) {showError('uploadError','Pilih rekaman yang selesai dianalisis untuk membuat anotasi.'); return;}
+  if(view===currentView) return true;
+  if(reviewBusy || uploading || sending) return false;
+  if(currentView==='annotation' && !(await persistReview(false))) return false;
+  if(view==='annotation' && !summary) {showError('uploadError','Pilih rekaman yang selesai dianalisis untuk membuat anotasi.'); return false;}
   if(document.fullscreenElement===$('reviewPanel')) await document.exitFullscreen();
   cancelDrawing(); pauseComparison();
-  await stopReviewTracking(); currentView=view; reviewVideo.pause();
+  await stopReviewTracking();
+  if(view==='profile')previousWorkspaceView=currentView;
+  if(currentView==='profile')workspaceAuth.resetPasswordForm();
+  currentView=view; reviewVideo.pause();
+  $('videoWorkspace').hidden=view==='profile'; $('profilePane').hidden=view!=='profile';
   $('analysisPane').hidden=view!=='analysis'; $('evidencePane').hidden=view!=='evidence'; $('reviewPanel').hidden=view!=='annotation';
-  $('pageTitle').textContent={analysis:'Analisis video',evidence:'Bukti & hasil',annotation:'Anotasi manual'}[view];
+  $('pageTitle').textContent={analysis:'Analisis video',evidence:'Bukti & hasil',annotation:'Anotasi manual',profile:'Profil'}[view];
   for(const button of document.querySelectorAll('[data-view]')) {if(button.dataset.view===view) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current');}
   syncControls();
   if(view==='annotation') await loadManualFrame(Math.min(summary.frames-1,Math.round(original.currentTime*summary.fps)));
+  return true;
 }
 for(const button of document.querySelectorAll('[data-view]')) button.onclick=()=>setView(button.dataset.view);
 for(const id of ['newVideoButton','emptyUploadButton']) $(id).onclick=()=>{showError('uploadError','');$('uploadDialog').showModal();};
@@ -45,7 +60,9 @@ async function api(url, options) {
 }
 function resetChat() { history = []; $('messages').replaceChildren(); showError('chatError',''); }
 function clearResults() {
+  $('workspaceTitle').textContent='Analisis rekaman'; $('workspaceTitle').removeAttribute('title');
   pauseComparison(); original.removeAttribute('src'); tracked.removeAttribute('src'); original.load(); tracked.load(); summary = null;
+  exporting=false; $('resultMode').value='ai'; $('correctedOption').disabled=true; syncResultSwitch();
   ['videoContent','stats','resultsContent'].forEach(id => $(id).hidden = true);
   $('emptyVideos').hidden = false; $('resultsEmpty').hidden = false;
   $('resultsEmpty').textContent = 'Hasil akan tersedia setelah video selesai dianalisis.';
@@ -73,8 +90,9 @@ function refreshCounts() {
   updateMoment();
 }
 function displayResults(data) {
+  $('progressArea').hidden=true;
   summary = data.summary; Object.assign(objectNames,summary.object_names || {});
-  $('workspaceTitle').textContent=data.filename.length>38 ? data.filename.slice(0,35)+'…' : data.filename;
+  $('workspaceTitle').textContent='Analisis rekaman';
   $('workspaceTitle').title=data.filename;
   for(const kind of summary.object_classes || []) {if(!Array.from($('evidenceFilter').options).some(o=>o.value===kind)) $('evidenceFilter').add(new Option(objectNames[kind] || kind,kind));}
   $('videoContent').hidden = false; $('emptyVideos').hidden = true; $('stats').hidden = false;
@@ -426,6 +444,8 @@ async function loadManualFrame(index,discard=false) {
   } catch(error) {showError('reviewError',error.message);} finally {reviewBusyState(false);}
 }
 $('openReview').onclick=()=>setView('annotation');
+$('profileBack').onclick=async()=>{if(await setView(previousWorkspaceView))$('profileButton').focus();};
+$('comparisonLayout').onchange=()=>{$('compare').dataset.layout=$('comparisonLayout').value;};
 $('loadReviewFrame').onclick=()=>loadManualFrame(Math.round(Number($('reviewSeconds').value)*summary.fps));
 $('previousReviewFrame').onclick=()=>loadManualFrame(reviewFrame-1);
 $('nextReviewFrame').onclick=()=>loadManualFrame(reviewFrame+1);
@@ -526,8 +546,9 @@ $('suggestBoxes').onclick=async()=>{
 $('exportDataset').onclick=async()=>{if(reviewDirty){showError('reviewError','Simpan koreksi terlebih dahulu.');return;} reviewBusyState(true); showError('reviewError',''); try{const response=await workspaceAuth.request(`/api/jobs/${job.id}/dataset`); if(!response.ok){const data=await response.json();throw new Error(data.detail);} const url=URL.createObjectURL(await response.blob()), a=document.createElement('a'); a.href=url;a.download=`koreksi_${job.id}.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); $('reviewStatus').textContent='Dataset YOLO diekspor. Pisahkan train/val/test berdasarkan video sebelum training.';}catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}};
 let exportPoll=null, currentExport=null;
 async function startExport(download=false) {
-  if(!job || !summary)return;
+  if(!job || !summary || exporting)return;
   const source=job.id, current=generation;
+  exporting=true; syncResultSwitch();
   try {
     const data=await api(`/api/jobs/${source}/exports`,{method:'POST'});
     currentExport={source,id:data.id};$('exportProgress').hidden=false;
@@ -540,26 +561,29 @@ async function startExport(download=false) {
         $('cancelExport').hidden=!['queued','processing','cancelling'].includes(state.status);
         $('cancelExport').disabled=state.status==='cancelling';
         if(['queued','processing','cancelling'].includes(state.status)){exportPoll=setTimeout(poll,1000);return;}
+        exporting=false; syncResultSwitch();
         if(state.status==='done'){
           $('correctedOption').disabled=false; $('correctedOption').dataset.url=state.media_url;
           if(download){const a=document.createElement('a');a.href=state.media_url;a.download=state.filename;a.click();}
           else {$('resultMode').value='corrections';switchResultMode();}
         }
-      }catch(error){$('exportStatus').textContent=error.message;}
+      }catch(error){if(current===generation){exporting=false; syncResultSwitch();$('exportStatus').textContent=error.message;}}
     }
     clearTimeout(exportPoll);await poll();
-  }catch(error){if(current===generation){$('exportProgress').hidden=false;$('exportStatus').textContent=error.message;}}
+  }catch(error){if(current===generation){exporting=false;syncResultSwitch();$('exportProgress').hidden=false;$('exportStatus').textContent=error.message;}}
 }
 $('exportCorrectedVideo').onclick=async()=>{if(reviewBusy || trackingWanted || !(await persistReview(false)))return;await startExport(true);};
 $('cancelExport').onclick=async()=>{if(currentExport)try{await api(`/api/jobs/${currentExport.source}/exports/${currentExport.id}/cancel`,{method:'POST'});}catch(error){$('exportStatus').textContent=error.message;}};
 function switchResultMode(){
+  syncResultSwitch();
   if(!job || !summary)return;
   pauseComparison();const at=original.currentTime;
   tracked.src=$('resultMode').value==='corrections' ? $('correctedOption').dataset.url : mediaUrl('tracked.mp4');
   tracked.addEventListener('loadedmetadata',()=>{tracked.currentTime=Math.min(at,tracked.duration);},{once:true});
   $('comparisonBadge').textContent=$('resultMode').value==='corrections' ? 'Koreksi pengguna · belum bukti training' : (summary.model_id ? 'Hasil model fine-tuning' : 'Hasil model dasar');
 }
-$('resultMode').onchange=()=>{if($('resultMode').value==='corrections' && $('correctedOption').disabled)startExport(false);else switchResultMode();};
+$('resultMode').onchange=()=>{if($('resultMode').value==='corrections' && $('correctedOption').disabled){$('resultMode').value='ai';syncResultSwitch();startExport(false);}else switchResultMode();};
+for(const id of ['resultAi','resultCorrections']) $(id).onchange=()=>{if($(id).disabled || !$(id).checked)return;$('resultMode').value=$(id).value;$('resultMode').onchange();};
 $('prepareCorrections').onclick=()=>startExport(false);
 let queueData=null;
 async function refreshQueue(){
