@@ -6,7 +6,7 @@
 | --- | --- | --- |
 | 1. Akses dan data | Login, RBAC, workspace, SQLite, CSRF, rate limit, audit, backup database | Diterapkan dan diuji |
 | 2. Dashboard | Akses TypeScript, menu akun, kontrol lanjutan dilipat, viewer hanya baca | Diterapkan; editor tetap JavaScript |
-| 3. Deployment | Container CPU, proxy HTTPS, pengujian otomatis CI | Konfigurasi tersedia; domain/TLS nyata belum diaktifkan |
+| 3. Deployment | Container CPU, proxy HTTPS, pengujian otomatis CI | CI container/HTTPS lulus; domain publik belum diaktifkan |
 | 4. Absensi wajah | Enrollment, verifikasi identitas, PAD, aturan absensi | Rencana lanjutan, belum mengumpulkan biometrik |
 
 ## Diterapkan
@@ -89,8 +89,10 @@ hanya capability `NET_BIND_SERVICE` untuk binary Caddy/port 80 dan 443,
 dan `no-new-privileges`; isolasi app bukan jaminan isolasi host.
 
 Validasi yang dijalankan: TypeScript strict, build UI, regresi playback/tracking/auth,
-dan Compose config untuk localhost serta domain HTTPS. Docker daemon tidak tersedia pada sesi ini:
-image build, volume permissions, model setup, sertifikat dan runtime HTTPS belum teruji.
+dan Compose config untuk localhost serta domain HTTPS. [CI](https://github.com/Maliq-dlt/N-Gram/actions/runs/37948789812)
+lulus untuk image build, container readonly, volume aplikasi, sertifikat CA lokal,
+login HTTPS dan CSRF melalui published port. Docker daemon lokal tidak tersedia;
+setup model pada volume deployment dan domain publik belum diverifikasi.
 
 ## Fase lanjutan, belum diterapkan
 

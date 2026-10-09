@@ -16,10 +16,12 @@ Tanggal: 9 Oktober 2026. Scope: studio lokal, satu proses FastAPI, SQLite dan co
 | Dependency UI | npm audit: 0 vulnerabilities |
 | Python | Ruff check/format dan ty lulus pada source terkait |
 | Distribusi | wheel/sdist dan audit isi paket lulus |
+| Docker CPU / proxy HTTPS | CI image, readonly runtime dan published HTTPS lulus |
 | Preservasi | 4.800 berkas diperiksa; tidak ada perubahan |
 
 Storage self-check memeriksa constraint, hashing/sesi, ownership, concurrent writes,
-revision guard, backup/restore database, dan deteksi perubahan/pemotongan rantai audit.
+revision guard, peningkatan hash password legacy tanpa menimpa perubahan bersamaan,
+backup/restore database, dan deteksi perubahan/pemotongan rantai audit.
 Browser memeriksa login owner, pemutar/anotasi, kontrol fullscreen, logout, serta
 viewer yang tidak dapat mengubah data. Pengujian fullscreen tidak membuktikan
 semua browser/perangkat mempunyai layout yang identik.
@@ -55,8 +57,8 @@ Laporan runtime rinci tidak diterbitkan karena dapat berisi path/media lokal.
 ## CI dan batas bukti
 
 Workflow menguji academic core, studio, dependency, paket, image Docker readonly,
-dan akses HTTPS lewat published port Caddy dari host. Run CI patch harus lulus
-sebelum perubahan digabungkan ke main. Docker daemon lokal tidak tersedia;
+dan akses HTTPS lewat published port Caddy dari host. [Run CI patch](https://github.com/Maliq-dlt/N-Gram/actions/runs/37948789812)
+lulus untuk ketiga job academic, studio dan container sebelum merge ke main. Docker daemon lokal tidak tersedia;
 validasi image/runtime dilakukan pada runner CI.
 
 Windows sandbox menolak private ACL beberapa temporary directories dan named

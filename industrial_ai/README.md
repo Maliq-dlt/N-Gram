@@ -63,7 +63,7 @@ berkas. Gunakan satu proses server.
 --build` menjalankannya bila Docker daemon tersedia. Model perlu disiapkan di volume
 `models` melalui setup CLI. Akses container melewati Caddy HTTPS (default
 `https://localhost` dengan CA lokal yang perlu dipercaya pengguna); port aplikasi
-tetap internal. Workflow CI menguji container/image; daemon Docker lokal tidak tersedia.
+tetap internal. [CI](https://github.com/Maliq-dlt/N-Gram/actions/runs/37948789812) lulus untuk container/image dan published HTTPS; daemon Docker lokal tidak tersedia.
 
 [Hardening, backup, HTTPS, dan batas implementasi](docs/HARDENING.md) · [Bukti verifikasi keamanan](docs/VERIFICATION_SECURITY.md) · [Kebijakan keamanan](../SECURITY.md).
 
