@@ -122,6 +122,39 @@ def main():
                 "cookie protection",
             )
             check(request("/api/admin/users")[0] == 200, "owner administration")
+            old_cookie = next(cookie.value for cookie in jar if cookie.name == "insight_session")
+            assert isinstance(old_cookie, str)
+            old_csrf = owner["csrf_token"]
+            other_session = database.authenticate("deployment-owner", password)
+            status, rotated, cookie_headers = request(
+                "/api/auth/password",
+                {"current_password": password, "new_password": "new-deployment-password-long"},
+                old_csrf,
+            )
+            check(
+                status == 200 and rotated["csrf_token"] != old_csrf,
+                "password rotates csrf over HTTP",
+            )
+            check(
+                "HttpOnly" in cookie_headers.get("Set-Cookie", ""), "rotated HTTP cookie protection"
+            )
+            check(
+                database.session(old_cookie) is None
+                and database.session(other_session["token"]) is None,
+                "password revokes every previous session",
+            )
+            stale = Request(
+                origin + "/api/jobs", headers={"Cookie": "insight_session=" + old_cookie}
+            )
+            try:
+                with build_opener().open(stale, timeout=5) as old_response:
+                    check(old_response.status == 401, "old cookie denied over HTTP")
+            except HTTPError as error:
+                check(error.code == 401, "old cookie denied over HTTP")
+            check(request("/api/auth/logout", {}, old_csrf)[0] == 403, "old csrf denied over HTTP")
+            owner = rotated
+            check(request("/api/jobs")[0] == 200, "rotated HTTP session works")
+
             check(request("/api/auth/logout", {})[0] == 403, "missing csrf denied")
             check(
                 request("/api/auth/logout", {}, owner["csrf_token"], "http://foreign.example")[0]

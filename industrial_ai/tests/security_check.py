@@ -188,6 +188,8 @@ with TestClient(app.app) as current, TestClient(app.app) as second:
     fixture.login(current, "viewer")
     fixture.login(second, "viewer")
     replacement = fixture.password + "_new"
+    unchanged_cookie = current.cookies.get(access.COOKIE)
+    unchanged_csrf = current.headers["X-CSRF-Token"]
     check(
         current.post(
             "/api/auth/password",
@@ -197,14 +199,33 @@ with TestClient(app.app) as current, TestClient(app.app) as second:
         "password change requires current password",
     )
     check(
-        current.post(
-            "/api/auth/password",
-            json={"current_password": fixture.password, "new_password": replacement},
-        ).status_code
-        == 200,
-        "password change succeeds",
+        current.cookies.get(access.COOKIE) == unchanged_cookie
+        and current.headers["X-CSRF-Token"] == unchanged_csrf,
+        "failed password change does not rotate session",
     )
-    check(current.get("/api/jobs").status_code == 200, "password change retains current session")
+    check(
+        current.get("/api/jobs").status_code == 200, "failed password leaves current session valid"
+    )
+    old_cookie = current.cookies.get(access.COOKIE)
+    old_csrf = current.headers["X-CSRF-Token"]
+    response = current.post(
+        "/api/auth/password",
+        json={"current_password": fixture.password, "new_password": replacement},
+    )
+    check(response.status_code == 200, "password change succeeds")
+    check(current.cookies.get(access.COOKIE) != old_cookie, "password change rotates cookie")
+    check(response.json()["csrf_token"] != old_csrf, "password change rotates csrf")
+    check(current.get("/api/jobs").status_code == 200, "rotated session works")
+    check(
+        current.post("/api/auth/logout", json={}).status_code == 403,
+        "old csrf denied with new session",
+    )
+    current.headers["X-CSRF-Token"] = response.json()["csrf_token"]
+    check(
+        current.get("/api/auth/session").json()["csrf_token"] == response.json()["csrf_token"],
+        "new csrf session matches",
+    )
+    check(fixture.store.session(old_cookie) is None, "old current cookie revoked")
     check(second.get("/api/jobs").status_code == 401, "password change revokes other sessions")
     check(fixture.store.authenticate("viewer", fixture.password) is None, "old password rejected")
 with TestClient(app.app) as durable:

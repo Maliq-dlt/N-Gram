@@ -314,12 +314,25 @@ def install(app, max_upload: int):
     @app.post("/api/auth/password")
     def password(data: Password, request: Request):
         user = actor()
-        if not store().verify_password(user["id"], data.current_password):
-            raise HTTPException(403, "Password saat ini tidak sesuai.")
-        store().change_password(
-            user["id"], data.new_password, keep_token=request.cookies.get(COOKIE, "")
+        authenticated = store().change_password(
+            user["id"],
+            data.new_password,
+            current_password=data.current_password,
+            token=request.cookies.get(COOKIE, ""),
         )
-        return {"ok": True}
+        if authenticated is None:
+            raise HTTPException(403, "Password atau sesi berubah. Masuk kembali dan coba lagi.")
+        response = JSONResponse(session_response(authenticated))
+        response.set_cookie(
+            COOKIE,
+            authenticated["token"],
+            httponly=True,
+            samesite="strict",
+            secure=(public_url() or "").startswith("https://"),
+            max_age=8 * 3600,
+            path="/",
+        )
+        return response
 
     @app.get("/api/admin/users")
     def users():

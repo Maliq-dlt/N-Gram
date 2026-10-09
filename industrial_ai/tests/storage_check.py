@@ -120,10 +120,44 @@ def main():
     assert store.session(login["token"]) is None
     assert store.authenticate("Reader", "reader-password-long") is None
     login = store.authenticate("Reader", "changed-password-long")
-    store.change_password(viewer["id"], "another-password-long", keep_token=login["token"])
-    assert store.session(login["token"])
+    other_login = store.authenticate("Reader", "changed-password-long")
+    assert (
+        store.change_password(
+            viewer["id"], "another-password-long", current_password="wrong", token=login["token"]
+        )
+        is None
+    )
+    assert store.session(login["token"]) and store.session(other_login["token"])
+    rotated = store.change_password(
+        viewer["id"],
+        "another-password-long",
+        current_password="changed-password-long",
+        token=login["token"],
+    )
+    assert rotated and rotated["token"] != login["token"] and rotated["csrf"] != login["csrf"]
+    assert store.session(login["token"]) is None and store.session(other_login["token"]) is None
+    assert store.session(rotated["token"])
+    raced_hash = Store._password("race-winner-password")
+
+    def race_password(password):
+        with store.connection() as db:
+            db.execute("UPDATE users SET password=? WHERE id=?", (raced_hash, viewer["id"]))
+            db.commit()
+        return concurrent_hash
+
+    with patch.object(store, "_password", side_effect=race_password):
+        assert (
+            store.change_password(
+                viewer["id"],
+                "losing-password-long",
+                current_password="another-password-long",
+                token=rotated["token"],
+            )
+            is None
+        )
+    assert store.verify_password(viewer["id"], "race-winner-password")
     store.revoke_user(viewer["id"])
-    assert store.session(login["token"]) is None
+    assert store.session(rotated["token"]) is None
     assert store.list_users(second)[0]["id"] == viewer["id"]
     store.register_resource("job", "a", workspace, base / "job-a")
     assert store.require_resource("job", "a", second) is None

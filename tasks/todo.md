@@ -58,6 +58,10 @@ Fine-tuning terbukti berjalan, tetapi peningkatan akurasi memerlukan evaluasi in
 - [x] CSRF seluruh mutasi, pembatasan login/API, cookie HttpOnly dan header keamanan.
 - [x] Audit HMAC/anchor, uji perubahan/truncation log dan restore database.
 - [x] Auth TypeScript strict, kontrol viewer, menu akun dan informasi lanjutan dilipat.
+- [x] Profil readonly dari identitas sesi nyata; password scrypt bersalt dan rotasi
+  seluruh sesi/cookie/CSRF tanpa menghapus video atau anotasi.
+- [x] Avatar/aksi akun dari adaptasi Origin UI dropdown-menu #393 dan mode hasil
+  segmented-control #23552 memakai elemen native; verifikasi UI terbaru dicatat terpisah.
 - [x] Docker CPU/Compose/Caddy dan CI lint/typecheck/API/security/container.
 - [ ] Deployment HTTPS dengan domain nyata dan uji pemulihan seluruh media.
 - [ ] Audit independen/pentest; external anchor, kuota dan worker shared sebelum skala besar.

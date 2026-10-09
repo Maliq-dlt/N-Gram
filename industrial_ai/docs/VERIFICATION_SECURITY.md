@@ -2,6 +2,30 @@
 
 Tanggal: 9 Oktober 2026. Scope: studio lokal, satu proses FastAPI, SQLite dan container CPU.
 
+## Revisi profil dan dashboard, 9 Oktober 2026
+
+Profil pengguna menampilkan identitas sesi nyata dan form password inline. Navigasi
+menjeda video tanpa mengubah posisi; akses profil diblokir ketika unggah/review sedang
+berjalan. Isian password dibersihkan saat meninggalkan halaman.
+
+| Pemeriksaan ulang | Hasil |
+| --- | --- |
+| Storage dan rotasi password/sesi | Lulus, termasuk race dan rollback |
+| Keamanan API | 91 assertions lulus |
+| HTTP nyata, cookie/CSRF baru dan pencabutan sesi lama | 19 pemeriksaan lulus |
+| UI/auth/playback/mode hasil/navigasi profil | Lima suite native lulus |
+| Tracking/koreksi/workflow | 31 + 27 + 29 pemeriksaan lulus |
+| UI build/typecheck, npm audit | Lulus; 0 vulnerabilities |
+| Python source quality | Ruff lulus; format 36 berkas lulus, perubahan pengguna pada tests/e2e.py dikecualikan |
+| Type Python | Scope production yang sama dengan workflow CI lulus |
+| Browser nyata | Profil, kembali tanpa reset waktu, terang/gelap, 390px tanpa overflow; fullscreen overlay sejajar video |
+| Preservasi | 4.804 berkas diperiksa; hanya tiga metadata security operasional berubah, core/bobot/hasil asli tetap |
+
+Tes perubahan password memakai akun fixture terisolasi. Password owner asli tidak
+diubah. Screenshot dan laporan rinci disimpan lokal dalam `.tmp`, tidak diterbitkan.
+Tabel berikut merekam validasi fondasi sebelumnya, bukan pengulangan seluruh run
+training atau pengujian Docker pada revisi UI ini.
+
 ## Bukti yang dijalankan
 
 | Pemeriksaan | Hasil |
