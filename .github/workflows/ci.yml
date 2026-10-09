@@ -80,6 +80,7 @@ jobs:
       - name: UI quality and build
         run: |
           npm ci
+          npm run typecheck
           npm run check
           npm run build
           npm audit --audit-level=high
@@ -93,7 +94,10 @@ jobs:
         run: |
           .venv/bin/ruff check .
           .venv/bin/ruff format --check .
-          .venv/bin/ty check app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py setup_models.py
+          .venv/bin/ty check access.py storage.py app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py setup_models.py
+          .venv/bin/python tests/storage_check.py
+          .venv/bin/python tests/security_check.py
+          .venv/bin/python tests/deployment_check.py
           .venv/bin/python tests/self_check.py
           .venv/bin/python tests/review_counts_check.py
           .venv/bin/python tests/tracking_check.py
@@ -117,3 +121,87 @@ jobs:
           path: industrial_ai/.tmp/**/report.json
           retention-days: 7
           if-no-files-found: ignore
+
+  container:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - name: Validate deployment configuration
+        working-directory: industrial_ai
+        run: |
+          docker compose config --quiet
+      - name: Build CPU image and test restricted runtime
+        run: |
+          docker build -t video-insight-ci industrial_ai
+          docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges \
+            --tmpfs /app/data:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /app/models:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /app/.cache:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /app/.tmp:uid=10001,gid=10001,mode=0700 \
+            video-insight-ci python tests/deployment_check.py
+      - name: Verify published HTTPS deployment
+        working-directory: industrial_ai
+        run: |
+          mkdir -p .tmp
+          docker tag video-insight-ci studio-ci-app
+          python - <<'PY'
+          import http.cookiejar, json, secrets, ssl, subprocess, time, urllib.error, urllib.request
+          from pathlib import Path
+          compose = ['docker', 'compose', '-p', 'studio-ci']
+          password = secrets.token_urlsafe(32)
+          bootstrap = 'import access,json,sys; d=json.load(sys.stdin); access.store().bootstrap(d["username"],d["password"])'
+          subprocess.run(compose + ['run', '--no-deps', '--rm', '-T', 'app', 'python', '-c', bootstrap], input=json.dumps({'username': 'ci-owner', 'password': password}), text=True, stdout=subprocess.DEVNULL, check=True)
+          subprocess.run(compose + ['up', '-d', '--no-build', '--wait', '--wait-timeout', '120'], check=True)
+          ca = Path('.tmp/caddy-root.crt')
+          for attempt in range(30):
+              result = subprocess.run(compose + ['exec', '-T', 'proxy', 'cat', '/data/caddy/pki/authorities/local/root.crt'], capture_output=True)
+              if result.returncode == 0 and b'BEGIN CERTIFICATE' in result.stdout:
+                  ca.write_bytes(result.stdout)
+                  break
+              time.sleep(1)
+          else:
+              raise AssertionError('Caddy local CA was not generated')
+          cookies = http.cookiejar.CookieJar()
+          client = urllib.request.build_opener(urllib.request.HTTPSHandler(context=ssl.create_default_context(cafile=str(ca))), urllib.request.HTTPCookieProcessor(cookies))
+          def request(path, body=None, csrf=None):
+              headers = {'Origin': 'https://localhost'}
+              if body is not None:
+                  headers['Content-Type'] = 'application/json'
+              if csrf is not None:
+                  headers['X-CSRF-Token'] = csrf
+              req = urllib.request.Request('https://localhost' + path, data=json.dumps(body).encode() if body is not None else None, headers=headers)
+              try:
+                  response = client.open(req, timeout=10)
+              except urllib.error.HTTPError as error:
+                  response = error
+              with response:
+                  return response.status, response.headers, response.read()
+          for attempt in range(30):
+              try:
+                  status, _, _ = request('/healthz')
+                  if status == 200:
+                      break
+              except (OSError, urllib.error.URLError):
+                  pass
+              time.sleep(1)
+          else:
+              raise AssertionError('Published HTTPS health check failed')
+          assert request('/')[0] == 200
+          assert request('/api/jobs')[0] == 401
+          status, headers, body = request('/api/auth/login', {'username': 'ci-owner', 'password': password})
+          assert status == 200, status
+          session = json.loads(body)
+          assert session['user']['role'] == 'admin' and session['csrf_token']
+          cookie = next(cookie for cookie in cookies if cookie.name == 'insight_session')
+          assert cookie.secure and cookie.has_nonstandard_attr('HttpOnly')
+          assert request('/api/jobs')[0] == 200
+          assert request('/api/auth/logout', {})[0] == 403
+          assert request('/api/auth/logout', {}, session['csrf_token'])[0] == 200
+          assert request('/api/jobs')[0] == 401
+          print('PASS: published HTTPS, verified Caddy CA, login, Secure/HttpOnly cookie, CSRF and logout')
+          PY
+      - name: Clean deployment smoke resources
+        if: always()
+        working-directory: industrial_ai
+        run: docker compose -p studio-ci down --volumes --remove-orphans

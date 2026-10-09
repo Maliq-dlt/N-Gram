@@ -2,33 +2,38 @@
 
 ## Lingkup dukungan
 
-Perbaikan keamanan ditujukan ke versi terbaru di `main`. Video Insight adalah
-aplikasi lokal satu pengguna. Jalankan pada `127.0.0.1`; belum ada autentikasi,
-izin per pengguna, atau rancangan deployment internet.
+Perbaikan ditujukan ke versi terbaru `main`. Video Insight memakai autentikasi,
+workspace/role dan SQLite lokal, dengan satu worker. Default tetap loopback. Konfigurasi
+container/HTTPS tersedia, tetapi runtime container dan deployment publik belum tervalidasi.
+[Hardening dan batas implementasi](industrial_ai/docs/HARDENING.md) menjelaskan setup,
+backup, audit, serta fitur yang masih direncanakan.
 
 ## Melaporkan celah secara privat
 
-Gunakan **[Report a vulnerability](https://github.com/Maliq-dlt/N-Gram/security/advisories/new)**
-(pelaporan privat diaktifkan). Sertakan commit/versi, komponen, langkah reproduksi,
-dampak, dan contoh minimal tanpa data pribadi. Jika kanal belum tersedia, buka issue
-yang hanya meminta kanal kontak; jangan sertakan payload eksploitasi/rekaman sensitif.
-Tidak ada janji waktu respons atau dukungan enterprise.
+Gunakan [Report a vulnerability](https://github.com/Maliq-dlt/N-Gram/security/advisories/new).
+Sertakan commit, komponen, reproduksi minimal dan dampak tanpa credential/data pribadi.
+Jika kanal tidak tersedia, buka issue yang hanya meminta kanal privat; jangan sertakan
+payload eksploitasi atau rekaman sensitif. Tidak ada janji waktu respons enterprise.
 
-## Perlindungan yang diterapkan
+## Boundary keamanan
 
-- Backend loopback; Host dan Origin request tulis diperiksa.
-- UUID/nama media serta ukuran/durasi/resolusi upload divalidasi.
-- Kotak harus valid; state ditulis atomik dengan revision guard.
-- Training otomatis memakai label disahkan dan minimal dua hash sumber asli.
-- Model unduhan utama punya revision/checksum; hasil dan bobot dasar dipertahankan.
-- CI berizin baca repository; Actions dipin ke commit.
+Cookie sesi HttpOnly/SameSite, CSRF pada unsafe API selain login yang dilindungi Origin,
+validasi Host/Origin, role/workspace dan rate limit diterapkan backend. Password memakai
+scrypt; tidak ada password bawaan. UI tidak menggantikan otorisasi backend. Media/path,
+input kotak dan batas upload divalidasi; FFmpeg membatasi protokol dan format. Checkpoint
+berasal dari sumber setup tepercaya; API tidak menerima checkpoint arbitrer.
 
-## Data dan model lokal
+SQLite menyimpan metadata authoritative; media asli tetap berupa berkas. Audit HMAC
+mempunyai key/anchor di host yang sama di luar DB, bukan proteksi terhadap administrator
+host berprivilege. Backup SQLite/key/anchor dan manifest tidak menyalin semua video/model.
 
-Upload, anotasi, hasil, serta kandidat berada di `industrial_ai/data/`; bobot di
-`models/`. Folder ini tidak diunggah ke GitHub. Periksa screenshot/log sebelum dibagikan
-agar tidak memuat wajah, plat, atau data pribadi. Checkpoint PyTorch harus berasal
-dari sumber tepercaya pada setup; API tidak menerima upload checkpoint arbitrer.
+## Data dan batas penggunaan
 
-Deteksi/percakapan bukan penentu identitas atau dasar keputusan keselamatan.
-Tinjau label dan lakukan evaluasi independen sebelum pemakaian operasional.
+`industrial_ai/data/`, `models/` dan cache tidak masuk Git. Berkas akses awal
+`data/security/first-access.txt`, database, key dan backup adalah data sensitif. Periksa
+log/screenshot sebelum berbagi wajah atau plat. Jangan mengunggah credential ke issue.
+
+Deteksi/percakapan dan nama objek manual bukan pengenal wajah atau penentu keselamatan.
+Facial enrollment, embeddings, PAD dan evaluasi identitas belum diterapkan. Gunakan review
+manusia dan evaluasi independen sebelum pemakaian operasional. Patuhi lisensi Ultralytics
+AGPL-3.0/enterprise serta hak masing-masing checkpoint sebelum redistribusi.

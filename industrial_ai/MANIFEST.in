@@ -6,3 +6,6 @@ include dashboard.js ui.css package.json package-lock.json
 recursive-include assets *.css
 include assets/THIRD_PARTY_LICENSES.txt
 include reports/WORKFLOW_REVIEW_BELAJAR.md
+
+include auth.js theme.js auth.ts tsconfig.json Dockerfile compose.yaml Caddyfile.example .dockerignore
+recursive-include docs *.md

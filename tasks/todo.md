@@ -51,6 +51,21 @@ Bukti dan batas: [Verifikasi review/belajar](../industrial_ai/reports/WORKFLOW_R
 Status CI berjalan ditampilkan pada [GitHub Actions](https://github.com/Maliq-dlt/N-Gram/actions/workflows/ci.yml).
 Fine-tuning terbukti berjalan, tetapi peningkatan akurasi memerlukan evaluasi independen.
 
+## Fondasi akses dan database — 9 Oktober 2026
+
+- [x] Login, admin/reviewer/viewer, pemisahan resource/model menurut workspace.
+- [x] SQLite authoritative, migrasi tanpa menghapus media, revisi dan backup database.
+- [x] CSRF seluruh mutasi, pembatasan login/API, cookie HttpOnly dan header keamanan.
+- [x] Audit HMAC/anchor, uji perubahan/truncation log dan restore database.
+- [x] Auth TypeScript strict, kontrol viewer, menu akun dan informasi lanjutan dilipat.
+- [x] Docker CPU/Compose/Caddy dan CI lint/typecheck/API/security/container.
+- [ ] Deployment HTTPS dengan domain nyata dan uji pemulihan seluruh media.
+- [ ] Audit independen/pentest; external anchor, kuota dan worker shared sebelum skala besar.
+- [ ] Enrollment wajah/PAD dan aturan absensi setelah data berizin/evaluasi tersedia.
+
+Rincian: [fase hardening dan absensi](../industrial_ai/docs/HARDENING.md).
+Status centang CI berarti pipeline tersedia; hasil run dicatat pada laporan verifikasi.
+
 ## Perbaikan berikutnya pada demo
 
 - [ ] Ukur tracking kerumunan dengan video independen: ID switch/IDF1 dan error hitungan.
@@ -60,7 +75,7 @@ Fine-tuning terbukti berjalan, tetapi peningkatan akurasi memerlukan evaluasi in
   menguji setup library dan inferensi memakai bobot lokal yang sudah tersedia.
 - [ ] Tinjau label publik objek/helm, lalu evaluasi kandidat pada sumber terpisah.
   [Pipeline dan sumber data](video_training_pipeline.md); auto-label tetap draft.
-- [ ] Tambahkan audit revisi serta uji backup/restore ke direktori baru.
+- [x] Audit revisi dan backup/restore database ke direktori baru. Media tetap perlu backup terpisah.
 - [ ] Bandingkan chat dasar/LoRA pada 100 prompt dengan rubrik dan decoding yang sama.
 
 Prioritas awal: evaluasi kerumunan, data helm dan reproduksi setup. Model lebih

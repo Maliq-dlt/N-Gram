@@ -30,10 +30,11 @@ requires = ["setuptools>=83"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["app", "vision", "chat", "runtime", "setup_models", "fine_tune_chat", "detector_training", "prompt_tracking", "corrections", "video_finetune", "operations", "review"]
+py-modules = ["app", "vision", "chat", "runtime", "setup_models", "fine_tune_chat", "detector_training", "prompt_tracking", "corrections", "video_finetune", "operations", "review", "access", "storage"]
 
 [tool.setuptools.data-files]
-"share/industrial-video-workspace" = ["index.html", "dashboard.js"]
+"share/industrial-video-workspace" = ["index.html", "dashboard.js", "auth.js", "theme.js", "auth.ts", "tsconfig.json", "Dockerfile", "compose.yaml", "Caddyfile.example", ".dockerignore"]
+"share/industrial-video-workspace/docs" = ["docs/HARDENING.md", "docs/VERIFICATION_SECURITY.md"]
 "share/industrial-video-workspace/assets" = ["assets/dashboard.css", "assets/THIRD_PARTY_LICENSES.txt"]
 
 [tool.ruff]

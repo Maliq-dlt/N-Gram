@@ -2,6 +2,14 @@
 
 ## 2026-10-09
 
+- Fondasi akses: login tanpa password default, admin/reviewer/viewer, isolasi
+  workspace, cookie server/CSRF, pembatasan permintaan dan audit HMAC.
+- Metadata SQLite dengan migrasi idempotent; JSON menjadi snapshot kompatibel,
+  dan video/model lama tetap tersedia. Backup database serta manifest artefak.
+- Auth TypeScript strict, menu akun dan viewer hanya baca; pemutar/editor native
+  tetap dipertahankan. Docker CPU, Compose/Caddy opsional dan CI deployment.
+- Absensi wajah/enrollment/PAD didokumentasikan sebagai fase lanjutan.
+
 - Antrean review objek/helm, approval terpisah, dan training otomatis setelah
   seluruh posisi kelompok selesai serta tersedia dua sumber asli berbeda.
 - Snapshot label yang disahkan konsisten dengan fingerprint; perubahan berikutnya
