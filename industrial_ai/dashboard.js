@@ -38,7 +38,7 @@ const showError = (id, text) => { $(id).textContent = text; $(id).hidden = !text
 const mediaUrl = name => `/api/jobs/${job.id}/media/${encodeURIComponent(name)}`;
 const timestamp = value => { const s = Math.max(0, Math.floor(value || 0)); return `${Math.floor(s/60).toString().padStart(2,'0')}:${(s%60).toString().padStart(2,'0')}`; };
 async function api(url, options) {
-  const response = await fetch(url, options);
+  const response = await workspaceAuth.request(url, options);
   const data = await response.json();
   if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Input tidak valid. Periksa isian dan coba lagi.');
   return data;
@@ -523,7 +523,7 @@ $('suggestBoxes').onclick=async()=>{
     cancelDrawing();$('reviewStatus').textContent='Kotak AI dapat diedit/dihapus. Lengkapi yang terlewat, lalu Simpan koreksi.';
   }catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);drawManualBoxes();}
 };
-$('exportDataset').onclick=async()=>{if(reviewDirty){showError('reviewError','Simpan koreksi terlebih dahulu.');return;} reviewBusyState(true); showError('reviewError',''); try{const response=await fetch(`/api/jobs/${job.id}/dataset`); if(!response.ok){const data=await response.json();throw new Error(data.detail);} const url=URL.createObjectURL(await response.blob()), a=document.createElement('a'); a.href=url;a.download=`koreksi_${job.id}.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); $('reviewStatus').textContent='Dataset YOLO diekspor. Pisahkan train/val/test berdasarkan video sebelum training.';}catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}};
+$('exportDataset').onclick=async()=>{if(reviewDirty){showError('reviewError','Simpan koreksi terlebih dahulu.');return;} reviewBusyState(true); showError('reviewError',''); try{const response=await workspaceAuth.request(`/api/jobs/${job.id}/dataset`); if(!response.ok){const data=await response.json();throw new Error(data.detail);} const url=URL.createObjectURL(await response.blob()), a=document.createElement('a'); a.href=url;a.download=`koreksi_${job.id}.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); $('reviewStatus').textContent='Dataset YOLO diekspor. Pisahkan train/val/test berdasarkan video sebelum training.';}catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}};
 let exportPoll=null, currentExport=null;
 async function startExport(download=false) {
   if(!job || !summary)return;
@@ -636,6 +636,7 @@ $('analysisModel').onchange=()=>{$('modelHelp').textContent=$('analysisModel').v
 $('reanalyzeButton').onclick=async()=>{if(!job || !summary)return; showError('uploadError',''); try {const data=await api(`/api/jobs/${job.id}/reanalyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model_id:$('analysisModel').value,device:$('deviceMode').value})});await setView('analysis');await refreshHistory(data.id);await selectJob(data.id);}catch(error){showError('uploadError',error.message);}};
 syncMetadata();
 (async () => {
+  await workspaceAuth.ready;
   try { const health=await api('/api/health'); $('systemStatus').textContent=health.vision_ready && health.chat_ready ? `Model lokal siap · ${health.device.startsWith('cuda') ? 'RTX / CUDA' : 'CPU'}${health.adapter_ready ? ' · LoRA' : ''}` : 'Model belum lengkap · lihat README'; await refreshTraining(); const jobs=await refreshHistory(); if (jobs.length) { const preferred=jobs.find(j=>['queued','processing','cancelling'].includes(j.status)) || jobs.find(j=>j.status==='done') || jobs[0]; $('historySelect').value=preferred.id; await selectJob(preferred.id); } }
   catch(error) { $('systemStatus').textContent='Server tidak terhubung'; showError('uploadError',error.message); }
 })();

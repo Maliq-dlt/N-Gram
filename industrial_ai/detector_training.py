@@ -9,6 +9,7 @@ import re
 import shutil
 from pathlib import Path
 
+from access import has_document, read_document
 from runtime import MODELS
 
 
@@ -19,7 +20,7 @@ def collect_reviewed(folders: list[Path], group: str, *, approved_only: bool = F
         with (folder / "upload.bin").open("rb") as source:
             source_hash = hashlib.file_digest(source, "sha256").hexdigest()
         origin = folder / "source.json"
-        source_meta = json.loads(origin.read_text(encoding="utf-8")) if origin.is_file() else None
+        source_meta = read_document(origin) if has_document(origin) else None
         if source_meta is not None:
             offset = source_meta.get("start_seconds")
             if (
@@ -32,9 +33,9 @@ def collect_reviewed(folders: list[Path], group: str, *, approved_only: bool = F
                 raise ValueError("Metadata sumber segmen tidak valid atau hash upload berubah.")
             source_hash = source_meta["source_sha256"]
         annotations = folder / "annotations.json"
-        if not annotations.is_file():
+        if not has_document(annotations):
             continue
-        data = json.loads(annotations.read_text(encoding="utf-8"))
+        data = read_document(annotations)
         for frame in data["frames"]:
             if not frame.get(flag, False) or (
                 approved_only and group not in frame.get("learn_groups", [])

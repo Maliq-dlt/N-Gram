@@ -15,6 +15,7 @@ import runtime  # isort: skip
 import cv2
 import numpy as np
 import torch
+from access_fixture import authorize
 from fastapi.testclient import TestClient
 from ultralytics import YOLO
 
@@ -85,6 +86,7 @@ with (
     patch.object(app, "training_root", trainings),
     TestClient(app.app) as client,
 ):
+    authorize(client)
     for folder in folders:
         response = client.post(
             "/api/jobs/" + folder.name + "/annotations",

@@ -31,14 +31,15 @@ print("PASS: completed corrections update global chatbot peak.")
 
 import copy
 import json
-import tempfile
 from unittest.mock import patch
 from uuid import uuid4
 
+from access_fixture import authorize
 from fastapi.testclient import TestClient
 
 import app
 import runtime
+from operations import working_directory
 from vision import reviewed_summary
 
 original = copy.deepcopy(sample)
@@ -78,7 +79,7 @@ helmet["manual_frames"][0].update(complete=False, helmets_complete=True)
 assert reviewed_summary(helmet)["reviewed_occupancy"] == helmet["occupancy"]
 
 # API reads the same view for dashboard, JSON export and chatbot; old disk result stays intact.
-with tempfile.TemporaryDirectory(dir=runtime.ROOT / ".tmp") as directory:
+with working_directory(dir=runtime.ROOT / ".tmp") as directory:
     root = Path(directory)
     job_id = str(uuid4())
     folder = root / job_id
@@ -92,7 +93,11 @@ with tempfile.TemporaryDirectory(dir=runtime.ROOT / ".tmp") as directory:
         json.dumps({"revision": 1, "frames": sample["manual_frames"]})
     )
     client = TestClient(app.app)
-    with patch.object(runtime, "JOBS", root):
+    with (
+        patch.object(runtime, "JOBS", root),
+        patch.object(app, "training_root", root / "trainings"),
+    ):
+        authorize(client)
         base = f"/api/jobs/{job_id}"
         state = client.get(base).json()["summary"]
         export = client.get(base + "/summary")
