@@ -99,5 +99,8 @@ Council sudah tidak digunakan dan pemantauannya dinonaktifkan atas arahan penggu
 Ini belum evaluasi akurasi kerumunan/APD secara independen, instalasi Windows baru
 beserta seluruh unduhan Qwen, atau deployment multi-user. Tracking manual belum
 menjamin identitas/lintasan unik; CCTV live, OCR plat, wajah dan absensi tetap roadmap.
+Checkout Git menormalisasi CRLF core menjadi LF. CI mengembalikan akhir baris
+hanya bila kandidat byte cocok SHA-256 asli; perubahan isi tetap ditolak. Pemulihan
+checkout LF dan penolakan korupsi juga diuji pada clone terpisah.
 CI menjalankan pengujian CPU; RTX dan chat Qwen/LoRA divalidasi lokal. CI tidak
 melakukan deployment otomatis ke mesin pengguna. Status run publik ada pada tautan CI.

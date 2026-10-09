@@ -30,7 +30,21 @@ jobs:
       - run: uv sync --locked --python 3.11
       - name: Frozen core and tests
         run: |
-          uv run python -c "import hashlib,json,pathlib; manifest=json.loads(pathlib.Path('verifikasi/core_manifest.json').read_text()); assert all(hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()==h for p,h in manifest.items()), 'Frozen core changed'"
+          # Restore Git-normalized line endings only if they match the exact
+          # frozen Windows bytes; any source/content change still fails.
+          uv run python - <<'PY'
+          import hashlib, json
+          from pathlib import Path
+          manifest = json.loads(Path('verifikasi/core_manifest.json').read_text())
+          for name, expected in manifest.items():
+              path = Path(name)
+              content = path.read_bytes()
+              if hashlib.sha256(content).hexdigest() != expected:
+                  content = content.replace(b'\r\n', b'\n').replace(b'\n', b'\r\n')
+                  assert hashlib.sha256(content).hexdigest() == expected, name
+                  path.write_bytes(content)
+          print('Frozen core: all original SHA256 values match')
+          PY
           uv run pytest -q
       - name: Source quality
         run: |
