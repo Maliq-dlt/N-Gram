@@ -215,6 +215,7 @@ Dari industrial_ai setelah setup:
 ```powershell
 . .\setup_lokal.ps1
 $env:npm_config_cache = Join-Path $PWD '.cache/npm'
+npm run typecheck
 npm run check
 npm run build
 npm audit --audit-level=high
@@ -232,19 +233,20 @@ uv run --frozen ty check --exclude .tmp --exclude .venv --exclude .cache --exclu
 uv run --frozen python -m build --no-isolation --outdir .tmp/dist
 ```
 
-Uji HTTP/model nyata perlu server aktif dan clip OpenCV 12 detik. Siapkan sekali:
+Uji akses HTTP menjalankan server fixture sendiri dan tidak memerlukan video pengguna:
 
 ```powershell
-New-Item -ItemType Directory -Force .tmp/real_smoke | Out-Null
-Invoke-WebRequest 'https://raw.githubusercontent.com/opencv/opencv/master/samples/data/vtest.avi' -OutFile '.tmp/real_smoke/vtest.avi'
-ffmpeg -n -i .tmp/real_smoke/vtest.avi -t 12 -an -c:v libx264 -f mp4 .tmp/real_smoke/upload.bin
-uv run --frozen python tests/e2e.py
+uv run --frozen python tests/storage_check.py
+uv run --frozen python tests/security_check.py
+uv run --frozen python tests/deployment_check.py
 ```
 
-FFmpeg menolak menimpa clip lama. E2E menambah job valid/error dan memperbarui
-`reports/e2e_publication.json`; simpan salinan laporan itu sebelum mengulang tes. Kotak
-fixture menguji API/ekspor, bukan ground truth. [Verifikasi terbaru](reports/WORKFLOW_REVIEW_BELAJAR.md)
-dan [publikasi awal](reports/VERIFIKASI_PUBLIK.md) merangkum bukti. Laporan rinci, screenshot CCTV, model dan data runtime tetap lokal.
+71 pemeriksaan video/model/chat penuh dijalankan pada salinan runner dengan sesi
+terautentikasi. Runner `tests/e2e.py` lama mengasumsikan API tanpa login dan belum
+dipindahkan ke alur auth; jangan menjalankannya sebagai smoke keamanan.
+Kotak fixture menguji API/ekspor, bukan ground truth. [Verifikasi keamanan](docs/VERIFICATION_SECURITY.md),
+[review/belajar](reports/WORKFLOW_REVIEW_BELAJAR.md) dan [publikasi awal](reports/VERIFIKASI_PUBLIK.md)
+merangkum bukti. Screenshot CCTV, bobot dan data runtime tetap lokal.
 
 ## Batas dan prioritas berikutnya
 

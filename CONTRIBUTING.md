@@ -21,11 +21,15 @@ cd industrial_ai
 . .\setup_lokal.ps1
 $env:npm_config_cache = Join-Path $PWD '.cache/npm'
 npm ci
+npm run typecheck
 npm run check
 npm run build
 npm audit --audit-level=high
 uv run --frozen ruff check .
-uv run --frozen ty check app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py
+uv run --frozen ty check access.py storage.py app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py
+uv run --frozen python tests/storage_check.py
+uv run --frozen python tests/security_check.py
+uv run --frozen python tests/deployment_check.py
 uv run --frozen python tests/self_check.py
 uv run --frozen python tests/review_counts_check.py
 uv run --frozen python tests/tracking_check.py
