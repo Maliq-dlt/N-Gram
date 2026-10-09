@@ -217,11 +217,11 @@ print("PASS: bus/vehicle queries, old summaries, boundaries, custom classes, nam
 
 # Detector training: no source leakage, complete-only reviews and immutable labels.
 import json
-import tempfile
 
 from detector_training import build_dataset, collect_reviewed, train_candidate
+from operations import working_directory
 
-with tempfile.TemporaryDirectory(dir=Path(".tmp")) as directory:
+with working_directory(dir=Path(".tmp")) as directory:
     root = Path(directory)
     folders = []
     for i in range(2):
@@ -299,7 +299,7 @@ assert "2 Tool_Box" in facts("Berapa Tool_Box AI pada detik 1?", custom)["answer
 print("PASS: mixed-case custom class queries remain grounded.")
 
 # Automatic learning accepts only explicit Simpan & pelajari records, never legacy fixtures.
-with tempfile.TemporaryDirectory(dir=Path(".tmp")) as tmp:
+with working_directory(dir=Path(".tmp")) as tmp:
     root = Path(tmp)
     folders = []
     for i in range(2):

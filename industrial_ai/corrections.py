@@ -1,21 +1,16 @@
 """Durable preview overlays and immutable MP4 exports; never training labels."""
 
-import json
 import shutil
-import tempfile
 from pathlib import Path
 
-from operations import check_cancel, run_command
+from access import read_document
+from operations import check_cancel, run_command, working_directory
 from prompt_tracking import PromptTracker
 
 
 def read_corrections(folder: Path) -> dict:
     path = folder / "tracking_corrections.json"
-    return (
-        json.loads(path.read_text(encoding="utf-8"))
-        if path.is_file()
-        else {"revision": 0, "frames": []}
-    )
+    return read_document(path, {"revision": 0, "frames": []})
 
 
 def merge_overlay(row: dict, detected: list, suppressed: set) -> dict:
@@ -60,12 +55,12 @@ def render_video(
         raise ValueError("FFmpeg belum tersedia pada PATH server.")
     source = folder / "original.mp4"
     overlays = folder / "overlays.json"
-    ai = json.loads(overlays.read_text(encoding="utf-8")) if overlays.is_file() else {"frames": []}
+    ai = read_document(overlays, {"frames": []})
     rows = {f["frame_index"]: f for f in ai["frames"]}
     rows.update({f["frame_index"]: f for f in corrections["frames"]})
     rows.update({f["frame_index"]: f for f in annotations["frames"]})
     # ponytail: export saved spans only; following beyond them requires playing that span first.
-    with tempfile.TemporaryDirectory(prefix="correction_", dir=folder) as directory:
+    with working_directory(prefix="correction_", dir=folder) as directory:
         temporary = Path(directory)
         capture = cv2.VideoCapture(str(source))
         width, height = int(capture.get(3)), int(capture.get(4))

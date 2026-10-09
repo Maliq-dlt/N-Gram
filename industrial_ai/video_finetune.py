@@ -5,6 +5,7 @@ from __future__ import annotations
 import runtime  # isort: skip  # Workspace-local caches before importing native libraries.
 
 import argparse
+import getpass
 import hashlib
 import http.client
 import json
@@ -168,7 +169,7 @@ def select_frames(
     import numpy as np
 
     if not 1 <= limit <= 80 or not 1 <= stride <= 100:
-        raise ValueError("Batas frame 1–80; stride 1–100.")
+        raise ValueError("Batas frame 1-80; stride 1-100.")
     capture = cv2.VideoCapture(str(video))
     candidates = []
     try:
@@ -285,6 +286,9 @@ def auto_label_batch(
         capture.release()
 
 
+API_SESSION: dict[str, str] = {}
+
+
 def api_request(
     server: str, path: str, payload=None, upload: Path | None = None, device: str = "auto"
 ) -> dict:
@@ -299,6 +303,9 @@ def api_request(
         raise ValueError("Server harus http://127.0.0.1:<port> tanpa credential/path/query.")
     connection = http.client.HTTPConnection(location.hostname, location.port or 8765, timeout=600)
     try:
+        headers = {"Origin": server.rstrip("/")}
+        if API_SESSION:
+            headers.update(API_SESSION)
         if upload:
             boundary = uuid4().hex
             header = f'--{boundary}\r\nContent-Disposition: form-data; name="file"; filename="{upload.name}"\r\nContent-Type: video/mp4\r\n\r\n'.encode()
@@ -308,6 +315,8 @@ def api_request(
             connection.putheader(
                 "Content-Length", str(len(header) + upload.stat().st_size + len(footer))
             )
+            for key, value in headers.items():
+                connection.putheader(key, value)
             connection.endheaders(header)
             with upload.open("rb") as stream:
                 while block := stream.read(1024 * 1024):
@@ -319,10 +328,15 @@ def api_request(
                 "POST" if payload is not None else "GET",
                 path,
                 body=data,
-                headers={"Content-Type": "application/json"},
+                headers={**headers, "Content-Type": "application/json"},
             )
         response = connection.getresponse()
         result = json.loads(response.read())
+        if path == "/api/auth/login" and response.status == 200:
+            cookie = response.getheader("set-cookie", "").split(";", 1)[0]
+            if not cookie.startswith("insight_session="):
+                raise ValueError("Cookie sesi tidak tersedia.")
+            API_SESSION.update({"Cookie": cookie, "X-CSRF-Token": result["csrf_token"]})
         if response.status >= 400:
             raise ValueError(f"API {response.status}: {result.get('detail', result)}")
         return result
@@ -332,7 +346,7 @@ def api_request(
 
 def prepare(source: Path, server: str, group: str, device: str, limit: int) -> Path:
     if not 1 <= limit <= 80:
-        raise ValueError("Pilih 1–80 frame per sumber.")
+        raise ValueError("Pilih 1-80 frame per sumber.")
     # Metadata is written locally: only the standard local server using this workspace is supported.
     health = api_request(server, "/api/health")
     if not health.get("vision_ready"):
@@ -347,9 +361,9 @@ def prepare(source: Path, server: str, group: str, device: str, limit: int) -> P
         folder = runtime.JOBS / state["id"]
         if not (folder / "state.json").is_file():
             raise ValueError("Server memakai workspace berbeda; metadata sumber belum ditulis.")
-        (folder / "source.json").write_text(
-            json.dumps(segment["source"], indent=2), encoding="utf-8"
-        )
+        from app import write_json
+
+        write_json(folder / "source.json", segment["source"])
         deadline = time.monotonic() + 600
         while (
             state["status"] in {"queued", "processing", "uploading"} and time.monotonic() < deadline
@@ -389,7 +403,7 @@ def prepare(source: Path, server: str, group: str, device: str, limit: int) -> P
                     "boxes": row["boxes"],
                 },
             )
-        (folder / "selection.json").write_text(json.dumps(labelled, indent=2), encoding="utf-8")
+        write_json(folder / "selection.json", labelled)
         manifest.append({"job_id": state["id"], "source": segment["source"], "selection": labelled})
         (output / "manifest.json").write_text(json.dumps(manifest, indent=2), encoding="utf-8")
         print(
@@ -406,8 +420,14 @@ def main():
     parser.add_argument("--group", choices=["objects", "helmets", "both"], default="both")
     parser.add_argument("--device", choices=["auto", "cpu", "cuda"], default="auto")
     parser.add_argument("--frames", type=int, default=60)
+    parser.add_argument("--username", default="owner")
     args = parser.parse_args()
     try:
+        api_request(
+            args.server,
+            "/api/auth/login",
+            {"username": args.username, "password": getpass.getpass("Password Video Insight: ")},
+        )
         for video in args.videos:
             print(
                 "Prepared:",

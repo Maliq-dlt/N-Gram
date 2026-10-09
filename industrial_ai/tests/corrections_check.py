@@ -14,6 +14,7 @@ import runtime  # isort: skip  # Workspace-local caches before native libraries.
 
 import cv2
 import numpy as np
+from access_fixture import authorize
 from fastapi.testclient import TestClient
 
 import app
@@ -120,7 +121,12 @@ app.write_json(
 original_hashes = {p.name: hashlib.sha256(p.read_bytes()).hexdigest() for p in folder.iterdir()}
 prompt = {"label": "karung", "name": "Benda uji", "color": "#336699", "bbox": person["bbox"]}
 base = f"/api/jobs/{folder.name}"
-with patch.object(runtime, "JOBS", root), TestClient(app.app) as client:
+with (
+    patch.object(runtime, "JOBS", root),
+    patch.object(app, "training_root", root / "trainings"),
+    TestClient(app.app) as client,
+):
+    authorize(client)
     check(
         client.get(base + "/corrections").json() == {"revision": 0, "frames": []},
         "legacy empty corrections",
@@ -178,7 +184,12 @@ with patch.object(runtime, "JOBS", root), TestClient(app.app) as client:
     client.post(base + "/tracking/" + second["id"] + "/stop")
     saved = client.get(base + "/corrections").json()
 # Lifespan shutdown and new client: no tracker or memory retained.
-with patch.object(runtime, "JOBS", root), TestClient(app.app) as client:
+with (
+    patch.object(runtime, "JOBS", root),
+    patch.object(app, "training_root", root / "trainings"),
+    TestClient(app.app) as client,
+):
+    authorize(client)
     check(
         not app.tracking_sessions and client.get(base + "/corrections").json() == saved,
         "restart restores disk rows without live sessions",

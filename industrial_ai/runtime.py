@@ -19,7 +19,10 @@ for variable, relative in {
     os.environ[variable] = str(path)
 tempfile.tempdir = str(ROOT / ".tmp")
 MODELS = ROOT / "models"
-JOBS = ROOT / "data" / "jobs"
+DATA_ROOT = Path(os.environ.get("INSIGHT_DATA_ROOT", str(ROOT / "data"))).resolve()
+if not DATA_ROOT.is_relative_to(ROOT):
+    raise ValueError("INSIGHT_DATA_ROOT must stay inside the workspace.")
+JOBS = DATA_ROOT / "jobs"
 for path in (MODELS, JOBS):
     path.mkdir(parents=True, exist_ok=True)
 

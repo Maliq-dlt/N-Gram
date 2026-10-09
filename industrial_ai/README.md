@@ -24,6 +24,7 @@ cd N-Gram/industrial_ai
 $env:npm_config_cache = Join-Path $PWD '.cache/npm'
 npm ci
 npm run setup
+uv run python access.py init --username owner
 npm start
 ```
 
@@ -42,9 +43,29 @@ ruang untuk Torch, Qwen dan cache. Bobot di `models/` tidak masuk GitHub;
 revision/checksum dikunci di `setup_models.py`. Untuk library saja:
 `npm run setup -- -SkipModels`.
 
-CSS build sudah disertakan. `npm run build` membangun HeroUI/Tailwind; dashboard
-memakai HTML/JavaScript native tanpa React. Inferensi setelah setup memakai model
+Akun owner dibuat dengan password interaktif; tidak ada password bawaan. Launcher dapat
+membuat akses awal lokal melalui bootstrap `--generate`; berkas `data/security/first-access.txt`
+harus diperlakukan sebagai rahasia dan tidak masuk Git. Masuk sebelum membuka rekaman.
+
+CSS dan JavaScript hasil build disertakan. `npm run build` mengompilasi auth TypeScript
+strict dan HeroUI/Tailwind; `npm run typecheck` memeriksa kontrak auth. Dashboard memakai
+DOM native tanpa React; playback/editor lama masih JavaScript dan diuji terpisah. Inferensi setelah setup memakai model
 lokal tanpa API key/cloud chat. Cache/temp/upload/hasil berada dalam subproyek.
+
+## Akses dan deployment
+
+Setiap pengguna berada dalam satu workspace: admin mengelola akses, reviewer membuat
+analisis/koreksi, viewer membaca hasil dan chat fakta. Cookie sesi HttpOnly/SameSite dan
+CSRF melindungi API; metadata authoritative berada di SQLite, media asli tetap berupa
+berkas. Gunakan satu proses server.
+
+`docker compose config --quiet` memvalidasi konfigurasi CPU lokal; `docker compose up
+--build` menjalankannya bila Docker daemon tersedia. Model perlu disiapkan di volume
+`models` melalui setup CLI. Akses container melewati Caddy HTTPS (default
+`https://localhost` dengan CA lokal yang perlu dipercaya pengguna); port aplikasi
+tetap internal. [CI](https://github.com/Maliq-dlt/N-Gram/actions/runs/37948789812) lulus untuk container/image dan published HTTPS; daemon Docker lokal tidak tersedia.
+
+[Hardening, backup, HTTPS, dan batas implementasi](docs/HARDENING.md) · [Bukti verifikasi keamanan](docs/VERIFICATION_SECURITY.md) · [Kebijakan keamanan](../SECURITY.md).
 
 ## Alur penggunaan
 
@@ -194,6 +215,7 @@ Dari industrial_ai setelah setup:
 ```powershell
 . .\setup_lokal.ps1
 $env:npm_config_cache = Join-Path $PWD '.cache/npm'
+npm run typecheck
 npm run check
 npm run build
 npm audit --audit-level=high
@@ -211,19 +233,20 @@ uv run --frozen ty check --exclude .tmp --exclude .venv --exclude .cache --exclu
 uv run --frozen python -m build --no-isolation --outdir .tmp/dist
 ```
 
-Uji HTTP/model nyata perlu server aktif dan clip OpenCV 12 detik. Siapkan sekali:
+Uji akses HTTP menjalankan server fixture sendiri dan tidak memerlukan video pengguna:
 
 ```powershell
-New-Item -ItemType Directory -Force .tmp/real_smoke | Out-Null
-Invoke-WebRequest 'https://raw.githubusercontent.com/opencv/opencv/master/samples/data/vtest.avi' -OutFile '.tmp/real_smoke/vtest.avi'
-ffmpeg -n -i .tmp/real_smoke/vtest.avi -t 12 -an -c:v libx264 -f mp4 .tmp/real_smoke/upload.bin
-uv run --frozen python tests/e2e.py
+uv run --frozen python tests/storage_check.py
+uv run --frozen python tests/security_check.py
+uv run --frozen python tests/deployment_check.py
 ```
 
-FFmpeg menolak menimpa clip lama. E2E menambah job valid/error dan memperbarui
-`reports/e2e_publication.json`; simpan salinan laporan itu sebelum mengulang tes. Kotak
-fixture menguji API/ekspor, bukan ground truth. [Verifikasi terbaru](reports/WORKFLOW_REVIEW_BELAJAR.md)
-dan [publikasi awal](reports/VERIFIKASI_PUBLIK.md) merangkum bukti. Laporan rinci, screenshot CCTV, model dan data runtime tetap lokal.
+71 pemeriksaan video/model/chat penuh dijalankan pada salinan runner dengan sesi
+terautentikasi. Runner `tests/e2e.py` lama mengasumsikan API tanpa login dan belum
+dipindahkan ke alur auth; jangan menjalankannya sebagai smoke keamanan.
+Kotak fixture menguji API/ekspor, bukan ground truth. [Verifikasi keamanan](docs/VERIFICATION_SECURITY.md),
+[review/belajar](reports/WORKFLOW_REVIEW_BELAJAR.md) dan [publikasi awal](reports/VERIFIKASI_PUBLIK.md)
+merangkum bukti. Screenshot CCTV, bobot dan data runtime tetap lokal.
 
 ## Batas dan prioritas berikutnya
 
@@ -283,9 +306,10 @@ video asal pada split yang sama, termasuk setelah analisis ulang.
 | `review.py` / `corrections.py` | Antrean review / ekspor MP4 |
 | `detector_training.py` | Dataset lintas-sumber dan training kandidat |
 | `operations.py` | Pembatalan serta proses native |
-| `index.html` / `dashboard.js` / `ui.css` | Dashboard dan anotasi |
+| `index.html` / `dashboard.js` / `auth.ts` / `ui.css` | Dashboard, anotasi, dan auth DOM bertipe |
+| `storage.py` / `access.py` | SQLite, sesi, workspace/role, audit, dan CLI akses |
 | `tests/` | Regresi API, media, playback, dan training nyata |
 
 [Panduan kontribusi dan tes](../CONTRIBUTING.md) · [Keamanan](../SECURITY.md) ·
-[Lisensi dan atribusi](../NOTICE.md). Sistem JSON lokal satu pengguna tidak memerlukan
-Redis atau database server. Roadmap CCTV live/OCR/wajah tetap terpisah dari fitur demo.
+[Lisensi dan atribusi](../NOTICE.md). SQLite stdlib tidak memerlukan Redis atau database server. Laravel tidak diperlukan
+untuk boundary akses ini. Roadmap CCTV live/OCR/wajah tetap terpisah dari fitur demo.

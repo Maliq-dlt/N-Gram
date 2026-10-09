@@ -14,8 +14,10 @@ import runtime  # isort: skip
 
 import cv2
 import numpy as np
+from access_fixture import authorize
 from fastapi.testclient import TestClient
 
+import access
 import app
 from operations import WorkCancelled, check_cancel, run_command
 
@@ -77,6 +79,8 @@ def fixture(offset=0, status="done"):
             ],
         },
     )
+    if runtime.JOBS == jobs and access.principal.get() is not None:
+        access.register("job", folder)
     return folder
 
 
@@ -117,6 +121,7 @@ with (
     patch.object(app, "training_root", trainings),
     TestClient(app.app) as client,
 ):
+    authorize(client)
     check(
         client.get("/api/jobs/" + interrupted.name).json()["status"] == "error",
         "restart marks interrupted work retryable",

@@ -2,7 +2,6 @@
 
 import json
 import sys
-import tempfile
 import time
 from pathlib import Path
 from unittest.mock import patch
@@ -13,9 +12,11 @@ import runtime  # isort: skip  # Set workspace-local caches before library impor
 
 import cv2
 import numpy as np
+from access_fixture import authorize
 from fastapi.testclient import TestClient
 
 import app
+from operations import working_directory
 from prompt_tracking import PromptTracker
 
 checks = []
@@ -26,7 +27,7 @@ def check(value, name):
     checks.append(name)
 
 
-with tempfile.TemporaryDirectory(dir=runtime.ROOT / ".tmp") as directory:
+with working_directory(dir=runtime.ROOT / ".tmp") as directory:
     root = Path(directory)
     job_id = str(uuid4())
     folder = root / job_id
@@ -130,7 +131,11 @@ with tempfile.TemporaryDirectory(dir=runtime.ROOT / ".tmp") as directory:
     (folder / "state.json").write_text(json.dumps({"id": job_id, "status": "done"}))
     (folder / "summary.json").write_text(json.dumps({"frames": 15, "fps": 10, "duration": 1.5}))
     client = TestClient(app.app)
-    with patch.object(runtime, "JOBS", root):
+    with (
+        patch.object(runtime, "JOBS", root),
+        patch.object(app, "training_root", root / "trainings"),
+    ):
+        authorize(client)
         base = f"/api/jobs/{job_id}"
         check(
             client.post(base + "/tracking", json={"frame_index": 15, "boxes": [prompt]}).status_code

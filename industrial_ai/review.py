@@ -1,7 +1,8 @@
 """Review positions are navigation hints, never automatic label approval."""
 
-import json
 from pathlib import Path
+
+from access import has_document, read_document
 
 
 def review_queue(
@@ -15,8 +16,8 @@ def review_queue(
             positions.setdefault(index, set()).add(reason)
 
     selection = folder / "selection.json"
-    if selection.is_file():
-        data = json.loads(selection.read_text(encoding="utf-8"))
+    if has_document(selection):
+        data = read_document(selection)
         if group in data.get("groups", ["objects", "helmets"]):
             for row in data["frames"]:
                 add(row["frame_index"], "Sampel untuk review")

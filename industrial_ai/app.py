@@ -7,20 +7,23 @@ import runtime  # isort: skip  # Set local cache paths before upload/ML imports.
 import asyncio
 import json
 import logging
+import os
 import re
 import threading
 from concurrent.futures import ThreadPoolExecutor
 from contextlib import asynccontextmanager
+from contextvars import copy_context
 from datetime import UTC, datetime
 from pathlib import Path
 from typing import Annotated, Literal, cast
 from uuid import UUID, uuid4
 
-from fastapi import FastAPI, File, Form, HTTPException, Request, UploadFile
+from fastapi import FastAPI, File, Form, HTTPException, UploadFile
 from fastapi.responses import FileResponse, JSONResponse, Response
 from pydantic import BaseModel, Field, model_validator
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
+import access
 from corrections import merge_overlay, read_corrections, render_video
 from operations import WorkCancelled, check_cancel
 from review import review_queue
@@ -40,7 +43,7 @@ def submit_work(pool, worker, folder, *args):
     with state_lock:
         active_work[folder] = threading.Event()
         try:
-            pool.submit(worker, folder, *args)
+            pool.submit(copy_context().run, worker, folder, *args)
         except BaseException:
             active_work.pop(folder, None)
             raise
@@ -56,7 +59,9 @@ def cancel_work(folder: Path):
         }:
             event.set()
             update_state(
-                folder, status="cancelling", message="Membatalkan pada batas kerja berikutnya…"
+                folder,
+                status="cancelling",
+                message="Membatalkan pada batas kerja berikutnya...",
             )
         return read_state(folder)
 
@@ -73,18 +78,20 @@ def job_folder(job_id: str) -> Path:
     except ValueError as exc:
         raise HTTPException(404, "Video tidak ditemukan.") from exc
     folder = runtime.JOBS / job_id
-    if not (folder / "state.json").is_file():
+    access.owned("job", job_id, folder)
+    if not access.has_document(folder / "state.json"):
         raise HTTPException(404, "Video tidak ditemukan.")
     return folder
 
 
 def read_state(folder: Path) -> dict:
     with state_lock:
-        return json.loads((folder / "state.json").read_text(encoding="utf-8"))
+        return access.read_document(folder / "state.json")
 
 
 def write_json(path: Path, data: dict) -> None:
     with state_lock:
+        access.persist_document(path, data)
         temporary = path.with_suffix(".pending")
         temporary.write_text(json.dumps(data, ensure_ascii=False, indent=2), encoding="utf-8")
         temporary.replace(path)
@@ -152,6 +159,10 @@ def run_video(folder: Path, line: float) -> None:
                 )
             }
         summary["model_id"] = read_state(folder).get("model_id", "")
+        for name in ("overlays.json", "selection.json", "source.json"):
+            path = folder / name
+            if path.is_file():
+                access.persist_document(path, json.loads(path.read_text(encoding="utf-8")))
         write_json(folder / "summary.json", summary)
         update_state(folder, status="done", progress=100, message="Analisis selesai")
     except WorkCancelled as exc:
@@ -170,6 +181,7 @@ def run_video(folder: Path, line: float) -> None:
 
 @asynccontextmanager
 async def lifespan(_app: FastAPI):
+    access.migrate_existing(training_root)
     # Results survive restart; interrupted work is explicit, never fabricated as complete.
     for path in runtime.JOBS.glob("*/state.json"):
         if read_state(path.parent)["status"] in {"queued", "processing", "uploading", "cancelling"}:
@@ -179,7 +191,7 @@ async def lifespan(_app: FastAPI):
                 message="Proses terhenti ketika server ditutup. Gunakan Coba lagi jika upload lengkap; file lama tetap tersimpan.",
             )
     for path in training_root.glob("*/state.json"):
-        data = json.loads(path.read_text(encoding="utf-8"))
+        data = access.read_document(path)
         if data["status"] in {"queued", "processing", "cancelling"}:
             write_json(
                 path,
@@ -204,31 +216,17 @@ async def lifespan(_app: FastAPI):
         tracking_sessions.clear()
 
 
-app = FastAPI(title="Video Insight Lokal", lifespan=lifespan)
-app.add_middleware(
-    TrustedHostMiddleware, allowed_hosts=["127.0.0.1", "localhost", "[::1]", "testserver"]
+app = FastAPI(
+    title="Video Insight", lifespan=lifespan, docs_url=None, redoc_url=None, openapi_url=None
 )
 
-
-@app.middleware("http")
-async def local_requests(request: Request, call_next):
-    if request.method == "POST":
-        origin = request.headers.get("origin")
-        if origin and origin != str(request.base_url).rstrip("/"):
-            return JSONResponse(
-                {"detail": "Permintaan harus berasal dari aplikasi lokal ini."}, status_code=403
-            )
-        if request.url.path == "/api/jobs":
-            length = request.headers.get("content-length", "")
-            if not length.isdigit():
-                return JSONResponse({"detail": "Ukuran upload wajib diketahui."}, status_code=411)
-            if int(length) > MAX_UPLOAD + 1024 * 1024:
-                return JSONResponse({"detail": "Ukuran video maksimal 250 MB."}, status_code=413)
-    response = await call_next(request)
-    response.headers["X-Content-Type-Options"] = "nosniff"
-    response.headers["Referrer-Policy"] = "same-origin"
-    response.headers["Cache-Control"] = "no-store"
-    return response
+app.add_middleware(
+    TrustedHostMiddleware,
+    allowed_hosts=os.environ.get("INSIGHT_HOSTS", "127.0.0.1,localhost,[::1],testserver").split(
+        ","
+    ),
+)
+access.install(app, MAX_UPLOAD)
 
 
 @app.get("/")
@@ -238,11 +236,9 @@ def home():
 
 @app.get("/assets/{name}")
 def ui_asset(name: str):
-    if name not in {"dashboard.css", "dashboard.js"}:
+    if name not in {"dashboard.css", "dashboard.js", "auth.js", "theme.js"}:
         raise HTTPException(404, "File UI tidak ditemukan.")
-    path = runtime.INDEX.parent / (
-        "dashboard.js" if name == "dashboard.js" else "assets/dashboard.css"
-    )
+    path = runtime.INDEX.parent / (name if name.endswith(".js") else "assets/dashboard.css")
     if not path.is_file():
         raise HTTPException(503, "Asset UI belum dibangun. Jalankan npm ci dan npm run build.")
     return FileResponse(path)
@@ -262,8 +258,11 @@ def health():
 
 @app.get("/api/jobs")
 def list_jobs():
-    # ponytail: one local user stores per-video JSON; move to SQLite for cross-video queries.
-    states = [read_state(path.parent) for path in runtime.JOBS.glob("*/state.json")]
+    states = [
+        read_state(folder)
+        for folder in access.folders("job")
+        if access.has_document(folder / "state.json")
+    ]
     return sorted(states, key=lambda s: s["created_at"], reverse=True)
 
 
@@ -287,6 +286,7 @@ async def upload_video(
     folder = runtime.JOBS / str(uuid4())
     try:
         folder.mkdir()
+        access.register("job", folder)
         state = {
             "id": folder.name,
             "filename": name,
@@ -312,7 +312,7 @@ async def upload_video(
         submit_work(executor, run_video, folder, line)
     except BaseException:
         try:
-            if (folder / "state.json").is_file():
+            if access.has_document(folder / "state.json"):
                 update_state(
                     folder, status="error", message="Upload tidak selesai. Silakan unggah ulang."
                 )
@@ -369,21 +369,16 @@ def completed_folder(job_id: str) -> tuple[Path, dict]:
     folder = job_folder(job_id)
     if read_state(folder)["status"] != "done":
         raise HTTPException(409, "Analisis video belum selesai.")
-    return folder, json.loads((folder / "summary.json").read_text(encoding="utf-8"))
+    return folder, access.read_document(folder / "summary.json")
 
 
 def read_annotations(folder: Path) -> dict:
-    path = folder / "annotations.json"
     with state_lock:
-        return (
-            json.loads(path.read_text(encoding="utf-8"))
-            if path.is_file()
-            else {"revision": 0, "frames": []}
-        )
+        return access.read_document(folder / "annotations.json", {"revision": 0, "frames": []})
 
 
 def result_summary(folder: Path) -> dict:
-    summary = json.loads((folder / "summary.json").read_text(encoding="utf-8"))
+    summary = access.read_document(folder / "summary.json")
     summary["manual_frames"] = read_annotations(folder)["frames"]
     return reviewed_summary(summary)
 
@@ -540,7 +535,7 @@ def persist_tracking(folder: Path, tracker, metadata: dict, frames: list) -> dic
 def analyzed_overlays(job_id: str):
     folder, _ = completed_folder(job_id)
     path = folder / "overlays.json"
-    return json.loads(path.read_text(encoding="utf-8")) if path.is_file() else {"frames": []}
+    return access.read_document(path, {"frames": []})
 
 
 @app.post("/api/jobs/{job_id}/tracking")
@@ -573,7 +568,12 @@ def start_tracking(job_id: str, request: TrackingPrompt):
             )
         except ValueError as exc:
             raise HTTPException(422, str(exc)) from exc
-        metadata = {"revision": revision, "suppressed": set(request.suppressed_ids)}
+        metadata = {
+            "revision": revision,
+            "suppressed": set(request.suppressed_ids),
+            "user_id": access.actor()["id"],
+            "workspace_id": access.workspace_id(),
+        }
         try:
             saved = persist_tracking(folder, tracker, metadata, [tracker.snapshot()])
         except BaseException:
@@ -594,7 +594,12 @@ def start_tracking(job_id: str, request: TrackingPrompt):
 def advance_tracking(job_id: str, session_id: str, request: TrackingStep):
     with tracking_lock, state_lock:
         owner, tracker, metadata = tracking_sessions.get(session_id, (None, None, None))
-        if owner != job_id or tracker is None:
+        if (
+            owner != job_id
+            or tracker is None
+            or metadata["user_id"] != access.actor()["id"]
+            or metadata["workspace_id"] != access.workspace_id()
+        ):
             raise HTTPException(404, "Sesi tracker berakhir. Jeda dan putar lagi.")
         if request.after_frame != tracker.index:
             raise HTTPException(409, "Posisi tracker berubah. Jeda dan putar lagi.")
@@ -606,9 +611,15 @@ def advance_tracking(job_id: str, session_id: str, request: TrackingStep):
 
 @app.post("/api/jobs/{job_id}/tracking/{session_id}/stop")
 def stop_tracking(job_id: str, session_id: str):
+    job_folder(job_id)
     with tracking_lock:
-        owner, tracker, _ = tracking_sessions.get(session_id, (None, None, None))
-        if owner == job_id and tracker is not None:
+        owner, tracker, metadata = tracking_sessions.get(session_id, (None, None, None))
+        if (
+            owner == job_id
+            and tracker is not None
+            and metadata["user_id"] == access.actor()["id"]
+            and metadata["workspace_id"] == access.workspace_id()
+        ):
             tracker.close()
             del tracking_sessions[session_id]
     return {"stopped": True}
@@ -643,7 +654,7 @@ def export_folder(job_id: str, revision: str) -> Path:
     if not re.fullmatch(r"c\d+_a\d+", revision):
         raise HTTPException(404, "Ekspor tidak ditemukan.")
     folder = job_folder(job_id) / "exports" / revision
-    if not (folder / "state.json").is_file():
+    if not access.has_document(folder / "state.json"):
         raise HTTPException(404, "Ekspor tidak ditemukan.")
     return folder
 
@@ -686,7 +697,7 @@ def start_export(job_id: str):
             raise HTTPException(409, "Belum ada koreksi tersimpan.")
         revision = f"c{corrections['revision']}_a{annotations['revision']}"
         folder = source / "exports" / revision
-        if (folder / "state.json").is_file() and read_state(folder)["status"] in {
+        if access.has_document(folder / "state.json") and read_state(folder)["status"] in {
             "queued",
             "processing",
             "cancelling",
@@ -903,6 +914,8 @@ def media(job_id: str, name: str):
     ):
         raise HTTPException(404, "Media tidak ditemukan.")
     path = folder / name
+    if name == "summary.json":
+        return JSONResponse(access.read_document(path))
     if not path.is_file():
         raise HTTPException(404, "Media belum tersedia.")
     if name == "upload.bin":
@@ -955,7 +968,7 @@ async def chat(request: ChatRequest):
         compute_lock.release()
 
 
-training_root = runtime.ROOT / "data/trainings"
+training_root = runtime.DATA_ROOT / "trainings"
 training_root.mkdir(parents=True, exist_ok=True)
 
 
@@ -966,7 +979,8 @@ def training_folder(training_id: str) -> Path:
     except ValueError as exc:
         raise HTTPException(404, "Training tidak ditemukan.") from exc
     folder = training_root / training_id
-    if not (folder / "state.json").is_file():
+    access.owned("training", training_id, folder)
+    if not access.has_document(folder / "state.json"):
         raise HTTPException(404, "Training tidak ditemukan.")
     return folder
 
@@ -993,7 +1007,11 @@ def candidate_models(model_id: str) -> dict:
 @app.get("/api/training")
 def training_list():
     return sorted(
-        [read_state(p.parent) for p in training_root.glob("*/state.json")],
+        [
+            read_state(folder)
+            for folder in access.folders("training")
+            if access.has_document(folder / "state.json")
+        ],
         key=lambda d: d["created_at"],
         reverse=True,
     )
@@ -1002,8 +1020,8 @@ def training_list():
 @app.get("/api/training/eligible")
 def training_eligible():
     items = []
-    for folder in runtime.JOBS.iterdir():
-        if not (folder / "state.json").is_file() or read_state(folder)["status"] != "done":
+    for folder in access.folders("job"):
+        if not access.has_document(folder / "state.json") or read_state(folder)["status"] != "done":
             continue
         data = read_annotations(folder)
         items.append(
@@ -1105,6 +1123,7 @@ def start_detector_training(
     folder = training_root / str(uuid4())
     try:
         folder.mkdir()
+        access.register("training", folder)
         write_json(
             folder / "state.json",
             {
@@ -1267,6 +1286,7 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
         )
     target = runtime.JOBS / str(uuid4())
     target.mkdir()
+    access.register("job", target)
     previous = read_state(source)
     shutil.copyfile(source / "upload.bin", target / "upload.bin")
     for correction in [
@@ -1277,6 +1297,8 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
     ]:
         if correction.is_file():
             shutil.copyfile(correction, target / correction.name)
+            if correction.suffix == ".json":
+                write_json(target / correction.name, access.read_document(correction))
     state = {
         "id": target.name,
         "filename": previous["filename"],

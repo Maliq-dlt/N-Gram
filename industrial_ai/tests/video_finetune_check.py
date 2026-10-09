@@ -14,6 +14,7 @@ import runtime  # isort: skip
 import cv2
 import numpy as np
 
+import access
 import app
 from detector_training import build_dataset, collect_reviewed
 from video_finetune import dedup_frames, probe, segment_video, select_frames
@@ -98,6 +99,8 @@ with (
     patch.object(runtime, "JOBS", root),
     patch.object(app.executor, "submit"),
 ):
+    user = access.store().bootstrap("owner", "controlled-test-password-123")
+    access.principal.set({**user, "tenant_name": "Local"})
     reanalysis = app.create_reanalysis("test_source", app.ReanalysisRequest())
     assert (
         json.loads((root / reanalysis["id"] / "source.json").read_text()) == segments[0]["source"]
