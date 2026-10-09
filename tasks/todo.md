@@ -1,6 +1,6 @@
 # To-do Video Insight Lokal
 
-Target: demonstrasi/portofolio lokal. Diperbarui 8 Oktober 2026.
+Target: demonstrasi/portofolio lokal. Diperbarui 9 Oktober 2026.
 Demo upload/tracking/chat sudah berjalan dan diuji. Checklist ini menunjukkan
 pekerjaan aktif; kriteria seluruh fase ada di [roadmap lengkap](roadmap_checklist.md).
 
@@ -14,7 +14,12 @@ pekerjaan aktif; kriteria seluruh fase ada di [roadmap lengkap](roadmap_checklis
 - [x] Qwen dasar berjalan tanpa adapter; fine-tuning opsional saat setup.
 - [x] Anotasi kotak AI/manual, label khusus, nama/warna dan draft otomatis.
 - [x] Klik kiri menggambar; klik kanan/Escape membatalkan interaksi/kotak baru.
+- [x] Anotasi layar penuh dengan sidebar label/warna/edit/hapus dan kontrol keyboard.
 - [x] Preview mengikuti kotak tanpa training ulang saat play/simpan/query.
+- [x] Tracking koreksi tersimpan lintas restart dan ekspor MP4 per revisi.
+  Rentang yang disiapkan tersimpan; label tetap perlu ditinjau sebelum training.
+- [x] CLI segmentasi video panjang, seleksi frame dan draft label objek/helm.
+  Split dataset memakai identitas video asal untuk mencegah kebocoran antarsegmen.
 - [x] Koreksi lengkap dipakai dashboard/chat/JSON pada posisi yang disahkan.
 - [x] Ringkasan mengikuti isi video dan pertanyaan orang memakai bukti orang.
 - [x] Dataset YOLO dengan provenance; training kandidat terpisah dari dua sumber.
@@ -35,8 +40,8 @@ Tes membuktikan alur aplikasi berjalan; belum mengukur akurasi pada semua kondis
 - [ ] Perluas dataset helm/APD dan ukur FP/FN pada data yang tidak dipakai training.
 - [ ] Uji setup dari clone kosong, termasuk unduhan semua model; publikasi baru
   menguji setup library dan inferensi memakai bobot lokal yang sudah tersedia.
-- [ ] Simpan tracking koreksi untuk seluruh video dan ekspor MP4 hasil koreksi.
-  Saat ini preview gerak hanya berlaku dalam sesi; koreksi frame tersimpan.
+- [ ] Tinjau label publik objek/helm, lalu evaluasi kandidat pada sumber terpisah.
+  [Pipeline dan sumber data](video_training_pipeline.md); auto-label tetap draft.
 - [ ] Tambahkan audit revisi serta uji backup/restore ke direktori baru.
 - [ ] Bandingkan chat dasar/LoRA pada 100 prompt dengan rubrik dan decoding yang sama.
 

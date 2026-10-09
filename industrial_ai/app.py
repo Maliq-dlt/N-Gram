@@ -1027,6 +1027,7 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
     shutil.copyfile(source / "upload.bin", target / "upload.bin")
     for correction in [
         source / "annotations.json",
+        source / "source.json",
         *source.glob("annotation_*.jpg"),
     ]:
         if correction.is_file():

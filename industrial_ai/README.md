@@ -54,10 +54,19 @@ lokal tanpa API key/cloud chat. Cache/temp/upload/hasil berada dalam subproyek.
    tanpa helm. Label khusus seperti `karung` bisa ditambahkan. Warna otomatis
    bisa diganti; nama/warna adalah metadata, bukan pengenal wajah.
 6. **Putar & ikuti kotak** mengikuti gerak dari posisi sekarang. Jeda/tandai ulang
-   jika target hilang. Tidak ada fine-tuning saat play/simpan/query.
+   jika target hilang. Tracking otomatis tersimpan saat frame disiapkan dan dimuat
+   kembali setelah restart. Tidak ada fine-tuning saat play/simpan/query.
 7. **Simpan koreksi** setelah seluruh objek dalam kelompok pada posisi itu diperiksa.
    Dashboard/chat/JSON memakai hitungan koreksi; putar/geser/tutup menyimpan draft.
    Draft belum menjadi hitungan atau dataset.
+8. **Ekspor video koreksi** menghasilkan MP4 H264 dengan audio sumber bila tersedia.
+   Kotak manual pada posisi tepat diutamakan, lalu tracking koreksi tersimpan,
+   lalu kotak AI awal. Rentang yang belum diputar belum mempunyai tracking koreksi.
+   Ekspor diberi penanda preview dan versi revisi; hasil AI/ekspor sebelumnya tetap ada.
+
+**Layar penuh** memperbesar video dan mempertahankan panel label/warna/edit/hapus
+di sidebar. Klik **Keluar layar penuh** atau tekan Escape untuk kembali; posisi
+video dan kotak tetap sama. Pada layar ponsel sempit, panel tampil di bawah video.
 
 Tema **Sistem/Terang/Gelap** tersimpan di browser.
 Review **Semua objek** dan **Kepala & helm** terpisah.
@@ -132,6 +141,8 @@ npm audit --audit-level=high
 uv run --frozen python tests/self_check.py
 uv run --frozen python tests/review_counts_check.py
 uv run --frozen python tests/tracking_check.py
+uv run --frozen python tests/corrections_check.py
+uv run --frozen python tests/video_finetune_check.py
 uv run --frozen ruff check . --exclude .code-review-graph
 uv run --frozen ruff format --check . --exclude .code-review-graph
 uv run --frozen ty check --exclude .tmp --exclude .venv --exclude .cache --exclude .uv-cache --exclude .code-review-graph --exclude node_modules --exclude models --exclude data
@@ -155,13 +166,33 @@ merangkum bukti. Laporan rinci, screenshot CCTV, model dan data runtime tetap lo
 
 Layak dibagikan sebagai demo/portofolio. Kerumunan/occlusion/objek kecil/background
 mirip masih bisa membuat target hilang, drift atau ID tertukar. Kotak tanpa penuntun
-detector berukuran tetap, input tracker maksimal 640px. Preview manual belum
-menjadi koreksi seluruh video/MP4 baru atau lintasan persisten. Belum ada ground
+detector berukuran tetap, input tracker maksimal 640px. Tracking koreksi tersimpan
+dan ekspor MP4 belum menghitung ulang lintasan/individu unik. Belum ada ground
 truth independen untuk klaim akurasi/kesiapan keselamatan pabrik.
 
 Prioritas: ukur ID switch/IDF1 serta FP/FN di video independen, perluas label helm/APD,
 lalu polish anotasi. Bandingkan YOLO satu tingkat lebih besar/ReID setelah baseline
 terukur. CCTV langsung, OCR plat, pengenalan wajah dan absensi belum tersedia.
+
+## Menyiapkan video panjang untuk review
+
+Server lokal harus aktif. CLI memotong video panjang menjadi MP4 maksimal 110 detik,
+memilih frame dengan pHash/jarak waktu, lalu membuat draft label objek dan helm.
+GPU dipilih otomatis bila tersedia; VRAM habis memakai CPU. Contoh:
+
+```powershell
+. .\setup_lokal.ps1
+uv run --frozen python video_finetune.py data/public/videos/scaffolding-current.ogv data/public/videos/traffic.webm --group both --device auto --frames 40
+```
+
+Gunakan `--device cpu` untuk CPU. Maksimal 80 frame dipilih per sumber, bukan per segmen.
+`data/video-prep/<id>/manifest.json` berisi job/posisi review; `selection.json` dalam
+folder job menandai deteksi meragukan. Di dashboard, buka rekaman segmen, pilih detik
+review dan sahkan kelompok objek/helm secara terpisah. Tidak ada label otomatis
+yang langsung masuk training. Metadata `source.json` menjaga semua segmen dari
+video asal pada split yang sama, termasuk setelah analisis ulang.
+
+[Tahapan, data publik dan batas evaluasi](../tasks/video_training_pipeline.md).
 
 ## Sumber dan lisensi
 

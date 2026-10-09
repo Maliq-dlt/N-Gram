@@ -4,6 +4,8 @@ from __future__ import annotations
 
 import hashlib
 import json
+import math
+import re
 import shutil
 from pathlib import Path
 
@@ -16,6 +18,19 @@ def collect_reviewed(folders: list[Path], group: str, *, approved_only: bool = F
     for folder in folders:
         with (folder / "upload.bin").open("rb") as source:
             source_hash = hashlib.file_digest(source, "sha256").hexdigest()
+        origin = folder / "source.json"
+        source_meta = json.loads(origin.read_text(encoding="utf-8")) if origin.is_file() else None
+        if source_meta is not None:
+            offset = source_meta.get("start_seconds")
+            if (
+                not re.fullmatch(r"[0-9a-f]{64}", source_meta.get("source_sha256", ""))
+                or source_meta.get("segment_sha256") != source_hash
+                or not isinstance(offset, (int, float))
+                or not math.isfinite(offset)
+                or offset < 0
+            ):
+                raise ValueError("Metadata sumber segmen tidak valid atau hash upload berubah.")
+            source_hash = source_meta["source_sha256"]
         annotations = folder / "annotations.json"
         if not annotations.is_file():
             continue
@@ -40,6 +55,11 @@ def collect_reviewed(folders: list[Path], group: str, *, approved_only: bool = F
                     "revision": data["revision"],
                     "updated_at": frame.get("updated_at", ""),
                     "frame_index": frame["frame_index"],
+                    "source_position": round(
+                        (source_meta["start_seconds"] if source_meta else 0)
+                        + frame.get("seconds", frame["frame_index"] / 10),
+                        6,
+                    ),
                     "image": image,
                     "boxes": boxes,
                 }
@@ -47,7 +67,7 @@ def collect_reviewed(folders: list[Path], group: str, *, approved_only: bool = F
     if approved_only:
         rows = list(
             {
-                (r["source_sha256"], r["frame_index"]): r
+                (r["source_sha256"], r["source_position"]): r
                 for r in sorted(rows, key=lambda r: r["updated_at"])
             }.values()
         )
@@ -110,7 +130,7 @@ def build_dataset(folder: Path, rows: list[dict], group: str, base_names: list[s
         "learned_classes": sorted(observed),
         "frames": manifest,
         "counts": counts,
-        "split_unit": "source upload SHA256",
+        "split_unit": "original source SHA256; upload SHA256 for legacy jobs",
         "notice": "Small local pilot. User-complete labels are not independently validated; no factory accuracy claim.",
     }
     (folder / "dataset/provenance.json").write_text(
