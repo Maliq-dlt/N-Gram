@@ -161,6 +161,7 @@ jobs:
                   break
               time.sleep(1)
           else:
+              print(result.stderr.decode(errors='replace'), flush=True)
               raise AssertionError('Caddy local CA was not generated')
           cookies = http.cookiejar.CookieJar()
           client = urllib.request.build_opener(urllib.request.HTTPSHandler(context=ssl.create_default_context(cafile=str(ca))), urllib.request.HTTPCookieProcessor(cookies))

@@ -156,16 +156,36 @@ class Store:
         if not isinstance(password, str) or not 12 <= len(password) <= 256:
             raise ValueError("Password must contain 12 to 256 characters.")
         salt = secrets.token_bytes(16)
-        digest = hashlib.scrypt(password.encode(), salt=salt, n=16384, r=8, p=1)
-        return salt.hex() + ":" + digest.hex()
+        digest = hashlib.scrypt(
+            password.encode(), salt=salt, n=131072, r=8, p=1, maxmem=256 * 1024 * 1024
+        )
+        return "scrypt-v1:" + salt.hex() + ":" + digest.hex()
 
     @staticmethod
     def _matches(password, encoded):
-        if not isinstance(password, str) or len(password) > 256:
+        if not isinstance(password, str) or len(password) > 256 or not isinstance(encoded, str):
             return False
-        salt, digest = encoded.split(":")
-        actual = hashlib.scrypt(password.encode(), salt=bytes.fromhex(salt), n=16384, r=8, p=1)
-        return hmac.compare_digest(actual.hex(), digest)
+        try:
+            parts = encoded.split(":")
+            if len(parts) == 3 and parts[0] == "scrypt-v1":
+                _, salt, digest = parts
+                cost = 131072
+            elif len(parts) == 2:
+                salt, digest = parts
+                cost = 16384
+            else:
+                return False
+            if len(salt) != 32 or len(digest) != 128:
+                return False
+            salt_bytes, digest_bytes = bytes.fromhex(salt), bytes.fromhex(digest)
+            if len(salt_bytes) != 16 or len(digest_bytes) != 64:
+                return False
+            actual = hashlib.scrypt(
+                password.encode(), salt=salt_bytes, n=cost, r=8, p=1, maxmem=256 * 1024 * 1024
+            )
+            return hmac.compare_digest(actual, digest_bytes)
+        except (ValueError, UnicodeError):
+            return False
 
     @staticmethod
     def _username(username):
@@ -255,10 +275,11 @@ class Store:
                 "SELECT * FROM users WHERE username=? AND active=1", (username,)
             ).fetchone()
         # Unknown usernames still pay the password hashing cost.
-        encoded = row["password"] if row else "00" * 16 + ":" + "00" * 64
+        encoded = row["password"] if row else "scrypt-v1:" + "00" * 16 + ":" + "00" * 64
         if not self._matches(password, encoded) or row is None:
             self.audit("login", outcome="denied")
             return None
+        upgraded = self._password(password) if not encoded.startswith("scrypt-v1:") else None
         token, csrf = secrets.token_urlsafe(32), secrets.token_urlsafe(32)
         digest, expires_at = hashlib.sha256(token.encode()).hexdigest(), int(time.time()) + seconds
 
@@ -268,6 +289,11 @@ class Store:
             ).fetchone()
             if current is None or current["password"] != encoded:
                 return None
+            if upgraded is not None:
+                db.execute(
+                    "UPDATE users SET password=? WHERE id=? AND password=?",
+                    (upgraded, row["id"], encoded),
+                )
             db.execute("DELETE FROM sessions WHERE expires_at<=?", (int(time.time()),))
             db.execute(
                 "INSERT INTO sessions VALUES(?,?,?,?)", (digest, row["id"], csrf, expires_at)

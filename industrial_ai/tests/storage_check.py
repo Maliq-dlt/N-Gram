@@ -1,5 +1,6 @@
 """Run: python industrial_ai/tests/storage_check.py"""
 
+import hashlib
 import json
 import sqlite3
 import sys
@@ -38,6 +39,60 @@ def main():
         pass
     else:
         raise AssertionError("Duplicate username must produce a domain error")
+    with store.connection() as db:
+        assert (
+            db.execute("SELECT password FROM users WHERE id=?", (admin["id"],))
+            .fetchone()[0]
+            .startswith("scrypt-v1:")
+        )
+    legacy_salt = bytes(range(16))
+    legacy = (
+        legacy_salt.hex()
+        + ":"
+        + hashlib.scrypt(b"correct horse battery staple", salt=legacy_salt, n=16384, r=8, p=1).hex()
+    )
+    with store.connection() as db:
+        db.execute("UPDATE users SET password=? WHERE id=?", (legacy, admin["id"]))
+        db.commit()
+    assert store.authenticate("Admin", "wrong-password") is None
+    with store.connection() as db:
+        assert (
+            db.execute("SELECT password FROM users WHERE id=?", (admin["id"],)).fetchone()[0]
+            == legacy
+        )
+    assert store.authenticate("Admin", "correct horse battery staple")
+    with store.connection() as db:
+        assert (
+            db.execute("SELECT password FROM users WHERE id=?", (admin["id"],))
+            .fetchone()[0]
+            .startswith("scrypt-v1:")
+        )
+    for invalid in (
+        "",
+        "bad:hash",
+        "scrypt-v2:" + legacy,
+        "scrypt-v1:" + "x" * 32 + ":" + "0" * 128,
+    ):
+        assert not Store._matches("correct horse battery staple", invalid)
+    concurrent_hash = Store._password("concurrent-password-change")
+    with store.connection() as db:
+        db.execute("UPDATE users SET password=? WHERE id=?", (legacy, admin["id"]))
+        db.commit()
+
+    def concurrent_change(password):
+        with store.connection() as db:
+            db.execute("UPDATE users SET password=? WHERE id=?", (concurrent_hash, admin["id"]))
+            db.commit()
+        return concurrent_hash
+
+    with patch.object(store, "_password", side_effect=concurrent_change):
+        assert store.authenticate("Admin", "correct horse battery staple") is None
+    with store.connection() as db:
+        assert (
+            db.execute("SELECT password FROM users WHERE id=?", (admin["id"],)).fetchone()[0]
+            == concurrent_hash
+        )
+    store.change_password(admin["id"], "correct horse battery staple")
     second = store.create_workspace("Other")
     viewer = store.create_user("Reader", "reader-password-long", "viewer", second)
     assert store.workspace("Other") == second

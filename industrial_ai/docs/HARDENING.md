@@ -11,7 +11,8 @@
 
 ## Diterapkan
 
-- Autentikasi aktif; password di-hash dengan scrypt stdlib, tanpa password bawaan.
+- Autentikasi aktif; password di-hash dengan scrypt stdlib (N=131072/r=8/p=1, sekitar 128 MiB),
+  tanpa password bawaan. Hash lama ditingkatkan setelah login berhasil.
   Owner pertama: `uv run python access.py init --username owner` (password interaktif).
   Bootstrap launcher `--generate` dapat menulis `data/security/first-access.txt` lokal;
   hapus salinan credential setelah akses diamankan dan jangan bagikan berkas itu.
@@ -84,7 +85,8 @@ sertifikat. Domain publik memakai sertifikat otomatis setelah DNS dan port 80/44
 tersedia; hostname di atas hanyalah contoh konfigurasi. App tidak mengekspos port host.
 Origin non-loopback wajib HTTPS; Host tidak memakai wildcard. Jangan mempercayai
 forwarded headers dari alamat sembarang. Proxy memakai user default image Caddy,
-capability dibuang dan `no-new-privileges`; isolasi app bukan jaminan isolasi host.
+hanya capability `NET_BIND_SERVICE` untuk binary Caddy/port 80 dan 443,
+dan `no-new-privileges`; isolasi app bukan jaminan isolasi host.
 
 Validasi yang dijalankan: TypeScript strict, build UI, regresi playback/tracking/auth,
 dan Compose config untuk localhost serta domain HTTPS. Docker daemon tidak tersedia pada sesi ini:
