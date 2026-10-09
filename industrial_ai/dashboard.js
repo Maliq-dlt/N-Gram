@@ -5,11 +5,14 @@ let currentView='analysis', uploading=false;
 const objectNames={karung:'Karung',person:'Orang',car:'Mobil',bus:'Bus',truck:'Truk',motorcycle:'Motor',bicycle:'Sepeda'};
 const vehicles = frame => Object.keys(frame).filter(k=>!['person','seconds'].includes(k)).reduce((n,k)=>n+(frame[k] || 0),0);
 function syncControls() {
-  const blocked=uploading || sending || reviewBusy || currentView==='annotation' || ['uploading','queued','processing'].includes(job?.status);
+  const blocked=uploading || sending || reviewBusy || currentView==='annotation' || ['uploading','queued','processing','cancelling'].includes(job?.status);
   for(const id of ['newVideoButton','emptyUploadButton','uploadButton']) $(id).disabled=blocked;
   $('historySelect').disabled=uploading || sending || reviewBusy || currentView==='annotation';
   $('closeUpload').disabled=uploading; $('sendChat').disabled=sending || reviewBusy; for(const button of document.querySelectorAll('[data-question]'))button.disabled=sending || reviewBusy;
   $('reanalyzeButton').disabled=blocked || !summary;
+  $('retryJob').hidden=!['error','cancelled'].includes(job?.status);
+  $('cancelJob').hidden=!['queued','processing','cancelling'].includes(job?.status);
+  $('cancelJob').disabled=job?.status==='cancelling';
   for(const button of document.querySelectorAll('[data-view]')) button.disabled=uploading || reviewBusy;
 }
 async function setView(view) {
@@ -53,21 +56,12 @@ async function refreshHistory(selected) {
   const jobs = await api('/api/jobs');
   $('historySelect').replaceChildren(new Option(jobs.length ? 'Pilih video tersimpan' : 'Belum ada video',''));
   for (const item of jobs) {
-    const mark = {done:'Selesai',processing:'Diproses',queued:'Antrean',error:'Gagal',uploading:'Upload'}[item.status];
+    const mark = {done:'Selesai',processing:'Diproses',queued:'Antrean',error:'Gagal',uploading:'Upload',cancelled:'Dibatalkan',cancelling:'Membatalkan'}[item.status];
     const option = new Option(`${item.filename} · ${mark}`, item.id);
     $('historySelect').append(option);
   }
   $('historySelect').value = selected || '';
   return jobs;
-}
-function refreshCounts() {
-  const occupancy=summary.reviewed_occupancy || summary.occupancy;
-  $('peakPeople').textContent=Math.max(0,...occupancy.map(f=>f.person || 0));
-  $('peakCars').textContent=Math.max(0,...occupancy.map(vehicles));
-  const status=summary.review_status, latest=status?.latest;
-  const latestCounts=latest ? Object.entries(latest.counts).filter(([,n])=>n>0).map(([k,n])=>`${n} ${(objectNames[k] || k).toLowerCase()}`).join(' · ') || '0 objek' : '';
-  $('correctionCounts').textContent=status ? `${status.saved_positions} posisi koreksi disahkan · ${status.draft_positions} draft belum dihitung${latest ? ` · Terakhir detik ${latest.seconds}: ${latestCounts}` : ''}. Track dan lintasan tetap dari analisis AI awal.` : '';
-  updateMoment();
 }
 function refreshCounts() {
   const occupancy=summary.reviewed_occupancy || summary.occupancy;
@@ -99,8 +93,11 @@ function displayResults(data) {
   renderEvidence();
   for (const [id,name] of [['downloadTracked','tracked.mp4'],['downloadSummary','summary_reviewed.json'],['downloadOriginal','upload.bin']]) { $(id).href = mediaUrl(name); $(id).setAttribute('download',name); }
   $('downloadSummary').href=`/api/jobs/${job.id}/summary`;
-  $('downloadSummary').href=`/api/jobs/${job.id}/summary`;
   $('analysisModel').value=summary.model_id || '';
+  $('resultMode').value='ai'; $('correctedOption').disabled=true;
+  const evidence=summary.learning_evidence;
+  $('modelHelp').textContent=evidence ? `Hasil fine-tuning nyata · checkpoint ${evidence.checkpoint_sha256.slice(0,12)} · ${evidence.training_seconds} detik training. Akurasi perlu evaluasi terpisah.` : 'Hasil model dasar. Koreksi manual ditampilkan melalui Tampilan koreksi.';
+  refreshQueue().catch(error=>showError('reviewError',error.message));
   updateMoment(); syncControls();
 }
 function renderEvidence() {
@@ -122,7 +119,7 @@ function renderEvidence() {
 $('evidenceFilter').onchange=renderEvidence;
 async function selectJob(id) {
   const current = ++generation;
-  clearTimeout(pollTimer);clearTimeout(trainingPoll);$('learningProgress').hidden=true; resetChat(); clearResults();
+  clearTimeout(pollTimer);clearTimeout(trainingPoll);clearTimeout(exportPoll);$('learningProgress').hidden=true;$('exportProgress').hidden=true;$('showLearnedResult').hidden=true; resetChat(); clearResults();
   $('currentFile').textContent='Pilih rekaman untuk mulai.';
   if (!id) { job = null; $('progressArea').hidden = true; $('comparisonBadge').textContent = 'Menunggu video'; syncControls(); return; }
   async function check() {
@@ -132,7 +129,7 @@ async function selectJob(id) {
       job = data; $('currentFile').textContent=data.filename; syncControls(); $('progressArea').hidden = false; $('jobProgress').value = data.progress; $('jobStatus').textContent = data.message;
       syncControls();
       if (data.status === 'done') { displayResults(data); await refreshHistory(id); }
-      else if (data.status === 'error') { $('comparisonBadge').textContent = 'Analisis gagal'; showError('uploadError',data.message); await refreshHistory(id); }
+      else if (['error','cancelled'].includes(data.status)) { $('comparisonBadge').textContent = 'Analisis gagal'; showError('uploadError',data.message); await refreshHistory(id); }
       else { $('comparisonBadge').textContent = 'Sedang diproses'; pollTimer = setTimeout(check,1500); }
     } catch (error) { if (current === generation) { showError('uploadError',error.message); syncControls(); } }
   }
@@ -237,7 +234,7 @@ function syncMetadata() {
 }
 for(const id of ['reviewLabel','customLabel','reviewName','reviewColorMode','reviewColor']) $(id).addEventListener('input',syncMetadata);
 function reviewBusyState(value) {
-  reviewBusy=value; for(const button of $('boxList').querySelectorAll('button')) button.disabled=value;
+  reviewBusy=value; for(const button of $('reviewQueue').querySelectorAll('button'))button.disabled=value; $('nextPending').disabled=value; for(const button of $('boxList').querySelectorAll('button')) button.disabled=value;
   for(const id of ['reviewControls','boxControls','metadataControls']) $(id).disabled=value;
   for(const id of ['saveReview','reloadReview','exportDataset','exportCorrectedVideo','closeReview','suggestBoxes','reviewGroup','applyBoxButton','cancelEditButton','reviewPlayback','reviewTimeline','learnDetector']) $(id).disabled=value;
   syncMetadata(); syncControls();
@@ -423,7 +420,7 @@ async function loadManualFrame(index,discard=false) {
       catch(error){showError('reviewError',error.message+' Anda tetap bisa menggambar kotak sendiri.');}
     }
     reviewBaseline=structuredClone(reviewBoxes);reviewDirty=false; unsavedAdds=[]; cancelDrawing(); $('reviewSeconds').value=(index/summary.fps).toFixed(2); $('reviewSeconds').max=(summary.duration-1/summary.fps).toFixed(2);
-    original.currentTime=index/summary.fps; tracked.currentTime=original.currentTime; reviewReady=true; $('reviewPlayback').textContent='Putar & ikuti kotak'; $('reviewStage').hidden=false; reviewSvg.toggleAttribute('hidden',false); drawManualBoxes();
+    original.currentTime=index/summary.fps; tracked.currentTime=original.currentTime; reviewReady=true; renderQueue(); $('reviewPlayback').textContent='Putar & ikuti kotak'; $('reviewStage').hidden=false; reviewSvg.toggleAttribute('hidden',false); drawManualBoxes();
     $('reviewStatus').textContent=`Frame ${index} · detik ${(index/summary.fps).toFixed(2)} · ${saved ? 'koreksi tersimpan dimuat' : predicted?.lost?.length ? 'hilang: '+lostTracks(predicted)+'; tandai ulang' : predicted?.merged ? 'tracking tersimpan dimuat; periksa sebelum Simpan koreksi' : 'kotak AI/tracker sebagai saran; koreksi sebelum disimpan'}`;
     return true;
   } catch(error) {showError('reviewError',error.message);} finally {reviewBusyState(false);}
@@ -499,8 +496,6 @@ async function persistReview(learn) {
     reviewBaseline=structuredClone(reviewBoxes);reviewDirty=false;unsavedAdds=[];cancelDrawing();
     try {const data=await api(`/api/jobs/${job.id}`);summary=data.summary;refreshCounts();}
     catch {showError('reviewError','Koreksi tersimpan, tetapi hitungan belum berhasil dimuat. Buka kembali rekaman untuk memperbaruinya.');}
-    try {const data=await api(`/api/jobs/${job.id}`);summary=data.summary;refreshCounts();}
-    catch {showError('reviewError','Koreksi tersimpan, tetapi hitungan belum berhasil dimuat. Buka kembali rekaman untuk memperbaruinya.');}
     $('reviewStatus').textContent=learn ? 'Koreksi tersimpan. Hitungan pada posisi ini, puncak dashboard, dan ringkasan chat sudah diperbarui.' : 'Draft disimpan otomatis. Putar untuk mengikuti kotak; Simpan koreksi setelah posisi ini diperiksa.';
     return true;
   }catch(error){showError('reviewError',error.message);return false;}
@@ -508,6 +503,11 @@ async function persistReview(learn) {
 }
 $('saveReview').onclick=async()=>{
   if(!(await persistReview(true)))return;
+  try {
+    const queue=await refreshQueue();
+    if(queue.pending) learningStatus(`Koreksi tersimpan. ${queue.pending} posisi ${queue.group==='objects'?'objek':'helm'} belum disahkan. Training dimulai setelah antrean selesai.`);
+    else {startExport(false); await startLearning(job.id,$('reviewGroup').value);}
+  }catch(error){showError('reviewError',error.message);}
 };
 $('learnDetector').onclick=async()=>{if(trackingWanted)await pauseReview();if(await persistReview(true))startLearning(job.id,$('reviewGroup').value);};
 $('suggestBoxes').onclick=async()=>{
@@ -524,51 +524,111 @@ $('suggestBoxes').onclick=async()=>{
   }catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);drawManualBoxes();}
 };
 $('exportDataset').onclick=async()=>{if(reviewDirty){showError('reviewError','Simpan koreksi terlebih dahulu.');return;} reviewBusyState(true); showError('reviewError',''); try{const response=await fetch(`/api/jobs/${job.id}/dataset`); if(!response.ok){const data=await response.json();throw new Error(data.detail);} const url=URL.createObjectURL(await response.blob()), a=document.createElement('a'); a.href=url;a.download=`koreksi_${job.id}.zip`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000); $('reviewStatus').textContent='Dataset YOLO diekspor. Pisahkan train/val/test berdasarkan video sebelum training.';}catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}};
-$('exportCorrectedVideo').onclick=async()=>{
-  if(reviewBusy || trackingWanted || !(await persistReview(false)))return;
-  reviewBusyState(true);showError('reviewError','');$('reviewStatus').textContent='Mengekspor video koreksi…';
+let exportPoll=null, currentExport=null;
+async function startExport(download=false) {
+  if(!job || !summary)return;
+  const source=job.id, current=generation;
   try {
-    const response=await fetch(`/api/jobs/${job.id}/corrected-video`,{method:'POST'});
-    if(!response.ok){const data=await response.json();throw new Error(data.detail);}
-    const url=URL.createObjectURL(await response.blob()), a=document.createElement('a');
-    a.href=url;a.download=`koreksi_video_${job.id}.mp4`;a.click();setTimeout(()=>URL.revokeObjectURL(url),1000);
-    $('reviewStatus').textContent='MP4 koreksi diekspor. Posisi tanpa koreksi memakai kotak AI awal; hasil tracker masih perlu diperiksa.';
-  }catch(error){showError('reviewError',error.message);}finally{reviewBusyState(false);}
-};
+    const data=await api(`/api/jobs/${source}/exports`,{method:'POST'});
+    currentExport={source,id:data.id};$('exportProgress').hidden=false;
+    async function poll(){
+      if(current!==generation)return;
+      try {
+        const state=await api(`/api/jobs/${source}/exports/${data.id}`);
+        if(current!==generation)return;
+        $('exportProgressBar').value=state.progress;$('exportStatus').textContent=state.message;
+        $('cancelExport').hidden=!['queued','processing','cancelling'].includes(state.status);
+        $('cancelExport').disabled=state.status==='cancelling';
+        if(['queued','processing','cancelling'].includes(state.status)){exportPoll=setTimeout(poll,1000);return;}
+        if(state.status==='done'){
+          $('correctedOption').disabled=false; $('correctedOption').dataset.url=state.media_url;
+          if(download){const a=document.createElement('a');a.href=state.media_url;a.download=state.filename;a.click();}
+          else {$('resultMode').value='corrections';switchResultMode();}
+        }
+      }catch(error){$('exportStatus').textContent=error.message;}
+    }
+    clearTimeout(exportPoll);await poll();
+  }catch(error){if(current===generation){$('exportProgress').hidden=false;$('exportStatus').textContent=error.message;}}
+}
+$('exportCorrectedVideo').onclick=async()=>{if(reviewBusy || trackingWanted || !(await persistReview(false)))return;await startExport(true);};
+$('cancelExport').onclick=async()=>{if(currentExport)try{await api(`/api/jobs/${currentExport.source}/exports/${currentExport.id}/cancel`,{method:'POST'});}catch(error){$('exportStatus').textContent=error.message;}};
+function switchResultMode(){
+  if(!job || !summary)return;
+  pauseComparison();const at=original.currentTime;
+  tracked.src=$('resultMode').value==='corrections' ? $('correctedOption').dataset.url : mediaUrl('tracked.mp4');
+  tracked.addEventListener('loadedmetadata',()=>{tracked.currentTime=Math.min(at,tracked.duration);},{once:true});
+  $('comparisonBadge').textContent=$('resultMode').value==='corrections' ? 'Koreksi pengguna · belum bukti training' : (summary.model_id ? 'Hasil model fine-tuning' : 'Hasil model dasar');
+}
+$('resultMode').onchange=()=>{if($('resultMode').value==='corrections' && $('correctedOption').disabled)startExport(false);else switchResultMode();};
+$('prepareCorrections').onclick=()=>startExport(false);
+let queueData=null;
+async function refreshQueue(){
+  if(!job || !summary)return null;
+  const source=job.id,group=$('reviewGroup').value;
+  const data=await api(`/api/jobs/${source}/review-queue?group=${group}`);
+  if(job?.id!==source || $('reviewGroup').value!==group)return null;
+  queueData=data;renderQueue();return data;
+}
+function renderQueue(){
+  if(!queueData)return;
+  $('queueStatus').textContent=`${queueData.reviewed}/${queueData.total} posisi disahkan · ${queueData.pending} perlu review`;
+  $('reviewQueue').replaceChildren();
+  for(const row of queueData.positions.filter(r=>$('queueFilter').value==='all' || !r.reviewed)){
+    const button=document.createElement('button');button.type='button';button.className='queue-position button button--outline button--sm';
+    button.textContent=`${row.reviewed?'✓ ':''}${row.seconds.toFixed(1)}s · ${row.reasons.join(' · ')}`;
+    button.disabled=reviewBusy;button.onclick=async()=>{if(trackingWanted)await pauseReview();await loadManualFrame(row.frame_index);};
+    if(row.frame_index===reviewFrame)button.setAttribute('aria-current','true');$('reviewQueue').append(button);
+  }
+}
+$('queueFilter').onchange=renderQueue;
+$('nextPending').onclick=async()=>{if(trackingWanted)await pauseReview();const data=await refreshQueue(),pending=data?.positions.filter(r=>!r.reviewed);if(pending?.length)await loadManualFrame((pending.find(r=>r.frame_index>reviewFrame)||pending[0]).frame_index);};
+$('reviewGroup').onchange=async()=>{try{await refreshQueue();}catch(error){showError('reviewError',error.message);}};
+$('retryJob').onclick=async()=>{try{const data=await api(`/api/jobs/${job.id}/retry`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model_id:job.model_id || '',device:$('deviceMode').value})});await refreshHistory(data.id);await selectJob(data.id);}catch(error){showError('uploadError',error.message);}};
+$('cancelJob').onclick=async()=>{try{await api(`/api/jobs/${job.id}/cancel`,{method:'POST'});}catch(error){showError('uploadError',error.message);}};
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
 try {$('themeSelect').value=localStorage.getItem('video-theme') || 'system';} catch {}
 function applyTheme() {const choice=$('themeSelect').value; document.documentElement.dataset.theme=choice==='system' ? (themeMedia.matches ? 'dark' : 'light') : choice; try {localStorage.setItem('video-theme',choice);} catch {}}
 $('themeSelect').onchange=applyTheme; themeMedia.addEventListener('change',()=>{if($('themeSelect').value==='system')applyTheme();}); applyTheme();
 let trainingPoll=null;
-async function refreshTraining() {
+async function refreshTraining(resume=true) {
+  const current=generation;
   const selected=$('analysisModel').value, jobs=await api('/api/training');
+  if(current!==generation)return;
   $('analysisModel').replaceChildren(new Option('YOLO dasar · pretrained',''));
   for(const item of jobs.filter(j=>j.status==='done')) $('analysisModel').add(new Option(`${item.group==='objects'?'Objek':'Helm'} · ${item.id.slice(0,6)} · hasil koreksi`,item.id));
   if(Array.from($('analysisModel').options).some(o=>o.value===selected)) $('analysisModel').value=selected;
-  const active=jobs.find(j=>j.followup_job_id && ['queued','processing'].includes(j.status));
-  if(active) pollTraining(active.id);
+  const active=jobs.find(j=>j.followup_job_id && ['queued','processing','cancelling'].includes(j.status));
+  if(active && resume) pollTraining(active.id);
 }
 function learningStatus(message,progress=0){$('learningProgress').hidden=false;$('learningProgressBar').value=progress;$('learningStatus').textContent=message;}
 async function startLearning(source,group){
+  const current=generation;
   try{
     $('showLearnedResult').hidden=true;
     const data=await api(`/api/jobs/${source}/learn`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({group,device:$('deviceMode').value})});
+    if(current!==generation)return;
     if(data.status==='waiting'){learningStatus(data.message);return;}
     pollTraining(data.id,data.result_job_id);
-  }catch(error){learningStatus('Koreksi tersimpan. '+error.message+' Klik Latih untuk video lain untuk mencoba kembali.');}
+  }catch(error){learningStatus('Koreksi tersimpan. '+error.message+' Klik Coba belajar lagi untuk mencoba kembali.');}
 }
-async function pollTraining(id,resultJobId=null){
-  const current=generation;clearTimeout(trainingPoll);
+async function pollTraining(id,resultJobId=null,current=generation){
+  if(current!==generation)return;clearTimeout(trainingPoll);
   try{
     const data=await api('/api/training/'+id);if(current!==generation)return;learningStatus(data.message,data.progress);
-    if(['queued','processing'].includes(data.status)){trainingPoll=setTimeout(()=>pollTraining(id,resultJobId),1500);return;}
-    if(data.status==='error'){learningStatus(data.message);return;}
-    await refreshTraining();
+    $('cancelLearning').hidden=!['queued','processing','cancelling'].includes(data.status);$('cancelLearning').disabled=data.status==='cancelling';$('cancelLearning').onclick=async()=>{try{await api('/api/training/'+id+'/cancel',{method:'POST'});}catch(error){learningStatus(error.message);}};
+    if(['queued','processing','cancelling'].includes(data.status)){trainingPoll=setTimeout(()=>pollTraining(id,resultJobId,current),1500);return;}
+    if(['error','cancelled'].includes(data.status)){learningStatus(data.message);$('cancelLearning').hidden=true;return;}
+    $('cancelLearning').hidden=true;await refreshTraining(false);if(current!==generation)return;
     if(resultJobId || data.result_job_id){
       const result=await api('/api/jobs/'+(resultJobId || data.result_job_id));
-      if(['queued','processing'].includes(result.status)){learningStatus('Belajar selesai. '+result.message,result.progress);trainingPoll=setTimeout(()=>pollTraining(id,resultJobId),1500);return;}
+      if(['queued','processing','cancelling'].includes(result.status)){learningStatus('Belajar selesai. '+result.message,result.progress);trainingPoll=setTimeout(()=>pollTraining(id,resultJobId,current),1500);return;}
+      if(current!==generation)return;
       learningStatus(result.status==='done' ? 'Belajar dan analisis ulang selesai. Hasil baru siap dilihat; koreksi tetap bisa ditanya.' : result.message,100);
       $('showLearnedResult').hidden=result.status!=='done';$('showLearnedResult').onclick=async()=>{if(!(await persistReview(false)))return;await setView('analysis');await refreshHistory(result.id);await selectJob(result.id);};
+      if(result.status==='done' && data.followup_job_id===job?.id && !reviewDirty && !reviewBusy && !trackingWanted && reviewVideo.paused && !sending){
+        await setView('analysis');await refreshHistory(result.id);await selectJob(result.id);
+        learningStatus(`Fine-tuning dan analisis ulang selesai · checkpoint ${data.checkpoint_sha256?.slice(0,12)}. Hasil baru sedang ditampilkan.`,100);
+      }
     }
   }catch(error){learningStatus(error.message);}
 }
@@ -576,6 +636,6 @@ $('analysisModel').onchange=()=>{$('modelHelp').textContent=$('analysisModel').v
 $('reanalyzeButton').onclick=async()=>{if(!job || !summary)return; showError('uploadError',''); try {const data=await api(`/api/jobs/${job.id}/reanalyze`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({model_id:$('analysisModel').value,device:$('deviceMode').value})});await setView('analysis');await refreshHistory(data.id);await selectJob(data.id);}catch(error){showError('uploadError',error.message);}};
 syncMetadata();
 (async () => {
-  try { const health=await api('/api/health'); $('systemStatus').textContent=health.vision_ready && health.chat_ready ? `Model lokal siap · ${health.device.startsWith('cuda') ? 'RTX / CUDA' : 'CPU'}${health.adapter_ready ? ' · LoRA' : ''}` : 'Model belum lengkap · lihat README'; await refreshTraining(); const jobs=await refreshHistory(); if (jobs.length) { const preferred=jobs.find(j=>['queued','processing'].includes(j.status)) || jobs.find(j=>j.status==='done') || jobs[0]; $('historySelect').value=preferred.id; await selectJob(preferred.id); } }
+  try { const health=await api('/api/health'); $('systemStatus').textContent=health.vision_ready && health.chat_ready ? `Model lokal siap · ${health.device.startsWith('cuda') ? 'RTX / CUDA' : 'CPU'}${health.adapter_ready ? ' · LoRA' : ''}` : 'Model belum lengkap · lihat README'; await refreshTraining(); const jobs=await refreshHistory(); if (jobs.length) { const preferred=jobs.find(j=>['queued','processing','cancelling'].includes(j.status)) || jobs.find(j=>j.status==='done') || jobs[0]; $('historySelect').value=preferred.id; await selectJob(preferred.id); } }
   catch(error) { $('systemStatus').textContent='Server tidak terhubung'; showError('uploadError',error.message); }
 })();

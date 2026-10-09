@@ -5,3 +5,4 @@ include reports/VERIFIKASI_PUBLIK.md reports/REFERENSI_GITHUB.md reports/DESAIN_
 include dashboard.js ui.css package.json package-lock.json
 recursive-include assets *.css
 include assets/THIRD_PARTY_LICENSES.txt
+include reports/WORKFLOW_REVIEW_BELAJAR.md

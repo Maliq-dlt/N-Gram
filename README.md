@@ -1,6 +1,41 @@
-# N-gram Language Model
+<div align="center">
 
-Tugas 16 langkah dan eksperimen smoothing dari nol. Penjelasan/hasil lengkap: [LAPORAN.md](LAPORAN.md); permintaan asli: [SPESIFIKASI_TUGAS.md](SPESIFIKASI_TUGAS.md).
+![N-Gram dan Video Insight](docs/banner.svg)
+
+**Eksperimen bahasa dari nol. Studio analisis video yang berjalan lokal.**
+
+[![CI](https://github.com/Maliq-dlt/N-Gram/actions/workflows/ci.yml/badge.svg)](https://github.com/Maliq-dlt/N-Gram/actions/workflows/ci.yml)
+
+[Mulai dengan studio](industrial_ai/README.md#mulai-di-windows) · [Laporan N-gram](LAPORAN.md) · [Kontribusi](CONTRIBUTING.md) · [Keamanan](SECURITY.md)
+
+</div>
+
+## Pilih tujuan Anda
+
+| Saya ingin… | Mulai dari sini |
+| --- | --- |
+| Unggah video, koreksi kotak, dan bertanya tentang rekaman | **[Video Insight](industrial_ai/README.md)** — dashboard, tracking, review, dan fine-tuning lokal |
+| Memahami probabilitas kata, smoothing, dan perplexity | **[Proyek N-gram](#mulai-di-windows-powershell)** — notebook dan CLI Python |
+| Menilai implementasi dan hasil pengujian | [Verifikasi studio](industrial_ai/reports/WORKFLOW_REVIEW_BELAJAR.md) · [Spesifikasi akademik](SPESIFIKASI_TUGAS.md) |
+| Berkontribusi atau memahami batas lisensi | [Panduan kontribusi](CONTRIBUTING.md) · [Komponen pihak ketiga](NOTICE.md) |
+
+> Video Insight ditujukan untuk demonstrasi lokal. Hasil deteksi tetap perlu ditinjau manusia. Bagian akademik mempertahankan core dan hasil eksperimen yang dibekukan.
+
+## Peta repository
+
+```text
+N-Gram/
+├── industrial_ai/     Studio video, backend, UI, dan tes fitur
+├── core/              Implementasi N-gram dan hasil awal yang dibekukan
+├── extensions/        Smoothing, eksperimen, dan CLI
+├── hasil_demonstrasi/ Bukti langkah pembelajaran N-gram
+├── verifikasi/        Manifest SHA-256 dan bukti reproduksi
+├── tasks/             Status pengerjaan dan roadmap
+├── docs/              Visual dokumentasi
+└── .github/           Pemeriksaan otomatis
+```
+
+Bobot AI, video pengguna, cache, serta environment lokal dibuat saat setup dan tidak masuk GitHub. Path kode dipertahankan agar import dan reproduksi tetap valid.
 
 ## Mulai di Windows PowerShell
 

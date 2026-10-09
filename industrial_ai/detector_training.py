@@ -139,12 +139,15 @@ def build_dataset(folder: Path, rows: list[dict], group: str, base_names: list[s
     return provenance
 
 
-def train_once(folder: Path, state: dict, device: str, progress) -> dict:
+def train_once(folder: Path, state: dict, device: str, progress, cancel=None) -> dict:
     import time
 
     import torch
     from ultralytics import YOLO
 
+    from operations import check_cancel
+
+    check_cancel(cancel)
     folder = folder.resolve()
     torch.set_num_threads(8)
     base = MODELS / ("yolo26n.pt" if state["group"] == "objects" else "helmet.pt")
@@ -158,12 +161,14 @@ def train_once(folder: Path, state: dict, device: str, progress) -> dict:
         )
 
     model.add_callback("on_fit_epoch_end", epoch_done)
+    model.add_callback("on_train_batch_end", lambda trainer: check_cancel(cancel))
     started = time.monotonic()
     result = model.train(
         data=str(folder / "dataset/data.yaml"),
         epochs=state["epochs"],
         imgsz=640,
         batch=2,
+        nbs=2,  # Update every pilot batch, including datasets smaller than the default nbs=64.
         device=int(device.split(":")[1]) if device.startswith("cuda") else "cpu",
         workers=0,
         project=str(folder),
@@ -183,6 +188,7 @@ def train_once(folder: Path, state: dict, device: str, progress) -> dict:
         patience=state["epochs"],
         verbose=False,
     )
+    check_cancel(cancel)
     checkpoint = folder / attempt / "weights/best.pt"
     if not checkpoint.is_file():
         raise RuntimeError("Training tidak menghasilkan checkpoint.")
@@ -198,7 +204,7 @@ def train_once(folder: Path, state: dict, device: str, progress) -> dict:
     }
 
 
-def train_candidate(folder: Path, state: dict, progress) -> dict:
+def train_candidate(folder: Path, state: dict, progress, cancel=None) -> dict:
     import gc
 
     import torch
@@ -215,7 +221,7 @@ def train_candidate(folder: Path, state: dict, progress) -> dict:
     device, reason = select_device(state["device_preference"], 2)
     fallback = False
     try:
-        result = train_once(folder, state, device, progress)
+        result = train_once(folder, state, device, progress, cancel)
     except torch.cuda.OutOfMemoryError:
         if device == "cpu":
             raise
@@ -224,7 +230,7 @@ def train_candidate(folder: Path, state: dict, progress) -> dict:
         gc.collect()
         torch.cuda.empty_cache()
         device, reason = "cpu", "VRAM habis; training diulang dengan CPU."
-        result = train_once(folder, state, device, progress)
+        result = train_once(folder, state, device, progress, cancel)
     return {
         **result,
         "device_reason": reason,

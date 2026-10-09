@@ -84,9 +84,17 @@ for frame in provenance["frames"]:
     source_splits.setdefault(frame["source_sha256"], set()).add(frame["split"])
 assert len(source_splits) == 2 and all(len(s) == 1 for s in source_splits.values())
 assert set.union(*source_splits.values()) == {"train", "val"}
-app.write_json(folders[0] / "state.json", {"filename": "segment.mp4", "line": 0.5})
+app.write_json(
+    folders[0] / "state.json",
+    {
+        "filename": "segment.mp4",
+        "line": 0.5,
+        "status": "done",
+        "bytes": (folders[0] / "upload.bin").stat().st_size,
+    },
+)
 with (
-    patch.object(app, "completed_folder", return_value=(folders[0], {})),
+    patch.object(app, "job_folder", return_value=folders[0]),
     patch.object(runtime, "JOBS", root),
     patch.object(app.executor, "submit"),
 ):

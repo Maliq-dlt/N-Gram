@@ -22,6 +22,8 @@ from pydantic import BaseModel, Field, model_validator
 from starlette.middleware.trustedhost import TrustedHostMiddleware
 
 from corrections import merge_overlay, read_corrections, render_video
+from operations import WorkCancelled, check_cancel
+from review import review_queue
 from vision import OBJECT_NAMES, process_video, reviewed_summary
 
 MAX_UPLOAD = 250 * 1024 * 1024
@@ -29,6 +31,39 @@ state_lock = threading.RLock()
 compute_lock = threading.Lock()
 executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="local-ai")
 logger = logging.getLogger("industrial_ai")
+export_lock = threading.Lock()
+export_executor = ThreadPoolExecutor(max_workers=1, thread_name_prefix="video-export")
+active_work: dict[Path, threading.Event] = {}
+
+
+def submit_work(pool, worker, folder, *args):
+    with state_lock:
+        active_work[folder] = threading.Event()
+        try:
+            pool.submit(worker, folder, *args)
+        except BaseException:
+            active_work.pop(folder, None)
+            raise
+
+
+def cancel_work(folder: Path):
+    with state_lock:
+        event = active_work.get(folder)
+        if event is not None and read_state(folder)["status"] in {
+            "queued",
+            "processing",
+            "cancelling",
+        }:
+            event.set()
+            update_state(
+                folder, status="cancelling", message="Membatalkan pada batas kerja berikutnya…"
+            )
+        return read_state(folder)
+
+
+def finish_work(folder):
+    with state_lock:
+        active_work.pop(folder, None)
 
 
 def job_folder(job_id: str) -> Path:
@@ -63,7 +98,9 @@ def update_state(folder: Path, **changes) -> None:
 
 
 def run_video(folder: Path, line: float) -> None:
+    cancel = active_work[folder]
     try:
+        check_cancel(cancel)
         update_state(folder, status="processing", progress=1, message="Memuat detektor lokal")
         import gc
 
@@ -79,6 +116,7 @@ def run_video(folder: Path, line: float) -> None:
                 line,
                 callback,
                 device=device,
+                cancel=cancel,
                 **candidate_models(read_state(folder).get("model_id", "")),
             )
         except torch.cuda.OutOfMemoryError:
@@ -95,12 +133,29 @@ def run_video(folder: Path, line: float) -> None:
                 line,
                 callback,
                 device=device,
+                cancel=cancel,
                 **candidate_models(read_state(folder).get("model_id", "")),
             )
+        check_cancel(cancel)
         summary["device_reason"] = reason
+        model_id = read_state(folder).get("model_id", "")
+        if model_id:
+            trained = read_state(training_folder(model_id))
+            summary["learning_evidence"] = {
+                k: trained.get(k)
+                for k in (
+                    "checkpoint_sha256",
+                    "base_sha256",
+                    "training_seconds",
+                    "group",
+                    "metrics",
+                )
+            }
         summary["model_id"] = read_state(folder).get("model_id", "")
         write_json(folder / "summary.json", summary)
         update_state(folder, status="done", progress=100, message="Analisis selesai")
+    except WorkCancelled as exc:
+        update_state(folder, status="cancelled", message=str(exc))
     except Exception:
         logger.exception("Video analysis failed: %s", folder.name)
         update_state(
@@ -109,6 +164,7 @@ def run_video(folder: Path, line: float) -> None:
             message="Video gagal dianalisis. Periksa format/durasi, model lokal, dan log server. Upload asli tetap tersimpan.",
         )
     finally:
+        finish_work(folder)
         compute_lock.release()
 
 
@@ -116,15 +172,15 @@ def run_video(folder: Path, line: float) -> None:
 async def lifespan(_app: FastAPI):
     # Results survive restart; interrupted work is explicit, never fabricated as complete.
     for path in runtime.JOBS.glob("*/state.json"):
-        if read_state(path.parent)["status"] in {"queued", "processing", "uploading"}:
+        if read_state(path.parent)["status"] in {"queued", "processing", "uploading", "cancelling"}:
             update_state(
                 path.parent,
                 status="error",
-                message="Proses terhenti ketika server ditutup. Silakan unggah ulang; file lama tetap tersimpan.",
+                message="Proses terhenti ketika server ditutup. Gunakan Coba lagi jika upload lengkap; file lama tetap tersimpan.",
             )
     for path in training_root.glob("*/state.json"):
         data = json.loads(path.read_text(encoding="utf-8"))
-        if data["status"] in {"queued", "processing"}:
+        if data["status"] in {"queued", "processing", "cancelling"}:
             write_json(
                 path,
                 {
@@ -133,8 +189,15 @@ async def lifespan(_app: FastAPI):
                     "message": "Training terhenti saat server ditutup. Kandidat belum siap.",
                 },
             )
+    for path in runtime.JOBS.glob("*/exports/*/state.json"):
+        if read_state(path.parent)["status"] in {"queued", "processing", "cancelling"}:
+            update_state(path.parent, status="error", message="Ekspor terhenti; coba ekspor lagi.")
     yield
+    with state_lock:
+        for event in active_work.values():
+            event.set()
     executor.shutdown(wait=True)
+    export_executor.shutdown(wait=True)
     with tracking_lock:
         for _, tracker, _ in tracking_sessions.values():
             tracker.close()
@@ -246,7 +309,7 @@ async def upload_video(
         if not size:
             raise HTTPException(422, "File video kosong.")
         update_state(folder, status="queued", bytes=size, message="Menunggu analisis")
-        executor.submit(run_video, folder, line)
+        submit_work(executor, run_video, folder, line)
     except BaseException:
         try:
             if (folder / "state.json").is_file():
@@ -268,6 +331,11 @@ def get_job(job_id: str):
     if state["status"] == "done":
         state["summary"] = result_summary(folder)
     return state
+
+
+@app.post("/api/jobs/{job_id}/cancel")
+def cancel_job(job_id: str):
+    return cancel_work(job_folder(job_id))
 
 
 class ManualBox(BaseModel):
@@ -555,8 +623,8 @@ def export_corrected_video(job_id: str):
         raise HTTPException(409, "Belum ada tracking/kotak koreksi yang tersimpan.")
     target = folder / f"corrected_c{corrections['revision']}_a{annotations['revision']}.mp4"
     if not target.is_file():
-        if not compute_lock.acquire(blocking=False):
-            raise HTTPException(409, "AI sedang bekerja. Ekspor setelah proses selesai.")
+        if not export_lock.acquire(blocking=False):
+            raise HTTPException(409, "Ekspor lain sedang berjalan. Tunggu proses selesai.")
         try:
             if not target.is_file():
                 render_video(folder, target, summary, corrections, annotations)
@@ -567,8 +635,113 @@ def export_corrected_video(job_id: str):
                 "Ekspor video koreksi gagal. Hasil awal tetap tersimpan; periksa FFmpeg/log server.",
             ) from exc
         finally:
-            compute_lock.release()
+            export_lock.release()
     return FileResponse(target, media_type="video/mp4", filename=target.name)
+
+
+def export_folder(job_id: str, revision: str) -> Path:
+    if not re.fullmatch(r"c\d+_a\d+", revision):
+        raise HTTPException(404, "Ekspor tidak ditemukan.")
+    folder = job_folder(job_id) / "exports" / revision
+    if not (folder / "state.json").is_file():
+        raise HTTPException(404, "Ekspor tidak ditemukan.")
+    return folder
+
+
+def run_export(folder, source, target, summary, corrections, annotations):
+    cancel = active_work[folder]
+    try:
+        check_cancel(cancel)
+        update_state(folder, status="processing", message="Merender video koreksi", progress=1)
+        if not target.is_file():
+            render_video(
+                source,
+                target,
+                summary,
+                corrections,
+                annotations,
+                progress=lambda p, m: update_state(folder, progress=p, message=m),
+                cancel=cancel,
+            )
+        check_cancel(cancel)
+        update_state(folder, status="done", progress=100, message="Video koreksi siap.")
+    except WorkCancelled as exc:
+        update_state(folder, status="cancelled", message=str(exc))
+    except Exception:
+        logger.exception("Export failed: %s", folder)
+        update_state(
+            folder, status="error", message="Ekspor gagal; hasil awal tetap tersimpan. Coba lagi."
+        )
+    finally:
+        finish_work(folder)
+        export_lock.release()
+
+
+@app.post("/api/jobs/{job_id}/exports", status_code=202)
+def start_export(job_id: str):
+    source, summary = completed_folder(job_id)
+    with state_lock:
+        corrections, annotations = read_corrections(source), read_annotations(source)
+        if not corrections["frames"] and not annotations["frames"]:
+            raise HTTPException(409, "Belum ada koreksi tersimpan.")
+        revision = f"c{corrections['revision']}_a{annotations['revision']}"
+        folder = source / "exports" / revision
+        if (folder / "state.json").is_file() and read_state(folder)["status"] in {
+            "queued",
+            "processing",
+            "cancelling",
+            "done",
+        }:
+            return read_state(folder)
+        if not export_lock.acquire(blocking=False):
+            raise HTTPException(409, "Ekspor lain masih berjalan.")
+        try:
+            folder.mkdir(parents=True, exist_ok=True)
+            target = source / f"corrected_{revision}.mp4"
+            write_json(
+                folder / "state.json",
+                {
+                    "id": revision,
+                    "status": "queued",
+                    "progress": 0,
+                    "message": "Menunggu ekspor",
+                    "filename": target.name,
+                    "media_url": f"/api/jobs/{job_id}/media/{target.name}",
+                },
+            )
+            submit_work(
+                export_executor,
+                run_export,
+                folder,
+                source,
+                target,
+                summary,
+                corrections,
+                annotations,
+            )
+        except BaseException:
+            export_lock.release()
+            raise
+        return read_state(folder)
+
+
+@app.get("/api/jobs/{job_id}/exports/{revision}")
+def get_export(job_id: str, revision: str):
+    return read_state(export_folder(job_id, revision))
+
+
+@app.post("/api/jobs/{job_id}/exports/{revision}/cancel")
+def cancel_export(job_id: str, revision: str):
+    return cancel_work(export_folder(job_id, revision))
+
+
+@app.get("/api/jobs/{job_id}/review-queue")
+def get_review_queue(job_id: str, group: Literal["objects", "helmets"] = "objects"):
+    folder, summary = completed_folder(job_id)
+    with state_lock:
+        return review_queue(
+            folder, read_annotations(folder), read_corrections(folder), summary, group
+        )
 
 
 @app.get("/api/jobs/{job_id}/annotations")
@@ -592,15 +765,41 @@ def save_annotations(job_id: str, request: ManualFrame):
             pending_image = snapshot.with_suffix(".pending")
             pending_image.write_bytes(image)
             pending_image.replace(snapshot)
+        previous = next((f for f in data["frames"] if f["frame_index"] == request.frame_index), {})
+        boxes = [box.model_dump() for box in request.boxes]
+        approved = []
+        flags = {}
+        for group, flag in [("objects", "complete"), ("helmets", "helmets_complete")]:
+
+            def labels(items, group=group):
+                return sorted(
+                    (b["label"], tuple(b["bbox"]))
+                    for b in items
+                    if (b["label"] in {"Hardhat", "NO-Hardhat"}) == (group == "helmets")
+                )
+
+            unchanged = labels(boxes) == labels(previous.get("boxes", []))
+            flags[flag] = bool(
+                getattr(request, flag)
+                if request.learn_group in {None, group}
+                else unchanged and previous.get(flag)
+            )
+            if unchanged and previous.get(flag):
+                flags[flag] = True
+            if request.learn_group == group:
+                if not getattr(request, flag):
+                    raise HTTPException(422, "Kelompok yang disahkan harus ditandai lengkap.")
+                approved.append(group)
+            elif unchanged and group in previous.get("learn_groups", []) and flags[flag]:
+                approved.append(group)
         row = {
             "frame_index": request.frame_index,
             "seconds": round(request.frame_index / summary["fps"], 2),
-            "complete": request.complete,
-            "helmets_complete": request.helmets_complete,
-            "boxes": [box.model_dump() for box in request.boxes],
+            **flags,
+            "boxes": boxes,
             "updated_at": datetime.now(UTC).isoformat(),
             "source": "manual",
-            "learn_groups": [request.learn_group] if request.learn_group else [],
+            "learn_groups": approved,
         }
         data["frames"] = [f for f in data["frames"] if f["frame_index"] != request.frame_index] + [
             row
@@ -699,7 +898,7 @@ def export_annotations(job_id: str):
 def media(job_id: str, name: str):
     folder = job_folder(job_id)
     if not re.fullmatch(
-        r"original\.mp4|tracked\.mp4|evidence_\d+\.jpg|helmet_\d+\.jpg|annotation_\d+\.jpg|summary\.json|upload\.bin",
+        r"original\.mp4|tracked\.mp4|corrected_c\d+_a\d+\.mp4|evidence_\d+\.jpg|helmet_\d+\.jpg|annotation_\d+\.jpg|summary\.json|upload\.bin",
         name,
     ):
         raise HTTPException(404, "Media tidak ditemukan.")
@@ -827,7 +1026,9 @@ class DetectorTrainingRequest(BaseModel):
 
 def run_training(folder: Path):
     handed_off = False
+    cancel = active_work[folder]
     try:
+        check_cancel(cancel)
         from detector_training import train_candidate
 
         update_state(
@@ -837,27 +1038,35 @@ def run_training(folder: Path):
             message="Menyiapkan dataset dan melepas memori chat",
         )
         result = train_candidate(
-            folder, read_state(folder), lambda p, m: update_state(folder, progress=p, message=m)
-        )
-        update_state(
             folder,
-            **result,
-            status="done",
-            progress=100,
-            message="Model hasil koreksi tersimpan.",
+            read_state(folder),
+            lambda p, m: update_state(folder, progress=p, message=m),
+            cancel,
         )
-        state = read_state(folder)
-        if state.get("followup_job_id"):
-            analysis = create_reanalysis(
-                state["followup_job_id"],
-                ReanalysisRequest(model_id=folder.name, device=state["device_preference"]),
-            )
-            handed_off = True
+        check_cancel(cancel)
+        with state_lock:
+            check_cancel(cancel)
             update_state(
                 folder,
-                result_job_id=analysis["id"],
-                message="Belajar selesai; menganalisis ulang video.",
+                **result,
+                status="done",
+                progress=100,
+                message="Model hasil koreksi tersimpan.",
             )
+            state = read_state(folder)
+            if state.get("followup_job_id"):
+                analysis = create_reanalysis(
+                    state["followup_job_id"],
+                    ReanalysisRequest(model_id=folder.name, device=state["device_preference"]),
+                )
+                handed_off = True
+                update_state(
+                    folder,
+                    result_job_id=analysis["id"],
+                    message="Belajar selesai; menganalisis ulang video.",
+                )
+    except WorkCancelled as exc:
+        update_state(folder, status="cancelled", message=str(exc))
     except Exception:
         logger.exception("Detector training failed: %s", folder.name)
         update_state(
@@ -866,19 +1075,29 @@ def run_training(folder: Path):
             message="Training gagal. Dataset dan hasil sebelumnya tetap tersimpan; periksa log server.",
         )
     finally:
+        finish_work(folder)
         if not handed_off:
             compute_lock.release()
 
 
 def start_detector_training(
-    request: DetectorTrainingRequest, *, approved_only=False, followup_job_id=None, fingerprint=None
+    request: DetectorTrainingRequest,
+    *,
+    approved_only=False,
+    followup_job_id=None,
+    fingerprint=None,
+    review_snapshot=None,
 ):
     from detector_training import collect_reviewed
 
     folders = [completed_folder(i)[0] for i in dict.fromkeys(request.job_ids)]
     try:
         with state_lock:
-            rows = collect_reviewed(folders, request.group, approved_only=approved_only)
+            rows = (
+                review_snapshot
+                if review_snapshot is not None
+                else collect_reviewed(folders, request.group, approved_only=approved_only)
+            )
     except ValueError as exc:
         raise HTTPException(422, str(exc)) from exc
     if not compute_lock.acquire(blocking=False):
@@ -903,7 +1122,7 @@ def start_detector_training(
                 "fingerprint": fingerprint,
             },
         )
-        executor.submit(run_training, folder)
+        submit_work(executor, run_training, folder)
     except BaseException:
         compute_lock.release()
         raise
@@ -927,6 +1146,12 @@ def learn_corrections(job_id: str, request: LearningRequest):
     from detector_training import collect_reviewed
 
     current, _ = completed_folder(job_id)
+    queue = get_review_queue(job_id, request.group)
+    if queue["pending"] or not queue["total"]:
+        return {
+            "status": "waiting",
+            "message": f"Koreksi tersimpan. Selesaikan antrean {request.group}: {queue['pending']} posisi belum disahkan.",
+        }
     flag = "complete" if request.group == "objects" else "helmets_complete"
     if not any(
         f.get(flag) and request.group in f.get("learn_groups", [])
@@ -936,9 +1161,12 @@ def learn_corrections(job_id: str, request: LearningRequest):
     folders = []
     for item in training_eligible():
         folder = job_folder(item["id"])
-        if any(
-            f.get(flag) and request.group in f.get("learn_groups", [])
-            for f in read_annotations(folder)["frames"]
+        if (
+            any(
+                f.get(flag) and request.group in f.get("learn_groups", [])
+                for f in read_annotations(folder)["frames"]
+            )
+            and not get_review_queue(item["id"], request.group)["pending"]
         ):
             folders.append(folder)
     # Keep the latest correction of each source frame, including copied reanalyses.
@@ -949,7 +1177,7 @@ def learn_corrections(job_id: str, request: LearningRequest):
     signature = sorted(
         (
             r["source_sha256"],
-            r["frame_index"],
+            r["source_position"],
             [{"label": b["label"], "bbox": b["bbox"]} for b in r["boxes"]],
         )
         for r in rows
@@ -961,19 +1189,20 @@ def learn_corrections(job_id: str, request: LearningRequest):
         (
             t
             for t in training_list()
-            if t.get("fingerprint") == fingerprint and t["status"] != "error"
+            if t.get("fingerprint") == fingerprint
+            and t["status"] in {"queued", "processing", "done"}
         ),
         None,
     )
     if previous:
-        if previous["status"] == "done" and previous.get("followup_job_id") != job_id:
+        if previous["status"] == "done":
             existing = next(
                 (
                     j
                     for j in list_jobs()
                     if j.get("source_job_id") == job_id
                     and j.get("model_id") == previous["id"]
-                    and j["status"] != "error"
+                    and j["status"] in {"queued", "processing", "done"}
                 ),
                 None,
             )
@@ -990,12 +1219,18 @@ def learn_corrections(job_id: str, request: LearningRequest):
         approved_only=True,
         followup_job_id=job_id,
         fingerprint=fingerprint,
+        review_snapshot=rows,
     )
 
 
 @app.get("/api/training/{training_id}")
 def get_training(training_id: str):
     return read_state(training_folder(training_id))
+
+
+@app.post("/api/training/{training_id}/cancel")
+def cancel_training(training_id: str):
+    return cancel_work(training_folder(training_id))
 
 
 class ReanalysisRequest(BaseModel):
@@ -1020,7 +1255,16 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
     """Create a new result while the caller owns compute_lock; worker releases it."""
     import shutil
 
-    source, _ = completed_folder(job_id)
+    source = job_folder(job_id)
+    previous = read_state(source)
+    upload = source / "upload.bin"
+    expected = previous.get("bytes")
+    if not expected and previous["status"] == "done" and (source / "original.mp4").is_file():
+        expected = upload.stat().st_size if upload.is_file() else 0
+    if not upload.is_file() or not expected or upload.stat().st_size != expected:
+        raise HTTPException(
+            409, "Upload tidak lengkap. Unggah ulang video; data lama tetap tersimpan."
+        )
     target = runtime.JOBS / str(uuid4())
     target.mkdir()
     previous = read_state(source)
@@ -1028,6 +1272,7 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
     for correction in [
         source / "annotations.json",
         source / "source.json",
+        source / "selection.json",
         *source.glob("annotation_*.jpg"),
     ]:
         if correction.is_file():
@@ -1043,7 +1288,22 @@ def create_reanalysis(job_id: str, request: ReanalysisRequest):
         "device_preference": request.device,
         "model_id": request.model_id,
         "source_job_id": job_id,
+        "bytes": expected,
     }
     write_json(target / "state.json", state)
-    executor.submit(run_video, target, state["line"])
+    submit_work(executor, run_video, target, state["line"])
     return read_state(target)
+
+
+@app.post("/api/jobs/{job_id}/retry", status_code=202)
+def retry_job(job_id: str, request: ReanalysisRequest):
+    if read_state(job_folder(job_id))["status"] not in {"error", "cancelled"}:
+        raise HTTPException(409, "Coba lagi tersedia untuk proses gagal atau dibatalkan.")
+    candidate_models(request.model_id)
+    if not compute_lock.acquire(blocking=False):
+        raise HTTPException(409, "AI masih bekerja. Tunggu proses selesai.")
+    try:
+        return create_reanalysis(job_id, request)
+    except BaseException:
+        compute_lock.release()
+        raise

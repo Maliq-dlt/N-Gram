@@ -2,6 +2,19 @@
 
 ## 2026-10-09
 
+- Antrean review objek/helm, approval terpisah, dan training otomatis setelah
+  seluruh posisi kelompok selesai serta tersedia dua sumber asli berbeda.
+- Snapshot label yang disahkan konsisten dengan fingerprint; perubahan berikutnya
+  masuk run berikutnya. Parameter pilot `nbs=2` memastikan update setiap batch.
+- Checkpoint baru menjalankan analisis ulang tanpa menimpa hasil sebelumnya;
+  hasil mencatat model ID, SHA-256, waktu training dan metrik.
+- Retry upload lengkap, pembatalan frame/batch/proses native, dan ekspor MP4
+  asinkron dengan progress; followup gagal dapat dicoba ulang tanpa training ulang.
+- CI untuk core beku, kualitas Python/UI, audit dependency, API/media, training
+  objek/helm nyata pada CPU, serta isi wheel/sdist. Dependabot mingguan tersedia.
+- Upgrade Torch/Transformers/setuptools untuk advisori dependency; setup vision-only
+  mempertahankan metadata chat. README, kontribusi, keamanan dan batas lisensi dirapikan.
+
 - Editor anotasi layar penuh dengan sidebar label/warna/edit/hapus; kotak dan
   posisi video tetap sama saat masuk/keluar.
 - Tracking koreksi tersimpan lintas restart; ekspor MP4 H264/audio per revisi

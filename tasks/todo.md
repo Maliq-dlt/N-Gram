@@ -33,6 +33,24 @@ pekerjaan aktif; kriteria seluruh fase ada di [roadmap lengkap](roadmap_checklis
 Bukti: [Verifikasi publik](../industrial_ai/reports/VERIFIKASI_PUBLIK.md).
 Tes membuktikan alur aplikasi berjalan; belum mengukur akurasi pada semua kondisi.
 
+## Perbaikan review dan belajar — 9 Oktober 2026
+
+- [x] Antrean sampel, draft, deteksi meragukan dan awal target tracker hilang.
+- [x] Approval objek/helm terpisah; edit geometri membatalkan approval terkait.
+- [x] Training otomatis setelah seluruh antrean kelompok selesai dan dua sumber berbeda.
+- [x] Snapshot disahkan, fingerprint konsisten, split menurut sumber asli.
+- [x] Update parameter nyata teruji pada CPU/RTX; hasil baru memakai checkpoint kandidat.
+- [x] Hasil awal tetap tersedia; koreksi pengguna diberi label terpisah dari hasil model.
+- [x] Retry upload lengkap, cancel kooperatif dan ekspor CPU asinkron dengan progress.
+- [x] Kandidat selesai dapat menganalisis ulang setelah followup gagal tanpa training ulang.
+- [x] CI kualitas/API/media/training/paket serta audit dependency dan Dependabot.
+- [x] README, CONTRIBUTING, SECURITY dan MIT source asli dengan atribusi pihak ketiga.
+- [x] Struktur kode dipertahankan; peta repository dan navigasi dokumentasi diperjelas.
+
+Bukti dan batas: [Verifikasi review/belajar](../industrial_ai/reports/WORKFLOW_REVIEW_BELAJAR.md).
+Status CI berjalan ditampilkan pada [GitHub Actions](https://github.com/Maliq-dlt/N-Gram/actions/workflows/ci.yml).
+Fine-tuning terbukti berjalan, tetapi peningkatan akurasi memerlukan evaluasi independen.
+
 ## Perbaikan berikutnya pada demo
 
 - [ ] Ukur tracking kerumunan dengan video independen: ID switch/IDF1 dan error hitungan.

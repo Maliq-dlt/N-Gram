@@ -2,10 +2,10 @@
 
 import json
 import shutil
-import subprocess
 import tempfile
 from pathlib import Path
 
+from operations import check_cancel, run_command
 from prompt_tracking import PromptTracker
 
 
@@ -44,7 +44,15 @@ COLORS = {
 }
 
 
-def render_video(folder: Path, target: Path, summary: dict, corrections: dict, annotations: dict):
+def render_video(
+    folder: Path,
+    target: Path,
+    summary: dict,
+    corrections: dict,
+    annotations: dict,
+    progress=None,
+    cancel=None,
+):
     import cv2
 
     ffmpeg = shutil.which("ffmpeg")
@@ -71,6 +79,12 @@ def render_video(folder: Path, target: Path, summary: dict, corrections: dict, a
             if not capture.isOpened() or not writer.isOpened():
                 raise ValueError("Video koreksi tidak dapat dibaca/ditulis.")
             for index in range(summary["frames"]):
+                check_cancel(cancel)
+                if progress and index % 10 == 0:
+                    progress(
+                        5 + int(85 * index / summary["frames"]),
+                        f"Merender koreksi {index}/{summary['frames']} frame",
+                    )
                 ok, frame = capture.read()
                 if not ok:
                     raise ValueError("Video berhenti sebelum semua frame koreksi terbaca.")
@@ -122,7 +136,9 @@ def render_video(folder: Path, target: Path, summary: dict, corrections: dict, a
         finally:
             capture.release()
             writer.release()
-        result = subprocess.run(
+        if progress:
+            progress(92, "Encoding MP4 H264 dan audio")
+        result = run_command(
             [
                 ffmpeg,
                 "-hide_banner",
@@ -151,10 +167,10 @@ def render_video(folder: Path, target: Path, summary: dict, corrections: dict, a
                 "+faststart",
                 str(temporary / "result.mp4"),
             ],
-            capture_output=True,
             timeout=300,
-            check=False,
+            cancel=cancel,
         )
         if result.returncode:
             raise ValueError("FFmpeg gagal mengekspor video koreksi; hasil awal tetap tersimpan.")
+        check_cancel(cancel)
         (temporary / "result.mp4").replace(target)

@@ -224,14 +224,14 @@ with patch.object(runtime, "JOBS", root), TestClient(app.app) as client:
         },
     )
     check(annotation.status_code == 200, "reviewed exact-frame annotation saved independently")
-    app.compute_lock.acquire()
+    app.export_lock.acquire()
     try:
         check(
             client.post(base + "/corrected-video").status_code == 409,
-            "busy compute gives recoverable error",
+            "busy export gives recoverable error",
         )
     finally:
-        app.compute_lock.release()
+        app.export_lock.release()
     with patch.object(app, "render_video", side_effect=ValueError("controlled failure")):
         check(client.post(base + "/corrected-video").status_code == 500, "export failure explicit")
     check(

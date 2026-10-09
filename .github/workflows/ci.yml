@@ -1,0 +1,105 @@
+name: CI
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  UV_CACHE_DIR: ${{ github.workspace }}/.uv-cache
+  UV_PYTHON_INSTALL_DIR: ${{ github.workspace }}/.cache/python
+  NPM_CONFIG_CACHE: ${{ github.workspace }}/.cache/npm
+  PYTHONUTF8: '1'
+
+jobs:
+  academic:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: '0.11.23'
+      - run: mkdir -p .tmp .cache
+      - run: uv sync --locked --python 3.11
+      - name: Frozen core and tests
+        run: |
+          uv run python -c "import hashlib,json,pathlib; manifest=json.loads(pathlib.Path('verifikasi/core_manifest.json').read_text()); assert all(hashlib.sha256(pathlib.Path(p).read_bytes()).hexdigest()==h for p,h in manifest.items()), 'Frozen core changed'"
+          uv run pytest -q
+      - name: Source quality
+        run: |
+          uv run ruff check core extensions jalankan_notebook.py
+          uv run ruff format --check core extensions jalankan_notebook.py
+          uv run ty check core/src extensions/src extensions/experiments jalankan_notebook.py
+      - run: uv build --out-dir .tmp/packages
+
+  studio:
+    runs-on: ubuntu-latest
+    timeout-minutes: 25
+    defaults:
+      run:
+        working-directory: industrial_ai
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version: '22'
+      - uses: astral-sh/setup-uv@c18668ad3cf93ea998bef934396af7bb5c839dc7 # v10.2.0
+        with:
+          version: '0.11.23'
+      - name: Install CPU test environment from lock
+        run: |
+          mkdir -p .tmp .cache
+          sudo apt-get update -qq
+          sudo apt-get install -y ffmpeg libgl1
+          uv venv --python 3.11
+          uv export --frozen --no-hashes --no-emit-project --no-emit-package torch --no-emit-package torchvision -o .tmp/requirements-ci.txt
+          python -c "from pathlib import Path; p=Path('.tmp/requirements-ci.txt'); p.write_text('\n'.join(s for s in p.read_text().splitlines() if not s.startswith(('nvidia-', 'cuda-', 'triton==')))+'\n')"
+          uv pip install torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cpu
+          uv pip install -r .tmp/requirements-ci.txt
+      - name: UI quality and build
+        run: |
+          npm ci
+          npm run check
+          npm run build
+          npm audit --audit-level=high
+      - name: Python dependency audit
+        run: uvx pip-audit==2.10.1 --path .venv/lib/python3.11/site-packages --skip-editable
+      - name: Audit public versions of CPU/CUDA wheel variants
+        run: |
+          printf 'torch==2.14.1\ntorchvision==0.29.1\n' > .tmp/requirements-ai-audit.txt
+          uvx pip-audit==2.10.1 --disable-pip --no-deps -r .tmp/requirements-ai-audit.txt
+      - name: Python quality and media/API regression
+        run: |
+          .venv/bin/ruff check .
+          .venv/bin/ruff format --check .
+          .venv/bin/ty check app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py setup_models.py
+          .venv/bin/python tests/self_check.py
+          .venv/bin/python tests/review_counts_check.py
+          .venv/bin/python tests/tracking_check.py
+          .venv/bin/python tests/corrections_check.py
+          .venv/bin/python tests/workflow_check.py
+          .venv/bin/python tests/video_finetune_check.py
+      - name: Real learning and inference smoke
+        run: |
+          .venv/bin/python setup_models.py --vision-only
+          .venv/bin/python tests/training_check.py cpu
+          .venv/bin/python tests/training_check.py cpu helmets
+      - name: Build and inspect distributions
+        run: |
+          uv build --out-dir .tmp/packages
+          .venv/bin/python tests/package_check.py .tmp/packages
+      - name: Keep verification reports
+        if: always()
+        uses: actions/upload-artifact@cf430e030ddbb5b0abf93d22962f4752f3646cd9 # v7.0.2
+        with:
+          name: studio-checks
+          path: industrial_ai/.tmp/**/report.json
+          retention-days: 7
+          if-no-files-found: ignore

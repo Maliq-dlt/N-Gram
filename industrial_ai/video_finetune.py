@@ -276,6 +276,7 @@ def auto_label_batch(
                 raise ValueError("Lebih dari 100 kotak; tinjau frame padat secara manual.")
         return {
             "frames": rows,
+            "groups": groups,
             "device": selected,
             "device_reason": reason,
             "source": "AI suggestions; human review required; no model training",

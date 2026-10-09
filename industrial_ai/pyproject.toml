@@ -8,16 +8,17 @@ dependencies = [
   "uvicorn>=0.30",
   "python-multipart>=0.0.18",
   "ultralytics>=8.4",
-  "transformers>=4.45,<5",
+  "transformers>=5.10,<6",
   "peft>=0.14",
   "lap>=0.5.12",
-  "torch>=2.7",
-  "torchvision>=0.22",
+  "torch==2.14.1+cu130",
+  "torchvision==0.29.1+cu130",
+  "setuptools>=83",
 ]
 
 [[tool.uv.index]]
 name = "pytorch-cuda"
-url = "https://download.pytorch.org/whl/cu128"
+url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [tool.uv.sources]
@@ -25,11 +26,11 @@ torch = { index = "pytorch-cuda" }
 torchvision = { index = "pytorch-cuda" }
 
 [build-system]
-requires = ["setuptools>=68"]
+requires = ["setuptools>=83"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["app", "vision", "chat", "runtime", "setup_models", "fine_tune_chat", "detector_training", "prompt_tracking", "corrections", "video_finetune"]
+py-modules = ["app", "vision", "chat", "runtime", "setup_models", "fine_tune_chat", "detector_training", "prompt_tracking", "corrections", "video_finetune", "operations", "review"]
 
 [tool.setuptools.data-files]
 "share/industrial-video-workspace" = ["index.html", "dashboard.js"]

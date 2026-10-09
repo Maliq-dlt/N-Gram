@@ -1,10 +1,18 @@
-# Video Insight Lokal
+<div align="center">
+
+# Video Insight
+
+**Unggah. Tinjau. Koreksi. Tanya rekamannya.**
+
+[Mulai](#mulai-di-windows) · [Cara kerja belajar](#kapan-ai-benar-benar-belajar) · [Verifikasi](#verifikasi) · [Keamanan](../SECURITY.md)
+
+</div>
 
 Demo/portofolio untuk unggah video, bandingkan rekaman asli dengan tracking AI,
 koreksi objek, dan tanya hasilnya lewat chatbot lokal. Subproyek `industrial_ai`
 terpisah dari artefak akademik N-gram di root repository.
 
-## Instalasi di Windows
+## Mulai di Windows
 
 Prasyarat: Node.js 20+, npm, [uv](https://docs.astral.sh/uv/getting-started/installation/),
 serta [FFmpeg dan FFprobe](https://ffmpeg.org/download.html) pada PATH.
@@ -55,11 +63,11 @@ lokal tanpa API key/cloud chat. Cache/temp/upload/hasil berada dalam subproyek.
    bisa diganti; nama/warna adalah metadata, bukan pengenal wajah.
 6. **Putar & ikuti kotak** mengikuti gerak dari posisi sekarang. Jeda/tandai ulang
    jika target hilang. Tracking otomatis tersimpan saat frame disiapkan dan dimuat
-   kembali setelah restart. Tidak ada fine-tuning saat play/simpan/query.
-7. **Simpan koreksi** setelah seluruh objek dalam kelompok pada posisi itu diperiksa.
+   kembali setelah restart. Play/query hanya tracking atau membaca fakta. Fine-tuning dimulai setelah seluruh antrean disahkan.
+7. **Sahkan & simpan koreksi** setelah seluruh objek dalam kelompok pada posisi itu diperiksa.
    Dashboard/chat/JSON memakai hitungan koreksi; putar/geser/tutup menyimpan draft.
    Draft belum menjadi hitungan atau dataset.
-8. **Ekspor video koreksi** menghasilkan MP4 H264 dengan audio sumber bila tersedia.
+8. **Ekspor video koreksi** berjalan di latar belakang dengan progress/cancel dan menghasilkan MP4 H264 dengan audio sumber bila tersedia.
    Kotak manual pada posisi tepat diutamakan, lalu tracking koreksi tersimpan,
    lalu kotak AI awal. Rentang yang belum diputar belum mempunyai tracking koreksi.
    Ekspor diberi penanda preview dan versi revisi; hasil AI/ekspor sebelumnya tetap ada.
@@ -70,6 +78,54 @@ video dan kotak tetap sama. Pada layar ponsel sempit, panel tampil di bawah vide
 
 Tema **Sistem/Terang/Gelap** tersimpan di browser.
 Review **Semua objek** dan **Kepala & helm** terpisah.
+
+## Kapan AI benar-benar belajar?
+
+```mermaid
+flowchart LR
+  A[Edit kotak] --> B[Draft tersimpan]
+  B --> C[Pengguna sahkan posisi]
+  C --> D{Antrean selesai?}
+  D -->|Belum| C
+  D -->|Ya| E{Minimal 2 sumber asli?}
+  E -->|Belum| F[Koreksi tersimpan; menunggu data]
+  E -->|Ya| G[Fine-tuning YOLO]
+  G --> H[Checkpoint baru]
+  H --> I[Analisis ulang sebagai video baru]
+```
+
+| Status | Yang benar-benar terjadi |
+| --- | --- |
+| **Draft** | Kotak tersimpan, belum disahkan dan belum menjadi label latihan |
+| **Koreksi disahkan** | Hitungan dashboard/chat/JSON pada timestamp itu berubah; kelompok tersebut boleh menjadi label latihan |
+| **Menunggu** | Antrean/sumber belum cukup. Bobot model belum berubah |
+| **Training** | Optimizer mengubah bobot kandidat dari snapshot label yang disahkan |
+| **Analisis ulang** | Checkpoint kandidat menjalankan inferensi baru pada video |
+| **Selesai** | Video baru, model ID, SHA-256 checkpoint, waktu training, dan metrik tersedia |
+
+Objek dan helm mempunyai approval terpisah. Perubahan kotak kelompok lain membatalkan
+approval kelompok yang berubah. Edit setelah training dimulai masuk run berikutnya.
+Antrean memuat sampel/draft, deteksi meragukan, serta awal target tracker yang hilang.
+Semua posisi dalam antrean kelompok yang dipilih harus disahkan sebelum training otomatis.
+
+**Tampilan koreksi pengguna** merender MP4 dari kotak tersimpan; ini berguna selama
+menunggu training. Label tampilannya menyebut koreksi pengguna. Render ini sendiri
+bukan bukti fine-tuning. Hasil AI awal dan ekspor revisi sebelumnya tetap tersedia.
+Fine-tuning nyata belum menjamin peningkatan akurasi: label benar/beragam dan evaluasi
+sumber independen tetap diperlukan. Anotasi video melatih YOLO, bukan Qwen.
+
+## Pemulihan proses
+
+| Situasi | Tindakan |
+| --- | --- |
+| Analisis gagal/server terputus | **Coba lagi dari upload** membuat job baru dari upload lengkap |
+| Analisis atau training ingin dihentikan | **Batalkan** menunggu batas frame/batch/FFmpeg; status tetap membatalkan sampai worker berhenti |
+| Ekspor MP4 berjalan | Progress dan cancel tersedia; worker CPU terpisah dari jalur AI |
+| Training gagal | Label/hasil lama tetap ada. Periksa log dan **Coba belajar lagi** |
+| Hasil baru siap saat mengedit | Edit dipertahankan; buka melalui tombol analisis baru |
+
+Retry mengulang proses, belum melanjutkan dari frame/epoch terakhir. Cancellation
+kooperatif menunggu operasi model yang sedang berjalan; tidak mematikan thread paksa.
 
 ## Makna hasil
 
@@ -116,13 +172,16 @@ diaktifkan. Pilihan CLI `--device cpu` / `--device cuda` tersedia.
 **GPU** mencoba CUDA dengan fallback CPU saat tidak tersedia, VRAM kurang atau
 CUDA OOM. Alasan dicatat pada hasil. Torch CUDA dari index resmi PyTorch dikunci
 di uv.lock dan juga dapat menjalankan CPU. AMD/Intel GPU belum dipakai.
-GPU membantu kecepatan; model/data menentukan akurasi.
+Build Torch memakai CUDA 13.0; GPU memerlukan driver NVIDIA yang mendukungnya.
+CPU tetap tersedia. GPU membantu kecepatan; model/data menentukan akurasi.
 
-Untuk belajar bentuk/kelas di video lain: **Belajar untuk video lain → Latih untuk
-video lain**, dengan review lengkap minimal dua upload sumber berbeda. Split
-menurut sumber video; potongan footage sama bukan evaluasi independen.
-Training menyimpan snapshot/provenance/metrics/checkpoint di `data/trainings/`
-dan analisis ulang sebagai job baru. Kandidat tidak mengganti default upload.
+Untuk belajar bentuk/kelas: selesaikan **antrean review** kelompok objek atau helm,
+lalu simpan posisi terakhir. Fine-tuning otomatis memerlukan minimal dua sumber asli
+berbeda. Potongan footage sama tetap satu sumber; label tracker tidak otomatis disahkan.
+Training menyimpan snapshot, provenance, metrik, dan checkpoint di `data/trainings/`,
+kemudian membuat job analisis baru. Hasil baru terbuka otomatis saat tidak ada edit
+aktif; jika sedang mengedit, tombol hasil baru tetap tersedia. Kandidat tidak mengubah
+default upload berikutnya. Pilih model kandidat secara eksplisit untuk video lain.
 
 **Ekspor dataset YOLO**: gambar tanpa border, label/bbox ternormalisasi,
 classes.txt, metadata review dan SHA256 sumber. Objek/helm terpisah; hanya kelompok
@@ -142,6 +201,9 @@ uv run --frozen python tests/self_check.py
 uv run --frozen python tests/review_counts_check.py
 uv run --frozen python tests/tracking_check.py
 uv run --frozen python tests/corrections_check.py
+uv run --frozen python tests/workflow_check.py
+uv run --frozen python tests/training_check.py cpu
+uv run --frozen python tests/training_check.py auto helmets
 uv run --frozen python tests/video_finetune_check.py
 uv run --frozen ruff check . --exclude .code-review-graph
 uv run --frozen ruff format --check . --exclude .code-review-graph
@@ -158,9 +220,10 @@ ffmpeg -n -i .tmp/real_smoke/vtest.avi -t 12 -an -c:v libx264 -f mp4 .tmp/real_s
 uv run --frozen python tests/e2e.py
 ```
 
-FFmpeg menolak menimpa clip lama. E2E menambah job valid/error; kotak fixture
-menguji API/ekspor, bukan ground truth. [Verifikasi publik](reports/VERIFIKASI_PUBLIK.md)
-merangkum bukti. Laporan rinci, screenshot CCTV, model dan data runtime tetap lokal.
+FFmpeg menolak menimpa clip lama. E2E menambah job valid/error dan memperbarui
+`reports/e2e_publication.json`; simpan salinan laporan itu sebelum mengulang tes. Kotak
+fixture menguji API/ekspor, bukan ground truth. [Verifikasi terbaru](reports/WORKFLOW_REVIEW_BELAJAR.md)
+dan [publikasi awal](reports/VERIFIKASI_PUBLIK.md) merangkum bukti. Laporan rinci, screenshot CCTV, model dan data runtime tetap lokal.
 
 ## Batas dan prioritas berikutnya
 
@@ -170,8 +233,7 @@ detector berukuran tetap, input tracker maksimal 640px. Tracking koreksi tersimp
 dan ekspor MP4 belum menghitung ulang lintasan/individu unik. Belum ada ground
 truth independen untuk klaim akurasi/kesiapan keselamatan pabrik.
 
-Prioritas: ukur ID switch/IDF1 serta FP/FN di video independen, perluas label helm/APD,
-lalu polish anotasi. Bandingkan YOLO satu tingkat lebih besar/ReID setelah baseline
+Prioritas: ukur ID switch/IDF1 serta FP/FN di video independen dan perluas label helm/APD. Bandingkan YOLO satu tingkat lebih besar/ReID setelah baseline
 terukur. CCTV langsung, OCR plat, pengenalan wajah dan absensi belum tersedia.
 
 ## Menyiapkan video panjang untuk review
@@ -211,3 +273,19 @@ video asal pada split yang sama, termasuk setelah analisis ulang.
 
 [Referensi GitHub](reports/REFERENSI_GITHUB.md) ·
 [Desain dashboard](reports/DESAIN_DASHBOARD.md) · [Changelog](CHANGELOG.md).
+
+## Untuk pengembang
+
+| Lokasi | Fungsi |
+| --- | --- |
+| `app.py` | API, state, snapshot label, serta koordinasi worker |
+| `vision.py` / `prompt_tracking.py` | Inferensi / tracking koreksi |
+| `review.py` / `corrections.py` | Antrean review / ekspor MP4 |
+| `detector_training.py` | Dataset lintas-sumber dan training kandidat |
+| `operations.py` | Pembatalan serta proses native |
+| `index.html` / `dashboard.js` / `ui.css` | Dashboard dan anotasi |
+| `tests/` | Regresi API, media, playback, dan training nyata |
+
+[Panduan kontribusi dan tes](../CONTRIBUTING.md) · [Keamanan](../SECURITY.md) ·
+[Lisensi dan atribusi](../NOTICE.md). Sistem JSON lokal satu pengguna tidak memerlukan
+Redis atau database server. Roadmap CCTV live/OCR/wajah tetap terpisah dari fitur demo.

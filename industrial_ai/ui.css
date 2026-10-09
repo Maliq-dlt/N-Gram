@@ -42,3 +42,8 @@ body{font-size:14px}h1{font-size:27px;font-weight:650;letter-spacing:-.8px;overf
 .review:fullscreen>#reviewStatus,.review:fullscreen>#reviewError{margin:0 16px 6px;flex-shrink:0}
 @media(max-width:760px){.review-window-actions{gap:4px}.review-window-actions .button{padding:0 8px}.review:fullscreen>.section-head h2{font-size:13px}.review:fullscreen>.review-grid{grid-template-columns:minmax(0,1fr) 180px;gap:8px;padding:0 8px}.review:fullscreen .annotation-inspector{padding:8px}.review:fullscreen .annotation-inspector .hint{display:none}.review:fullscreen>.review-actions,.review:fullscreen>.review-player-controls{padding:6px 8px}.review:fullscreen .annotation-inspector .input,.review:fullscreen .annotation-inspector .select__trigger{font-size:11px;height:32px}}
 @media(max-width:480px) and (orientation:portrait){.review:fullscreen{overflow:auto}.review:fullscreen>.review-grid{flex:none;grid-template-columns:1fr}.review:fullscreen .review-canvas{flex:none;height:40dvh}.review:fullscreen .annotation-inspector{max-height:38dvh}.review:fullscreen .coordinate-details{max-height:100px}}
+
+.review-queue { border-block:1px solid var(--line); padding-block:12px; }
+.queue-list { display:flex; flex-direction:column; gap:6px; max-height:180px; overflow:auto; }
+.queue-position { text-align:left; white-space:normal; justify-content:flex-start; }
+.queue-position[aria-current] { outline:2px solid currentColor; outline-offset:-2px; }

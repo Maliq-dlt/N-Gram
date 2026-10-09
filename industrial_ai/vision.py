@@ -112,10 +112,10 @@ def process_video(
     object_model=None,
     helmet_model=None,
     object_classes=None,
+    cancel=None,
 ):
     import json
     import shutil
-    import subprocess
     import time
     from typing import cast
 
@@ -124,10 +124,11 @@ def process_video(
     from ultralytics import YOLO
     from ultralytics.engine.results import Results
 
+    from operations import check_cancel, run_command
     from runtime import MODELS
 
     def command(args, timeout=180):
-        result = subprocess.run(args, capture_output=True, text=True, timeout=timeout, check=False)
+        result = run_command(args, text=True, timeout=timeout, cancel=cancel)
         if result.returncode:
             raise ValueError("Pemrosesan video gagal: " + result.stderr[-800:])
         return result.stdout
@@ -229,6 +230,7 @@ def process_video(
     index = 0
     try:
         while True:
+            check_cancel(cancel)
             ok, frame = capture.read()
             if not ok:
                 break
