@@ -298,6 +298,7 @@ def install(app, max_upload: int):
                         raise HTTPException(403, "Token CSRF tidak valid.")
                     if value["role"] == "viewer" and path not in {
                         "/api/chat",
+                        "/api/ngram/explore",
                         "/api/auth/logout",
                         "/api/auth/password",
                         "/api/auth/profile",

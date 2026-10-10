@@ -5,6 +5,8 @@ Status: implementasi prototipe video + chat lokal diizinkan pengguna pada 8 Okto
 Panduan aktual: [README aplikasi](../industrial_ai/README.md). Demo upload/tracking/chat/koreksi telah diuji; [verifikasi publik](../industrial_ai/reports/VERIFIKASI_PUBLIK.md) dan [status implementasi](todo.md#status-demo-lokal--8-oktober-2026) mencatat hasil. Gate formal roadmap tetap terpisah dari smoke test prototipe.
 Progres demo: [todo.md](todo.md). Kriteria fase lengkap: [roadmap_checklist.md](roadmap_checklist.md).
 
+> **Pembaruan 10 Oktober 2026:** pengguna melanjutkan pengembangan N-gram akademik. Rencana dan checklist baru berada di [ngram_academic/plan.md](ngram_academic/plan.md) dan [ngram_academic/todo.md](ngram_academic/todo.md). Dokumen ini tetap menyimpan jalur CCTV dan riwayat keputusan sebelumnya.
+
 ## 1. Cara memakai dokumen
 
 Baca skenario, persiapan, lalu roadmap. Jalankan task pada roadmap_checklist.md sesuai dependensi;

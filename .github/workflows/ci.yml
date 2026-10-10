@@ -94,9 +94,13 @@ jobs:
         run: |
           .venv/bin/ruff check .
           .venv/bin/ruff format --check .
-          .venv/bin/ty check access.py storage.py app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py setup_models.py
+          .venv/bin/ty check access.py storage.py app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py setup_models.py academic.py event_ledger.py fact_query.py
           .venv/bin/python tests/storage_check.py
           .venv/bin/python tests/profile_api_check.py
+          .venv/bin/python tests/ledger_check.py
+          .venv/bin/python tests/novelty_api_check.py
+          .venv/bin/python tests/academic_check.py
+          .venv/bin/python tests/fact_check.py
           .venv/bin/python tests/security_check.py
           .venv/bin/python tests/deployment_check.py
           .venv/bin/python tests/self_check.py
@@ -134,12 +138,12 @@ jobs:
           docker compose config --quiet
       - name: Build CPU image and test restricted runtime
         run: |
-          docker build -t video-insight-ci industrial_ai
+          docker build -f industrial_ai/Dockerfile -t video-insight-ci .
           docker run --rm --read-only --cap-drop ALL --security-opt no-new-privileges \
-            --tmpfs /app/data:uid=10001,gid=10001,mode=0700 \
-            --tmpfs /app/models:uid=10001,gid=10001,mode=0700 \
-            --tmpfs /app/.cache:uid=10001,gid=10001,mode=0700 \
-            --tmpfs /app/.tmp:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /workspace/industrial_ai/data:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /workspace/industrial_ai/models:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /workspace/industrial_ai/.cache:uid=10001,gid=10001,mode=0700 \
+            --tmpfs /workspace/industrial_ai/.tmp:uid=10001,gid=10001,mode=0700 \
             video-insight-ci python tests/deployment_check.py
       - name: Verify published HTTPS deployment
         working-directory: industrial_ai

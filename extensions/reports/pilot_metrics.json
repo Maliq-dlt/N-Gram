@@ -1,0 +1,1834 @@
+{
+  "schema_version": 1,
+  "generated_at": "2026-10-10",
+  "scope": "exploratory bounded document pilots; summaries only, no corpus or counts",
+  "runs": [
+    {
+      "run_id": "brown-doc-v1-20261010",
+      "status": "published_summary",
+      "source_name": "brown",
+      "metrics": [
+        {
+          "n": 1,
+          "method": "laplace",
+          "dev_cross_entropy": 6.25040043773385,
+          "test_cross_entropy": 6.227902074111229,
+          "test_perplexity": 506.69136673114804
+        },
+        {
+          "n": 1,
+          "method": "add_k",
+          "dev_cross_entropy": 6.238610941853704,
+          "test_cross_entropy": 6.216946384343145,
+          "test_perplexity": 501.17051092175905
+        },
+        {
+          "n": 1,
+          "method": "interpolation",
+          "dev_cross_entropy": 6.2386906740455,
+          "test_cross_entropy": 6.217016566323499,
+          "test_perplexity": 501.2056852949999
+        },
+        {
+          "n": 1,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 6.238602121830712,
+          "test_cross_entropy": 6.216938628336112,
+          "test_perplexity": null
+        },
+        {
+          "n": 1,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 6.238602121830712,
+          "test_cross_entropy": 6.216938628336112,
+          "test_perplexity": 501.1666238548257
+        },
+        {
+          "n": 1,
+          "method": "witten_bell",
+          "dev_cross_entropy": 6.238602121830712,
+          "test_cross_entropy": 6.216938628336112,
+          "test_perplexity": 501.1666238548257
+        },
+        {
+          "n": 1,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 6.238602121830712,
+          "test_cross_entropy": 6.216938628336112,
+          "test_perplexity": 501.1666238548257
+        },
+        {
+          "n": 1,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 6.2386906740455,
+          "test_cross_entropy": 6.217016566323499,
+          "test_perplexity": 501.2056852949999
+        },
+        {
+          "n": 2,
+          "method": "laplace",
+          "dev_cross_entropy": 7.453884093855957,
+          "test_cross_entropy": 7.4285308259517295,
+          "test_perplexity": 1683.33264712337
+        },
+        {
+          "n": 2,
+          "method": "add_k",
+          "dev_cross_entropy": 6.515555479389332,
+          "test_cross_entropy": 6.4869182507958305,
+          "test_perplexity": 656.4970832117607
+        },
+        {
+          "n": 2,
+          "method": "interpolation",
+          "dev_cross_entropy": 5.893887989237805,
+          "test_cross_entropy": 5.865442176477479,
+          "test_perplexity": 352.63804988961226
+        },
+        {
+          "n": 2,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 5.6572402232974355,
+          "test_cross_entropy": 5.635875521090951,
+          "test_perplexity": null
+        },
+        {
+          "n": 2,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 5.685851821895136,
+          "test_cross_entropy": 5.663292877590672,
+          "test_perplexity": 288.09574637900596
+        },
+        {
+          "n": 2,
+          "method": "witten_bell",
+          "dev_cross_entropy": 5.805711375105825,
+          "test_cross_entropy": 5.779795340408942,
+          "test_perplexity": 323.6929367736837
+        },
+        {
+          "n": 2,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 5.677038127878553,
+          "test_cross_entropy": 5.654210211562184,
+          "test_perplexity": 285.49091623858914
+        },
+        {
+          "n": 2,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 5.893873861689397,
+          "test_cross_entropy": 5.865434730388014,
+          "test_perplexity": 352.6354241249199
+        },
+        {
+          "n": 3,
+          "method": "laplace",
+          "dev_cross_entropy": 8.67783009936544,
+          "test_cross_entropy": 8.677113256064864,
+          "test_perplexity": 5867.085348685324
+        },
+        {
+          "n": 3,
+          "method": "add_k",
+          "dev_cross_entropy": 8.086079439849133,
+          "test_cross_entropy": 8.055922975616213,
+          "test_perplexity": 3152.4114405113496
+        },
+        {
+          "n": 3,
+          "method": "interpolation",
+          "dev_cross_entropy": 5.997166568942903,
+          "test_cross_entropy": 5.97335001565682,
+          "test_perplexity": 392.81942018858786
+        },
+        {
+          "n": 3,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 6.187955147394152,
+          "test_cross_entropy": 6.155752880332628,
+          "test_perplexity": null
+        },
+        {
+          "n": 3,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 5.676302420567862,
+          "test_cross_entropy": 5.655479922388369,
+          "test_perplexity": 285.85363737245956
+        },
+        {
+          "n": 3,
+          "method": "witten_bell",
+          "dev_cross_entropy": 5.991042149804787,
+          "test_cross_entropy": 5.961296658598913,
+          "test_perplexity": 388.1130482282957
+        },
+        {
+          "n": 3,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 5.659086607210918,
+          "test_cross_entropy": 5.637731033247204,
+          "test_perplexity": 280.8248128918608
+        },
+        {
+          "n": 3,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 5.893725874049402,
+          "test_cross_entropy": 5.865464443002696,
+          "test_perplexity": 352.64590200106204
+        }
+      ],
+      "comparison": [
+        {
+          "ci95": [
+            -0.02105683021392748,
+            -0.014210373564823166
+          ],
+          "difference": -0.017748889141165586,
+          "documents": 11,
+          "independent_groups": 11,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        }
+      ],
+      "test_policy": "exploratory Brown",
+      "provenance": {
+        "config_sha256": "3df342b00a14ed183956f8cf8167858df4bf6205be2fc5db358d31523c3a93d0",
+        "source_sha256": "058db3a7bdd5f8efb5f638ab52f7db42aba0d2fe9f15fca99f1a98777e167e11",
+        "code_sha256": {
+          "extensions/experiments/registry.py": "1bb456dab232ef9588e311f6856ee203c5b415663da9e4be2203f51f9325d166",
+          "extensions/experiments/research.py": "89e2f200b3ae513c822f308d052b2f12be70a4ee1383f23ab2da2f3600885fb0",
+          "extensions/src/analytics.py": "c3b928fae7c241871a3fd7948e32b12f53f6231a5042e33c6163ac2d9b68edfe",
+          "extensions/src/cli.py": "1880783d15bcad376c68b9183be2174c86ead31a2232ce6a585120262f6c2fb1",
+          "extensions/src/datasets.py": "120b2e76a7c6c0473af1f278c87e46370b305607fa2c8be0b1ca2c57351bfba2",
+          "extensions/src/models.py": "2a42b52a57fc52eca41ef62ecd42350adc0b84feb994a13565fa83f3f943fab2",
+          "extensions/src/pipeline.py": "cf52d5ae58ca209abdb425bf7681b9d55e7f2c838f69ca63c74cd3fc1f921f0c",
+          "extensions/src/quality.py": "6b3bc07092fa415e9ba7bd50d60e9936ba5bfa8850f035c863b8d65ae1ee56c5"
+        },
+        "outputs_sha256": {
+          "autocomplete.json": "09e76af133417e60fda95870a372198c6bd1b41622d049910f52b17445556029",
+          "bootstrap.json": "4394536dcd85b0fd6d3da1821e4b602bec4bf39a3f97cff6dd474844f6404eb7",
+          "diagnostics.json": "c43e0f9e377bf35f270ef4eea1290a105a41b7b57cc4f1f1eef91d516b6e98f0",
+          "domain_transfer.json": "969425a023597f263ee90cb276717593140496fb252e7eba8b607dd8c2aadc91",
+          "generated.json": "f06b506a8b15551306a66ffd86003e7c288baf2e71ba3329868dc3386e031c0c",
+          "metrics/target-3-kneser_ney.json": "2df13f86a79dcf712d9f146da1df026dc95b30f82e399b1150644f49772a038a",
+          "metrics/target-3-modified_kneser_ney.json": "cd48a906ca4199695780dfddcee1f11289b2211e7a837f2d9be2851007efe134",
+          "metrics/test-1-add_k.json": "98b075114b15e48a7b7827eed67dff633f209649f556fa5874ef52b714f7107d",
+          "metrics/test-1-interpolation.json": "45ed2aa87f7a6d6e5f12ce7ac81bf3818d6da3ae01600f9d712b9def328c3a35",
+          "metrics/test-1-interpolation_em.json": "45ed2aa87f7a6d6e5f12ce7ac81bf3818d6da3ae01600f9d712b9def328c3a35",
+          "metrics/test-1-kneser_ney.json": "07dd4b15123c699ef40e17ec180d1c2837a2b96a837fb3830a090bc0b561e28b",
+          "metrics/test-1-laplace.json": "e20291cac447ef42fe9abc2655674fd3094e88f89165283fa875c5a7f29e5550",
+          "metrics/test-1-modified_kneser_ney.json": "07dd4b15123c699ef40e17ec180d1c2837a2b96a837fb3830a090bc0b561e28b",
+          "metrics/test-1-stupid_backoff.json": "07dd4b15123c699ef40e17ec180d1c2837a2b96a837fb3830a090bc0b561e28b",
+          "metrics/test-1-witten_bell.json": "07dd4b15123c699ef40e17ec180d1c2837a2b96a837fb3830a090bc0b561e28b",
+          "metrics/test-2-add_k.json": "6aabf4ab497386b5e9c72f4cc74ada16c4c5e28d03eeab019b8f46835ddc6e0c",
+          "metrics/test-2-interpolation.json": "221b463f20cb46edfa97c8356119a92b2e30d0310a64c3fd4ae93dee517cfea9",
+          "metrics/test-2-interpolation_em.json": "461117c9be2cb02de5ebe157a2530bf83c0ead7b7429bfd64fb3b5def9ba0369",
+          "metrics/test-2-kneser_ney.json": "3b3e82bae7abec132484a94a29da0104bebdd8fdd4c5469dea877baf5f48c83c",
+          "metrics/test-2-laplace.json": "e26884d7ed4e242ca801c790f1cf9de9422ba93db9705ff091b52b8005bb9884",
+          "metrics/test-2-modified_kneser_ney.json": "98cf7aefef2ff15f05ab21051a2a34df3f6262cd29e442bbb2d432b499be8fd6",
+          "metrics/test-2-stupid_backoff.json": "9362e5bb3aac1ec2b5a6e00dd7bc54bab72041e7fb1458189cb62111d4bf9acd",
+          "metrics/test-2-witten_bell.json": "71a94f29feabce594fb1b2adaffeb5d319a7aadeed75b55e95977b603a626b64",
+          "metrics/test-3-add_k.json": "85bd4c054ff0a7b9c0ff09394ec186d7f10e826cf9a232ad9a934d84c28be29d",
+          "metrics/test-3-interpolation.json": "487606cb9eaeb330151b3373aa249848157c37cc7f6eb1e5a0e5c5f9db995a65",
+          "metrics/test-3-interpolation_em.json": "15e13cb6129383d3f3f087b92ebb5d37b5bcd35e2fd5a053ffee598c7b3f7f59",
+          "metrics/test-3-kneser_ney.json": "c9cef9fd4ee55cc746dbe53c43ac3b055eea6858a8c4067f131c878f5d2dfbb4",
+          "metrics/test-3-laplace.json": "02b17a53aea29e84ff5f44256033797e4a59a42bea4349866991806be2971af3",
+          "metrics/test-3-modified_kneser_ney.json": "2d90b1a39979ec346280d33c85934fcbbe14e3b76f8042a76b926167b6d685d6",
+          "metrics/test-3-stupid_backoff.json": "45bd355386afcaa4bc40441b0a8fdf9e832c00846ca62112fb44a5f1c695d915",
+          "metrics/test-3-witten_bell.json": "40af02eb430c48825efc238603f255fbc421995558d6174fdd0a374b324ec3ab",
+          "models/1-add_k.json.gz": "007cff9c436156e0a9f10ac1c0e733370c9422921ed91dc2945f925fdfabffae",
+          "models/1-add_k.json.gz.meta.json": "4574139875479f93964333cbf24b72b78fd43cff304cbfd44eda12807b589389",
+          "models/1-interpolation.json.gz": "23fe7467c4d41b927404466f5fb3666e749db551e83b1e9a3cdf6125b7e8f39b",
+          "models/1-interpolation.json.gz.meta.json": "a9b6027560d7d54a1e73cc64b94eb13dcfe527f05931e83c70c618b8daf75b5a",
+          "models/1-interpolation_em.json.gz": "449056a7107736129173c436d1dec59f3193b41f9ded581caa54fc2dd374294f",
+          "models/1-interpolation_em.json.gz.meta.json": "3a4cf61f22848950297b0770d5531c46ae12b406d6490daee8764dd1410c5af7",
+          "models/1-kneser_ney.json.gz": "56b3e125a5a5b6ad33553c7f806c5c4199760f2aca358e50d9df0cc3cdd498e6",
+          "models/1-kneser_ney.json.gz.meta.json": "269473b73527caa340e30d7cdd3ad994059bfa8b3d6ea356f18538024c99ad83",
+          "models/1-laplace.json.gz": "ad4246e00a87867c1f832519eb9d9eed8b48fa65e6061e5aec468938ee756466",
+          "models/1-laplace.json.gz.meta.json": "9fa18647b789428ba4bf5cc000c70460cf51f4d91ebee1bc07e3dcb4a39f9198",
+          "models/1-modified_kneser_ney.json.gz": "2b27ced584bb1811f637a9384611c4a198fdf347dc9fc1d0c6187e5255d41cc0",
+          "models/1-modified_kneser_ney.json.gz.meta.json": "d0d98bd7884cee735c348cccfd5b53a2b6de367d7ac395d77fd29a7e211d4ed8",
+          "models/1-stupid_backoff.json.gz": "6ae4329f81446eb4443ad2cfeed7321875e94bacd639f526b0415c8400f3fee7",
+          "models/1-stupid_backoff.json.gz.meta.json": "7d9590258d5652472a3f3ca4cf5e81dedc9a1a26483159500c9d20342d486a53",
+          "models/1-witten_bell.json.gz": "c46ea63ace8b02c293ccce0767f02fac2f19a8c2c4fe85dadf3776c0c37244b7",
+          "models/1-witten_bell.json.gz.meta.json": "0e8bf5d7e6a8b8cf3f9ac7d32ef1b63f16f3aa869ffab509e7e1d8e71d2a15cc",
+          "models/2-add_k.json.gz": "a2d5c08ed6444a965d530cfb478927b06568fcbb0c25af3c0488e02c191ad82c",
+          "models/2-add_k.json.gz.meta.json": "426470d314ff155b1b7e721391fb194be5ed8c59f59359a88a59564bf0414d97",
+          "models/2-interpolation.json.gz": "78337c536ac66f42825b6c4b89e67d92ff2f1ad3680decf5c90ab9b22be5835d",
+          "models/2-interpolation.json.gz.meta.json": "c4dbc12e0470092370893df103fac37b581e0c86b6f035ad83ff35a3b691d118",
+          "models/2-interpolation_em.json.gz": "f2ff020a7054024ef2268a01f5b3650ecaee92b1a6b0e0c98478f3d2f8ddd14a",
+          "models/2-interpolation_em.json.gz.meta.json": "741f5c4ace211f0239a58815f041d42cadd85cff3106106046c0756d875129a6",
+          "models/2-kneser_ney.json.gz": "7bd2ef554877744b945028cd1b9a18bf6aa2f90e83489becaedcf26558fd030c",
+          "models/2-kneser_ney.json.gz.meta.json": "3462c8728f0f6f976a1c0389b24df58dd406ac0dc9feb067cfba9084325043ae",
+          "models/2-laplace.json.gz": "086028a46ae8e3a65fc5b228744cea3eeb6cef560a68f484fc0ec4668aa703fb",
+          "models/2-laplace.json.gz.meta.json": "542e12a2befc923dce8b938d3a42af12ee31919c55af1e1274d6eeb06c6c6434",
+          "models/2-modified_kneser_ney.json.gz": "1192131d9b5900bc58053be349e96460021b3c5f380193c90aad98e52e49db93",
+          "models/2-modified_kneser_ney.json.gz.meta.json": "d2eba858bbea1b97c3d2ce3c69f2202390e69458fcb18c74f2e52c390fc23b2f",
+          "models/2-stupid_backoff.json.gz": "db0b65513e5ef2f6a1f2c3080c99fad40e49434b0ea52beb84071d5002a5f15c",
+          "models/2-stupid_backoff.json.gz.meta.json": "d22d13c44a22f9f17160a3ef13e0ed1a117719d40d79d6fb43139a04aaa095d9",
+          "models/2-witten_bell.json.gz": "558cf99541bb714705d4951b155a91f643bacdc081bb0341abdff96e064652ee",
+          "models/2-witten_bell.json.gz.meta.json": "e1862271289f2a2640dc0c61aeb27b64b96280be0c78663e4ba1fad8fcd07e01",
+          "models/3-add_k.json.gz": "a07a4f6b23d962b8ddd9f9ce4e62aa4b4d8b8e38dd8d64784bcf38e640acac1f",
+          "models/3-add_k.json.gz.meta.json": "9add1497f8b01cd63b57d904c6a3226cf14c59e89a57f74d3c5aacf3df9857fe",
+          "models/3-interpolation.json.gz": "e9b8da2088f80c39b6515bb00f206e285531e0427fdf4d5075caaff979302bc9",
+          "models/3-interpolation.json.gz.meta.json": "9b3c3eb9a7a93d9082bec9038d20aa5265304d6cfaed2219decd0e7ae95ed297",
+          "models/3-interpolation_em.json.gz": "90f95288ea142b4387cab9fdd03c732213fee79f09bb229753986b332671fe99",
+          "models/3-interpolation_em.json.gz.meta.json": "e120d468be282a7a901939dc8e0f4f294429dcddfaf6c23d8821fa9b7fe9d9de",
+          "models/3-kneser_ney.json.gz": "6062d8c6eb47982da9eac085321c0a934ef42dd5f658d915a3b438509d547664",
+          "models/3-kneser_ney.json.gz.meta.json": "a4e90854906e423e3ec1e6603ed008cf0cd46c7d305117c16225a04e9f49a3c6",
+          "models/3-laplace.json.gz": "b239cb0d3f545c3814e4953bfed1e028d277900897c029a17c978d1ac3933b1f",
+          "models/3-laplace.json.gz.meta.json": "6f1318bb99b1e068f08086fac736a5f38631d184078f42e87122d7e808e8eb9e",
+          "models/3-modified_kneser_ney.json.gz": "4141d15730c1dd6aadca599d88e021564fbc63a97f12eb8990cd8cb37eb7893e",
+          "models/3-modified_kneser_ney.json.gz.meta.json": "e83d890226f9a8cb5768d7b38b065321c8cbfd8ce3165fd4adab3cec0f6b0a7a",
+          "models/3-stupid_backoff.json.gz": "f81d185c88ac377310c1a4c847cc6ba57d50d76c195a0473d2d48da7c1f369bf",
+          "models/3-stupid_backoff.json.gz.meta.json": "6d4a0cba64bfa45ea74b620fbf52ee2e53f450a540d5b5ec667e3de1539eb0f3",
+          "models/3-witten_bell.json.gz": "d6ecd66ae856720638ee433524ca7882bb07b685b19bd692e3161a1de21830db",
+          "models/3-witten_bell.json.gz.meta.json": "302f302f65b81d0b5f499df5c0f4233bcbd3d2d6482b79cdceac798b0c6af937",
+          "protocol.json": "4cf0de0c89fc2cf42c76249166a1f30b45e42bb7fc69f608feeb990b110aa7a4",
+          "receipts/target-3-kneser_ney.json": "38f3e8d3140a0257fe859cc225875de471fa80affbbb89771bada0000d0e80d1",
+          "receipts/target-3-modified_kneser_ney.json": "2d6da066cb4865ecf42aee0a4d5376e64a82acf36faa2a6eccf1651c62ea0489",
+          "receipts/test-1-add_k.json": "279b03b9dbf0ac049600120e98b5f54cd3bada86ea3281433f54fa159aa1baa3",
+          "receipts/test-1-interpolation.json": "db16afb94d782e0726e726ecf0163a236e5350bd13d4b3351f203439ed6c1e9a",
+          "receipts/test-1-interpolation_em.json": "c0dffee37289bf4cf286b66f92ad60cc50d1e0ae35c1970aa9df4b66ef5609e9",
+          "receipts/test-1-kneser_ney.json": "f4623d84d4c762dcb1c34b9836c3f136aa71705aa5049694ddcda47cc04e1886",
+          "receipts/test-1-laplace.json": "79f455326054e9cace770794941c71208eb9b6797637f8ca609e6102071b095d",
+          "receipts/test-1-modified_kneser_ney.json": "c2c63b14325689cf95f6d8cd5603591ba3c48aad8c215a1585ef6e6cb29e10c4",
+          "receipts/test-1-stupid_backoff.json": "8afe5157df8438017b26a9075eaeca449a2ac4cecb65fb64669e6486e76203e8",
+          "receipts/test-1-witten_bell.json": "5e38cde7c316a57dc1285076979847ca90f5ec19d348bdd3c4efc7e9613f921f",
+          "receipts/test-2-add_k.json": "9269609c65f89b8e3f6b6bd49bd83c827142ca1bf0bfe859e96dfdc856470a7f",
+          "receipts/test-2-interpolation.json": "0c7310810b71396506c6278c79a9d44017e1ae85743f1fe20e07d3249d1d7a91",
+          "receipts/test-2-interpolation_em.json": "b75cad0ccbcd86494277acc123d09c16ee98561b055f754a8e69f6c773d699cd",
+          "receipts/test-2-kneser_ney.json": "14c5771f4371dc2df6c3c3c9f630209f0ba78e7e909b4258fd4ba4ce695c8c43",
+          "receipts/test-2-laplace.json": "0325bebb6df0a0e25f7a7c012b4966a5cd587bca33a44f7272f808d4f8a593b9",
+          "receipts/test-2-modified_kneser_ney.json": "06144d9d8d7f9e435296999450024c5ef8aee3892a89847b36b3d71a0adc8daf",
+          "receipts/test-2-stupid_backoff.json": "d5df84d09b920235a3a23dde87dd0d8141f1c76df35d8883656e123073d1ad24",
+          "receipts/test-2-witten_bell.json": "11adbf903405d36f6d51e79d68452de614711dfee42f58ad0908a57ab7b31c2d",
+          "receipts/test-3-add_k.json": "5e5afc3241c472c0f078d2130b554b6281553f896a298012181a80438a965e66",
+          "receipts/test-3-interpolation.json": "850a43152781592b119f2cd1c8cefdc948c268154c4b4f0d945328154a323203",
+          "receipts/test-3-interpolation_em.json": "8c3a39737f2e56084aaec2ce631e8f29a340cf8065dda016be58d209c1db94f6",
+          "receipts/test-3-kneser_ney.json": "3025ae8b994c61c96c5956735294f0092bcb7567d0066ce0478c0c81ec7c6ef4",
+          "receipts/test-3-laplace.json": "fc7bfb4dde7fdd6ae32578fbf0372d399c6da7607edfa26c92a4cbe0da03eeb7",
+          "receipts/test-3-modified_kneser_ney.json": "537bef789fc48ab3ccdad080be275291034bba23053eb12aee69650cd816a1b8",
+          "receipts/test-3-stupid_backoff.json": "1dae1317c4cf020421c850032dea36583bc04fea41066041177b737391c076e6",
+          "receipts/test-3-witten_bell.json": "7a6f07c068de4fb60c575d29b658951d3bfa2f73bca63173d32e4421569b92b1",
+          "selection.json": "3961e7b1e5d13b404e2f0e3dd4963465543b8f82244335d991df57484b9eb6b2",
+          "source_documents.json": "64b033ffc841bfc0beb02fb46bfbc759958c5b24ed55fa863f4ce9fcf127aee8",
+          "splits.json": "29e6f438ce93bd1394e96c1dff89c921045d62f2926835275ce0c66017d2c46d",
+          "stage_research.claim": "529c5090959bfae8ce3de80403fbb2dfa85dcf313a4e1379af37a3002d3e4356",
+          "summary.json": "daf0fa25df60626d16c5f21b5df0233d90fc87b8b260a03894bdea1071b9ceab",
+          "target_bootstrap.json": "e1ff8196e3bdf5a6f977a388a6b43be4a3498988652b5aaab9fea4ba81cb9d4f",
+          "target_documents.json": "86f92c69af20a8fa3b0f55f9673327bb4c737908c2f121d2d0fb8f21d0cd1d87",
+          "tuning/1-add_k.json": "bf6c37231acafab6e55786e561891376583d9c9049f64daaa2973fa3ad4221b6",
+          "tuning/1-interpolation.json": "b8a9fa41db97ab2178d69f96e5fb96191ab2e363e8c1e62897c618871e444793",
+          "tuning/1-interpolation_em.json": "8d123239b9b1137e103441eddf6c6faad1313f6043cbc65493f835feec0f2215",
+          "tuning/1-kneser_ney.json": "9ecfcb9f757bad4a899d0aaf031617f29f3c0d343fffa2e09942bf3672826da6",
+          "tuning/1-laplace.json": "09faf7ed141d24d7223fb49ebe4be77f940c55fd7b769dbb47e84e56a80dc4af",
+          "tuning/1-modified_kneser_ney.json": "76a7bad543c43cf6f9257f6716e19953702f9620cd7ef5484392bd0705c1fdc8",
+          "tuning/1-stupid_backoff.json": "76a7bad543c43cf6f9257f6716e19953702f9620cd7ef5484392bd0705c1fdc8",
+          "tuning/1-witten_bell.json": "76a7bad543c43cf6f9257f6716e19953702f9620cd7ef5484392bd0705c1fdc8",
+          "tuning/2-add_k.json": "70950f1dc6a95dd8dca4ad258b2cd23f0305522d241d985bd6b131e6e6c774b4",
+          "tuning/2-interpolation.json": "9a7f98e90723cb67998385ee83028bfd966db5e66c090118e7734ffd27e6f53e",
+          "tuning/2-interpolation_em.json": "836ff2b2f3ee3b0668fd96ae6ef4b7889d231262f6044ab960d9d810ffee0efd",
+          "tuning/2-kneser_ney.json": "62d81a84d8d07b9ed20f5ffab4858810d6253c51db97005ddb6219c527b2778d",
+          "tuning/2-laplace.json": "e538ef437caf9bfa29a1ead9901eccbe53e4372be0c237f7f43c61579ddc3aa4",
+          "tuning/2-modified_kneser_ney.json": "3c3100cedee93af4c7c93c1b9f7b822c31bca5802a5ae533c26974f963fd4a9b",
+          "tuning/2-stupid_backoff.json": "1b710550c15ad6c01d94517b70e9f8fe66e5477f09c68676c2f8a2ab1035a873",
+          "tuning/2-witten_bell.json": "de0347c1d2b825b1fb0b03e33e53d56a167f41cb29e9217e00fbcc6c36d469ec",
+          "tuning/3-add_k.json": "0764969c83f82d3197a98d8ac42e6739c5a9d0324b2337a0605d15223b97e1de",
+          "tuning/3-interpolation.json": "0d5bfa290fe80989f8a0430a2967cdf5788fd2ca40b61b9d72f66fac3998eac4",
+          "tuning/3-interpolation_em.json": "552b80b52609e442b57e0be7ef9076aacf5ea567eb6d43f4f22dea1dc3443c91",
+          "tuning/3-kneser_ney.json": "1cb1dc05c8e1210ff3b2f672d8d5aafb9b2d2fa1de56b908968d87759ceea4b9",
+          "tuning/3-laplace.json": "6cc49ae79f998b26ddd17256d5c6a5a0e9adea0fd7821db6064eedc8505c4dfb",
+          "tuning/3-modified_kneser_ney.json": "1d2619d5a5074ccea8f2f48e30234ae6e3371e81695ea921691cbb84db9e352a",
+          "tuning/3-stupid_backoff.json": "9eda301784cb6577e2a8ed649cde4e4e6c804b81fe57c0a82ee3e5055d34315e",
+          "tuning/3-witten_bell.json": "27a44b56514e0416a704c4fbdfb92412b8080d9d14e98f2eb9396632c53c1924"
+        },
+        "documents": 120,
+        "seed": 42,
+        "min_count": 2
+      },
+      "selection": {
+        "baseline": "3-kneser_ney",
+        "best": "3-modified_kneser_ney",
+        "rule": "minimum normalized dev_loss; lexical tie-break"
+      },
+      "autocomplete": {
+        "models": {
+          "1-kneser_ney": {
+            "coverage": 0.92,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 13.00700000138022,
+            "latency_ms_p95": 18.079075008427026,
+            "mrr": 0.11405824653252004,
+            "mrr_at_50": 0.11189028475151341,
+            "oov_rate": 0.08,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.09,
+            "top3": 0.09,
+            "top5": 0.1
+          },
+          "3-kneser_ney": {
+            "coverage": 0.92,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 26.506100002734456,
+            "latency_ms_p95": 31.945440007257275,
+            "mrr": 0.18943199216512055,
+            "mrr_at_50": 0.18724901982633466,
+            "oov_rate": 0.08,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.12,
+            "top3": 0.2,
+            "top5": 0.26
+          },
+          "3-modified_kneser_ney": {
+            "coverage": 0.92,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 23.986749998584855,
+            "latency_ms_p95": 29.030035004689125,
+            "mrr": 0.1945109430088393,
+            "mrr_at_50": 0.19236171766194649,
+            "oov_rate": 0.08,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.13,
+            "top3": 0.21,
+            "top5": 0.26
+          }
+        },
+        "roles": {
+          "dev_winner": "3-modified_kneser_ney",
+          "kneser_ney": "3-kneser_ney",
+          "unigram": "1-kneser_ney"
+        }
+      },
+      "benchmark": {
+        "benchmark_sha256": "8c384323fef6faefdf15fbbdab7a23b1ae2f71c4a4ac3da62c3d3a92e0f76045",
+        "execution": "One new serial subprocess per model; same fixed source-dev targets; no held-out test scoring",
+        "models": {
+          "1-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 383.4352999983821,
+              "p95_ms": 398.8062199947308
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "4d65809ae8ba7c2100644a4bfeb604314e3624ffbd90a62b98c67e6e4eab4b9e",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "1-kneser_ney",
+            "peak_rss_bytes": 147062784,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "d35135aa64461f4575ea81a6e148a68036c041b960ac81d6dc6c41263be90c31",
+            "score_single_target": {
+              "p50_ms": 0.0034000040614046156,
+              "p95_ms": 0.008420005906373262
+            },
+            "source_checkpoint_sha256": "56b3e125a5a5b6ad33553c7f806c5c4199760f2aca358e50d9df0cc3cdd498e6",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 12.845299999753479,
+              "p95_ms": 18.5121699985757
+            },
+            "top_k_sha256": "14d9a0fe6ce074e374fdc209e66053d957e937b9aa07e2bb8ceb06a2567e9f18",
+            "vocabulary_sha256": "cbebf0f43defb8a09e4278549b51f26fd6ee944eaf3fab3e5382cef4da296ae1",
+            "warmup": 1
+          },
+          "2-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 439.1739000129746,
+              "p95_ms": 452.38661999901524
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "4d65809ae8ba7c2100644a4bfeb604314e3624ffbd90a62b98c67e6e4eab4b9e",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "2-kneser_ney",
+            "peak_rss_bytes": 147345408,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "82a1cb311d8cf2225a7ae9ea6b8d5c841364fd8721510257a9837ce358390075",
+            "score_single_target": {
+              "p50_ms": 0.010299998393747956,
+              "p95_ms": 0.019899999460903928
+            },
+            "source_checkpoint_sha256": "7bd2ef554877744b945028cd1b9a18bf6aa2f90e83489becaedcf26558fd030c",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 25.73034999659285,
+              "p95_ms": 30.161590006173356
+            },
+            "top_k_sha256": "9cdb00d91e4fda7b4b1c79baf7c2df108478b7944ac506191687612b2aca7a53",
+            "vocabulary_sha256": "cbebf0f43defb8a09e4278549b51f26fd6ee944eaf3fab3e5382cef4da296ae1",
+            "warmup": 1
+          },
+          "3-interpolation_em": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 2929.3670000042766,
+              "p95_ms": 3014.100559997314
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "4d65809ae8ba7c2100644a4bfeb604314e3624ffbd90a62b98c67e6e4eab4b9e",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-interpolation_em",
+            "peak_rss_bytes": 149999616,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "ed75c50847e523f86625116e0355335fa4b06e92d9b4814af8c661e95be08d7f",
+            "score_single_target": {
+              "p50_ms": 0.01665000309003517,
+              "p95_ms": 0.039450001349905506
+            },
+            "source_checkpoint_sha256": "90f95288ea142b4387cab9fdd03c732213fee79f09bb229753986b332671fe99",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 35.684750000655185,
+              "p95_ms": 50.82462499703979
+            },
+            "top_k_sha256": "0bcfb744dde5683667a998a2f919d8d5417feaf46e4e794775487d4700281632",
+            "vocabulary_sha256": "cbebf0f43defb8a09e4278549b51f26fd6ee944eaf3fab3e5382cef4da296ae1",
+            "warmup": 1
+          },
+          "3-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 571.0402999975486,
+              "p95_ms": 673.5503899952164
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "4d65809ae8ba7c2100644a4bfeb604314e3624ffbd90a62b98c67e6e4eab4b9e",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-kneser_ney",
+            "peak_rss_bytes": 147841024,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "28bf0c612d57251e518d6c99648f467c263a9fc5bb3854846648182feaab06a8",
+            "score_single_target": {
+              "p50_ms": 0.015099998563528061,
+              "p95_ms": 0.033444999280618504
+            },
+            "source_checkpoint_sha256": "6062d8c6eb47982da9eac085321c0a934ef42dd5f658d915a3b438509d547664",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 32.014749995141756,
+              "p95_ms": 43.10050500425859
+            },
+            "top_k_sha256": "06f8da3af91754d17233f54253d1b9e788afcbec7cec22e7516e6b37345a10a4",
+            "vocabulary_sha256": "cbebf0f43defb8a09e4278549b51f26fd6ee944eaf3fab3e5382cef4da296ae1",
+            "warmup": 1
+          },
+          "3-modified_kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 593.1560000026366,
+              "p95_ms": 1157.9921300057322
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "4d65809ae8ba7c2100644a4bfeb604314e3624ffbd90a62b98c67e6e4eab4b9e",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-modified_kneser_ney",
+            "peak_rss_bytes": 177737728,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "97fd4dc22e5e087c8cd1d6d995091d301011e0746f392f67fc4933216b589d25",
+            "score_single_target": {
+              "p50_ms": 0.02600000152597204,
+              "p95_ms": 0.06951999966986477
+            },
+            "source_checkpoint_sha256": "4141d15730c1dd6aadca599d88e021564fbc63a97f12eb8990cd8cb37eb7893e",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 36.651499998697545,
+              "p95_ms": 70.69130999880144
+            },
+            "top_k_sha256": "af0e5ec44a0f78f567825ac2b2a53e73dece1076544e97b786f80fe23a21a09a",
+            "vocabulary_sha256": "cbebf0f43defb8a09e4278549b51f26fd6ee944eaf3fab3e5382cef4da296ae1",
+            "warmup": 1
+          },
+          "3-witten_bell": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 546.6812999948161,
+              "p95_ms": 559.1312700009439
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "4d65809ae8ba7c2100644a4bfeb604314e3624ffbd90a62b98c67e6e4eab4b9e",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-witten_bell",
+            "peak_rss_bytes": 147607552,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "aae6e567838031f1bccc8c0a3463391c3541eee178a1e9effbbd964e1746ca46",
+            "score_single_target": {
+              "p50_ms": 0.015350000467151403,
+              "p95_ms": 0.031965002563083544
+            },
+            "source_checkpoint_sha256": "d6ecd66ae856720638ee433524ca7882bb07b685b19bd692e3161a1de21830db",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 32.76690000348026,
+              "p95_ms": 44.628829995781416
+            },
+            "top_k_sha256": "13496c6974d7e8d8a1db37e8883b775da8007e15d0cae1a3230359685ead6270",
+            "vocabulary_sha256": "cbebf0f43defb8a09e4278549b51f26fd6ee944eaf3fab3e5382cef4da296ae1",
+            "warmup": 1
+          }
+        },
+        "repeats": 3,
+        "source_run": "brown-doc-v1-20261010",
+        "targets": 30,
+        "warmup": 1
+      },
+      "transfer_group_correction": {
+        "authoritative_group_bootstrap": {
+          "ci95": [
+            -0.03551140919321712,
+            -0.026373606255951
+          ],
+          "difference": -0.03099397192201876,
+          "documents": 120,
+          "independent_groups": 116,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        },
+        "baseline": "3-kneser_ney",
+        "best": "3-modified_kneser_ney",
+        "correction_code_sha256": "6dee0d100ebaa830b1586e84a7dfcdaa7fe361b424f0ee265d0134a3fb964c44",
+        "raw_bootstrap": {
+          "ci95": [
+            -0.03544810874130091,
+            -0.02635009968982897
+          ],
+          "difference": -0.03099397192201876,
+          "documents": 120,
+          "independent_groups": 120,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        },
+        "reason": "Frozen runner omitted duplicate group tags on target rows; resampled existing losses by source policy groups, no model evaluation repeated",
+        "source_run": "brown-doc-v1-20261010",
+        "target_sha256": "b2d5d4d6cb33b28eea973b0291a6206d477f38cd8d5f328822970f4e51746613"
+      }
+    },
+    {
+      "run_id": "reuters-doc-v1-20261010",
+      "status": "published_summary",
+      "source_name": "reuters",
+      "metrics": [
+        {
+          "n": 1,
+          "method": "laplace",
+          "dev_cross_entropy": 5.124863689388497,
+          "test_cross_entropy": 5.226566195820361,
+          "test_perplexity": 186.15249358933076
+        },
+        {
+          "n": 1,
+          "method": "add_k",
+          "dev_cross_entropy": 5.1012522113933745,
+          "test_cross_entropy": 5.201520932736067,
+          "test_perplexity": 181.54815453106715
+        },
+        {
+          "n": 1,
+          "method": "interpolation",
+          "dev_cross_entropy": 5.101417622637825,
+          "test_cross_entropy": 5.201706315033824,
+          "test_perplexity": 181.58181346489638
+        },
+        {
+          "n": 1,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 5.101233907632251,
+          "test_cross_entropy": 5.201500399269155,
+          "test_perplexity": null
+        },
+        {
+          "n": 1,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 5.101233907632251,
+          "test_cross_entropy": 5.201500399269155,
+          "test_perplexity": 181.54442675631526
+        },
+        {
+          "n": 1,
+          "method": "witten_bell",
+          "dev_cross_entropy": 5.101233907632251,
+          "test_cross_entropy": 5.201500399269155,
+          "test_perplexity": 181.54442675631526
+        },
+        {
+          "n": 1,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 5.101233907632251,
+          "test_cross_entropy": 5.201500399269155,
+          "test_perplexity": 181.54442675631526
+        },
+        {
+          "n": 1,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 5.101417622637825,
+          "test_cross_entropy": 5.201706315033824,
+          "test_perplexity": 181.58181346489638
+        },
+        {
+          "n": 2,
+          "method": "laplace",
+          "dev_cross_entropy": 5.820074820786323,
+          "test_cross_entropy": 5.949602194073915,
+          "test_perplexity": 383.60071006904985
+        },
+        {
+          "n": 2,
+          "method": "add_k",
+          "dev_cross_entropy": 5.056064714045092,
+          "test_cross_entropy": 5.242610284800994,
+          "test_perplexity": 189.16322842605913
+        },
+        {
+          "n": 2,
+          "method": "interpolation",
+          "dev_cross_entropy": 4.602273378717007,
+          "test_cross_entropy": 4.696008064717173,
+          "test_perplexity": 109.5091453248203
+        },
+        {
+          "n": 2,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 4.432267807584383,
+          "test_cross_entropy": 4.523670632984244,
+          "test_perplexity": null
+        },
+        {
+          "n": 2,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 4.486856053310284,
+          "test_cross_entropy": 4.581128300886163,
+          "test_perplexity": 97.62448187878118
+        },
+        {
+          "n": 2,
+          "method": "witten_bell",
+          "dev_cross_entropy": 4.56611184408829,
+          "test_cross_entropy": 4.672787033192793,
+          "test_perplexity": 106.9955273576866
+        },
+        {
+          "n": 2,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 4.483022870045488,
+          "test_cross_entropy": 4.568327079820986,
+          "test_perplexity": 96.38273420529872
+        },
+        {
+          "n": 2,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 4.599608377656474,
+          "test_cross_entropy": 4.694991848426045,
+          "test_perplexity": 109.39791687296821
+        },
+        {
+          "n": 3,
+          "method": "laplace",
+          "dev_cross_entropy": 6.741049614415739,
+          "test_cross_entropy": 6.8183921614617695,
+          "test_perplexity": 914.5134374241336
+        },
+        {
+          "n": 3,
+          "method": "add_k",
+          "dev_cross_entropy": 6.078940743096972,
+          "test_cross_entropy": 6.314678433595446,
+          "test_perplexity": 552.6243265986851
+        },
+        {
+          "n": 3,
+          "method": "interpolation",
+          "dev_cross_entropy": 4.6562014351527266,
+          "test_cross_entropy": 4.786308003641188,
+          "test_perplexity": 119.85803534423404
+        },
+        {
+          "n": 3,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 4.864145408382408,
+          "test_cross_entropy": 5.0532722683657445,
+          "test_perplexity": null
+        },
+        {
+          "n": 3,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 4.41598452164453,
+          "test_cross_entropy": 4.556736980557448,
+          "test_perplexity": 95.27209737677525
+        },
+        {
+          "n": 3,
+          "method": "witten_bell",
+          "dev_cross_entropy": 4.658746139826586,
+          "test_cross_entropy": 4.838883913600954,
+          "test_perplexity": 126.32827974565807
+        },
+        {
+          "n": 3,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 4.4041655180463195,
+          "test_cross_entropy": 4.538617794751008,
+          "test_perplexity": 93.56138966027765
+        },
+        {
+          "n": 3,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 4.5933163772924805,
+          "test_cross_entropy": 4.697641433054032,
+          "test_perplexity": 109.68816025424972
+        }
+      ],
+      "comparison": [
+        {
+          "ci95": [
+            -0.03310541821210265,
+            -0.006888742745511502
+          ],
+          "difference": -0.018119185806440216,
+          "documents": 13,
+          "independent_groups": 12,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        }
+      ],
+      "test_policy": "exploratory; parameters recorded before fitting; prior corpus exposure unknown",
+      "provenance": {
+        "config_sha256": "833e11616f1ae6b39ab92fe1f8cf23d044da2db445065c0046945b45319465e2",
+        "source_sha256": "b2d5d4d6cb33b28eea973b0291a6206d477f38cd8d5f328822970f4e51746613",
+        "code_sha256": {
+          "extensions/experiments/registry.py": "1bb456dab232ef9588e311f6856ee203c5b415663da9e4be2203f51f9325d166",
+          "extensions/experiments/research.py": "89e2f200b3ae513c822f308d052b2f12be70a4ee1383f23ab2da2f3600885fb0",
+          "extensions/src/analytics.py": "c3b928fae7c241871a3fd7948e32b12f53f6231a5042e33c6163ac2d9b68edfe",
+          "extensions/src/cli.py": "1880783d15bcad376c68b9183be2174c86ead31a2232ce6a585120262f6c2fb1",
+          "extensions/src/datasets.py": "120b2e76a7c6c0473af1f278c87e46370b305607fa2c8be0b1ca2c57351bfba2",
+          "extensions/src/models.py": "2a42b52a57fc52eca41ef62ecd42350adc0b84feb994a13565fa83f3f943fab2",
+          "extensions/src/pipeline.py": "cf52d5ae58ca209abdb425bf7681b9d55e7f2c838f69ca63c74cd3fc1f921f0c",
+          "extensions/src/quality.py": "6b3bc07092fa415e9ba7bd50d60e9936ba5bfa8850f035c863b8d65ae1ee56c5"
+        },
+        "outputs_sha256": {
+          "autocomplete.json": "48b090f69f96d9cf5dcb1cb686aba93fd9c0cbaa25bc6cbf183789bb87b69144",
+          "bootstrap.json": "36711b0e4101b6202c20547ea231530c06576b009f8ca9070b36ce41ce3909c1",
+          "diagnostics.json": "dcfff68870bc74b5aea20c643efaab2e7ca4e20483a16556baa07786e52d1982",
+          "domain_transfer.json": "8d20bd8c73bd290b272c0876b31a2abb7b9417dda86260fa914b9f262f37fd28",
+          "generated.json": "8b760f82058b186f366c73cfe9857dfe357f64cffe8f0bf75a595232e2234244",
+          "metrics/target-3-kneser_ney.json": "81de048437d79b48fafc18623ff70d558515b5ae414040167a4d7a102214b750",
+          "metrics/target-3-modified_kneser_ney.json": "e8b6105c8c6c30815b7885b79f43df27a0520e89d6dde235e5fd4fe57a73ba7e",
+          "metrics/test-1-add_k.json": "0400a280640e3bad25169553211a3cba9985592efb49206f50a1a7eb4222713c",
+          "metrics/test-1-interpolation.json": "15db2c5d99b858aa7ed956cdcebbcefef8428de909bb1280e9001aad4aa9f968",
+          "metrics/test-1-interpolation_em.json": "15db2c5d99b858aa7ed956cdcebbcefef8428de909bb1280e9001aad4aa9f968",
+          "metrics/test-1-kneser_ney.json": "8975124f221b4fafc6a20da8393497c3e5da95478efe5b7bbc72adf86898f1b5",
+          "metrics/test-1-laplace.json": "adc1661b9038f0fa54968469a1304731e690a629a1f986f06789707c0a612ac7",
+          "metrics/test-1-modified_kneser_ney.json": "8975124f221b4fafc6a20da8393497c3e5da95478efe5b7bbc72adf86898f1b5",
+          "metrics/test-1-stupid_backoff.json": "8975124f221b4fafc6a20da8393497c3e5da95478efe5b7bbc72adf86898f1b5",
+          "metrics/test-1-witten_bell.json": "8975124f221b4fafc6a20da8393497c3e5da95478efe5b7bbc72adf86898f1b5",
+          "metrics/test-2-add_k.json": "82728edf560a475ac1300bb26a411c76086e898c7c6fc1b54ab135346e94ef43",
+          "metrics/test-2-interpolation.json": "fa33aa5dab7249e822011883e3b0d5b091e52deb6fa498d4a86ca6e57029e058",
+          "metrics/test-2-interpolation_em.json": "e25f8d586c7ee63b4d1431b79035d7e44cd42124747600d785632ae69089f62e",
+          "metrics/test-2-kneser_ney.json": "0b606024286933bfb2f21b9458fb1a3edbee871687343b7069ca3d207f995764",
+          "metrics/test-2-laplace.json": "bf8aba94cbd5e097da084a96e3c15677203e39653b95f35767086d9dc98857de",
+          "metrics/test-2-modified_kneser_ney.json": "9c53f557f1d24a8d2c22621bf9433f1b906201ae546ff28b20beabc45fa78487",
+          "metrics/test-2-stupid_backoff.json": "aaf101d42d3d4d4c64659f95e01e4fd918ab808efef1552b140de3c9742a275e",
+          "metrics/test-2-witten_bell.json": "5a347ca8b317fd0eaa9666e1f31466a5d2616a1e8aa1cfde839c7ea7cd440a30",
+          "metrics/test-3-add_k.json": "4582bbeb0979dd81174a5455e612c7473eb6397034ea4562e886c5d08f8bbda8",
+          "metrics/test-3-interpolation.json": "67c7269f562815db27d294323e8f1e97c0987e5a072892cf1f86c0633014e776",
+          "metrics/test-3-interpolation_em.json": "c6a704f9130805f442de0d506dccd092a13d40e8b0bd34db42e0136e7a6424e7",
+          "metrics/test-3-kneser_ney.json": "4e72529003c3c341f4e8bb8489c1de50978d53893a8aeaaaf1a2ffc828b327e4",
+          "metrics/test-3-laplace.json": "bde1cde76b6b60f01b4f4912dbd6accb688fc70d1625d01be6ae4c37f8ea491c",
+          "metrics/test-3-modified_kneser_ney.json": "180c7249c93853baaaea68d2c36f6a1dfe27a0ce3858a4c803e0a1056144f29a",
+          "metrics/test-3-stupid_backoff.json": "52f18d5eba585db6711098d2ed75ab7f2c29c1b3a8722df53a1fc47f33ed68ca",
+          "metrics/test-3-witten_bell.json": "cab953c43c23e58a3bd586514aac11e562874588eaaa950ec75c12468c352947",
+          "models/1-add_k.json.gz": "e95b509f243f3ea28429fcd99d408f38e9e73d9880c97eeeb17587c9db516adc",
+          "models/1-add_k.json.gz.meta.json": "d33ef5b9bfa83936a5c4584262182a2187f48e2313c1464682700eade42c0c03",
+          "models/1-interpolation.json.gz": "d996f628acdb4df92753e75ec25af7c0fcefbda3f64fa2c774e782bd1267c142",
+          "models/1-interpolation.json.gz.meta.json": "604fecb38ebac110990f50c7d7175c531337eae0593b4061b598c68b8afdb441",
+          "models/1-interpolation_em.json.gz": "20e19468f79df510b62007cc0b770001d167c034d9001bdfd6bcbfb8087a0926",
+          "models/1-interpolation_em.json.gz.meta.json": "ea48a434bb3362fd04441536e2be3cca908f11567b502b9f40e5677f91fc8280",
+          "models/1-kneser_ney.json.gz": "528b0044fd6c02b47a016b515cb455e05f247e2972f3fdc31515e676f108741c",
+          "models/1-kneser_ney.json.gz.meta.json": "a46de94c2abb54a08e6191312b809eb242362bacea6d88197483d6ae59301ac2",
+          "models/1-laplace.json.gz": "15821de96858199ca2b0cfbfe2b776b9842dff99608d424e7a62e233fd5f17c5",
+          "models/1-laplace.json.gz.meta.json": "77677320323b1b3bf05604e76d605a50205f27a9368a8f93eb23856c127175c1",
+          "models/1-modified_kneser_ney.json.gz": "3bc0173c3c77916e07c310fc53bf99824d26b3e8cfce8ee8104ad5bbb8e41c0b",
+          "models/1-modified_kneser_ney.json.gz.meta.json": "f3e7db1fd0564f901d066b72ba2f3d62a419bb4f530a7a543e941b08938e9b20",
+          "models/1-stupid_backoff.json.gz": "48d8a7dc982b0268478a0836e6321ec2074224077c34246470440e2a7997e62b",
+          "models/1-stupid_backoff.json.gz.meta.json": "7b5951e8ec206db44486c41f54b44c5b5676d91fcc51beeb726944444d3d5e3c",
+          "models/1-witten_bell.json.gz": "753a09f3d0c4ba1ade4a02a929d2470c9f03f7a2fb31678b0086162a60558282",
+          "models/1-witten_bell.json.gz.meta.json": "94a04843e0f4c3225d6edb98059da3eef37788938e416aad6fc15820e1956a37",
+          "models/2-add_k.json.gz": "2d1950165c2e64e846e9966f273d461f791a7d9557feaa5565c085a42f50e8f8",
+          "models/2-add_k.json.gz.meta.json": "d33a1a75c766a19e602b2993181fa074cfa6d8d0967ba4bfde7cdfac41a07477",
+          "models/2-interpolation.json.gz": "56215167c8638d6a9bf485b38b19601f3e3dec1637977a59f33fecbc2870d640",
+          "models/2-interpolation.json.gz.meta.json": "83454e553262151ca65a2455d73816e0a4c484aec2ee2872fe429da1a4164c4a",
+          "models/2-interpolation_em.json.gz": "41a416ddfac729768cd657fa5318743034b87fdd53e4898e8b914f227f69fbb0",
+          "models/2-interpolation_em.json.gz.meta.json": "bbac6edbac290862a80169028376e7cbfe27da048a53a4170a1b57debbaae77e",
+          "models/2-kneser_ney.json.gz": "dc851ad57492d0e708c7439c2c5cf40e494aeade1d51a8047a7b55ce59da8890",
+          "models/2-kneser_ney.json.gz.meta.json": "a26e20acd9d2e535672ca6336184193e30193bf85a31ffb877ca6121f965a8da",
+          "models/2-laplace.json.gz": "7ef0d5f515b98454752945b728bc149bd15a3f27659a096150aa75e3c1ebc06d",
+          "models/2-laplace.json.gz.meta.json": "360fc687abde2b58b818fddab1e226db9eecc2ab9f66be45218ee6995b151d5f",
+          "models/2-modified_kneser_ney.json.gz": "337f29635beb0c436ba349d04fa634ba3cdd82d69134f3443b7c204be48c58c8",
+          "models/2-modified_kneser_ney.json.gz.meta.json": "f2556acc1bef4bcb277a40158e036b04147167be198ae53b0975a112d96c63fc",
+          "models/2-stupid_backoff.json.gz": "539ea3920402656021456c01b0545e7410ec17d702353681c78e3f60562d886f",
+          "models/2-stupid_backoff.json.gz.meta.json": "19b538ea7abe84a6f24608f92bf4f9a134ddb94487d3aeb1ecfebc020f076fd3",
+          "models/2-witten_bell.json.gz": "f15dd33c779d9d7bd5518ef1e6c0788a3ab4d278f8759abbe6707e77d636e212",
+          "models/2-witten_bell.json.gz.meta.json": "b124c758c1ea0e9c7c9eb5e063cb5df225279425d171dba3f787da57d12fec04",
+          "models/3-add_k.json.gz": "12200e9a3371cfe292e011ff5b58f3c542dad1c56609495409bb49421e63b5c1",
+          "models/3-add_k.json.gz.meta.json": "2c753d902970b6d745c123363ad1a51003b69f3c118d001ebbbda91282d42b69",
+          "models/3-interpolation.json.gz": "1063fb887d1bdd4bec7a6c51904522f18482274aad8c3445b802787651b7d66d",
+          "models/3-interpolation.json.gz.meta.json": "bf7aa0b8721bdb0458608639827e7a6139da3c107bbff793a343cafef209950c",
+          "models/3-interpolation_em.json.gz": "c65c267c34ae286808cb0332fe8f34c070074763c20e601e6a0a7bbfdd892d54",
+          "models/3-interpolation_em.json.gz.meta.json": "76ad522dfcaaa3c0e17d01206df24a28dd1f67421a445f29bdf9de84e248144a",
+          "models/3-kneser_ney.json.gz": "8052033c87599cd340c5ed782f566d5a665744a69ee2f7a7324180d77dbc2ca6",
+          "models/3-kneser_ney.json.gz.meta.json": "2e8721ae26fca5bcbe4aa4682787bf67485ad64c2623f938d171f444da31c4a9",
+          "models/3-laplace.json.gz": "0b3cf38ecac40147e048f8d08c72125a5e36b28fa6b9621c7766eca9ea6d8494",
+          "models/3-laplace.json.gz.meta.json": "aba1dc7a050e3b167a8cfdd7ebb4d6e5169dca4bbc52998c1753026eee0654ba",
+          "models/3-modified_kneser_ney.json.gz": "ad5a3a9aab9bd88a5d9018eb427301a2c090ba1a79d1d57e2fe1463e21fd2e42",
+          "models/3-modified_kneser_ney.json.gz.meta.json": "601b3b66d1becc41041f2fff86390bfc6f46a122d358af0d06083f31b2f4a787",
+          "models/3-stupid_backoff.json.gz": "3f6517c7922a432fd2449f446c43a0e10ac4824b330146dbe46d31ed0356851f",
+          "models/3-stupid_backoff.json.gz.meta.json": "c9c2d88a298c3ac13b3d9b6fee06a2be4682783fbd3299db92ed55156b2f5631",
+          "models/3-witten_bell.json.gz": "e6ebd72ea316173ad820653cf0f96dec0db30aff8708aee30752e99c1be11b67",
+          "models/3-witten_bell.json.gz.meta.json": "a4f89b2adf8dc620738a8ee194c4ceb38d9425a7e6520a52b40fde760dd620e4",
+          "protocol.json": "045314fda8656df57e4d5a01a3be953c6c35bbdaa07ebe0c8d83d850ecb3f8aa",
+          "receipts/target-3-kneser_ney.json": "574ebe7e195490333a3100b4ebf7fac169ffa57a072eca063cae425e1901a374",
+          "receipts/target-3-modified_kneser_ney.json": "5869340ba31b0532e6e21f893022c765feffe9af877e8d4cbd63034ffd9cb770",
+          "receipts/test-1-add_k.json": "59d215e5495b6e4d80f7e66d4dd7447e9f47238592483a784de9ac753ef9f3ac",
+          "receipts/test-1-interpolation.json": "ef7ecb69c6eebd499036bccc87405d13362e88523e8338dea20039b0e7c224e9",
+          "receipts/test-1-interpolation_em.json": "79503e51dac434a617dbba91e3a39899ea9a5ce8a164cb3f136d16aa421d165b",
+          "receipts/test-1-kneser_ney.json": "36834b5d5bfbb2ac2861002719f7a745079e51b99dd30f4f35bd227d24ac3eec",
+          "receipts/test-1-laplace.json": "9e8d9cf60d1d9932cce23f447ade2100f7005d00fe09ead916460e0428958b62",
+          "receipts/test-1-modified_kneser_ney.json": "4110301abb3c7aeb20f42b99071330529b281f31d22beb828a8642149b4d7c47",
+          "receipts/test-1-stupid_backoff.json": "b2e2d0c01ee7868ae3933868b6c9a3908eeda8586089bcf4bacd8bba25bae128",
+          "receipts/test-1-witten_bell.json": "53a2e2a91fd050a8de8098916f648d74a6a6bf64e3111d268f44e22d0e08fe6d",
+          "receipts/test-2-add_k.json": "22585e9dc93afdd8b63f6cd407a8ef62d1c9d9c02ceacf5ec876df79168685de",
+          "receipts/test-2-interpolation.json": "c85e048569c5e7409bd2fc49a86ce6239b331b5bf411358660036a2965c230dd",
+          "receipts/test-2-interpolation_em.json": "f21d0b0c0ea351d70fbb6fc8794d3791b8c0c4cb4e58dcca939f26e978e04b4b",
+          "receipts/test-2-kneser_ney.json": "f4ff222cba9db6a4dddd72a7cc02ed9aab2e4002a0175ecfe2c22b8e3ebeefe9",
+          "receipts/test-2-laplace.json": "5f21fb478c54c52854d76de8fdf4daddfb8b9544fd479e3730033eaf83cd23f6",
+          "receipts/test-2-modified_kneser_ney.json": "560752bd8532e8a86b29caa6810f13d91cce857d52375a9e696a602efaac495a",
+          "receipts/test-2-stupid_backoff.json": "8003d110c7ed0fe9665e6e7b423b7a7e0a08594d8d90ed03d4477ef9b7ac964c",
+          "receipts/test-2-witten_bell.json": "d3905c972177d8deba371a501ebddcfc85979bb4a901363a426d989be0b5fb62",
+          "receipts/test-3-add_k.json": "00e60c3163927a4767bae9684db08c4d932d15155055ccd27320ab51c72a80e0",
+          "receipts/test-3-interpolation.json": "eef10bae9839be02a4a7cf62dcc1e2035376edc89392d92b532aae9e14d11f5a",
+          "receipts/test-3-interpolation_em.json": "d711d0cc6361f938778d8ef88698994041f67fc26ee56ef658e28da672733a84",
+          "receipts/test-3-kneser_ney.json": "f9d9a868a80167596fdeda6960232fffcde3ead72f3d80bf7236b34215471158",
+          "receipts/test-3-laplace.json": "b84cad142d4c185da3b308e3a07a24e9f29c290ad3391d0e344b1484f26502fc",
+          "receipts/test-3-modified_kneser_ney.json": "0e296ff765874acb8df848b222afecdb7daf2fc15345d4dd42a840ffe9765174",
+          "receipts/test-3-stupid_backoff.json": "16f9af96c04a31538e86c1b3fcf38a57f4e222f8e4e697396844be69aab84988",
+          "receipts/test-3-witten_bell.json": "0840c37f95c398d6ca4e6b0291660c29d66bab814c50a360de1d97fbf7a302c8",
+          "selection.json": "3961e7b1e5d13b404e2f0e3dd4963465543b8f82244335d991df57484b9eb6b2",
+          "source_documents.json": "86f92c69af20a8fa3b0f55f9673327bb4c737908c2f121d2d0fb8f21d0cd1d87",
+          "splits.json": "5ae3651efaa85559f723ff6425d65362e6cece513560f9caa70df9019d4dc7f4",
+          "stage_research.claim": "c6fe62ed3089bbe12b55f6a467b307e8708c0c6adc827361b81022ed1b06b6f9",
+          "summary.json": "9aefb35cb3fd43d9455275c57e3dd7b80e9a55696d26ccf1d06b826e0e66bbe7",
+          "target_bootstrap.json": "6000fe9c2ccd5aefee55ee5d1604f8efda3f360f9de0097f32eded0f505c7c61",
+          "target_documents.json": "64b033ffc841bfc0beb02fb46bfbc759958c5b24ed55fa863f4ce9fcf127aee8",
+          "tuning/1-add_k.json": "77fd6c9851153f796436e2acbfd0d0c75df88604a69b1484d5ac5133f7796dfa",
+          "tuning/1-interpolation.json": "277a3d1b38a0736e37351f6ff8dbe9f11cfb78379bc1670b6b7e92ee146bd955",
+          "tuning/1-interpolation_em.json": "2e49e744192e2ee8281c4b3c2cd889907744d9e60c1765741f720d4e48413931",
+          "tuning/1-kneser_ney.json": "0c48b841acbd693217a2d6d09451dda62110534f1d0995ecb4c698a6cda73457",
+          "tuning/1-laplace.json": "a25b2f495b10c5b85968f664193c664c4f6d71020d3c4ea930d3ecd71ccd1c02",
+          "tuning/1-modified_kneser_ney.json": "8bdee18e24b83309a38dcc2ea6f36721786e23432f9debd20439779fde688155",
+          "tuning/1-stupid_backoff.json": "8bdee18e24b83309a38dcc2ea6f36721786e23432f9debd20439779fde688155",
+          "tuning/1-witten_bell.json": "8bdee18e24b83309a38dcc2ea6f36721786e23432f9debd20439779fde688155",
+          "tuning/2-add_k.json": "9ce61b8cdcb15c2b7392107ae584c7272fb3d856300ef2b000bde64cccd64752",
+          "tuning/2-interpolation.json": "1c73b378ba38dfb2c77d138099486669cc2f239c9a4cfaca4587ae1f86225b72",
+          "tuning/2-interpolation_em.json": "43a69e5774f9511581cdd82b7bc3377ae82c3bf05bfc51bb99c2d81c545cdaf7",
+          "tuning/2-kneser_ney.json": "c33e7a88f4b5853cceff07159135ecd159fc1dc79040e638c0b8215c07e83e14",
+          "tuning/2-laplace.json": "ae67338c57fa369f185c61cd9f4e854de2a56c29b9b16145bf79d69a5702c6ba",
+          "tuning/2-modified_kneser_ney.json": "dbcb79d8acfbe33bdd3fec51b52634e6a4d147b6a7a5965e79047554cafcbd5e",
+          "tuning/2-stupid_backoff.json": "b12314be9ad12e86296f10e0345a92a961a6a35b80c3a02247f84d3b233690b5",
+          "tuning/2-witten_bell.json": "c8c7b63f316df01dfde5e79ad43602a0903e763e741657fd4b17fc70b9fcf0d9",
+          "tuning/3-add_k.json": "93ca824a878807645bafea7ae0aabfca16ab2912978f10e64197e9658af11660",
+          "tuning/3-interpolation.json": "eef7888a50511393cbd0c083114a542408ea86b58702066094bb1959d3e2f8e0",
+          "tuning/3-interpolation_em.json": "3cc5ebc7414db6e6bf668324b8e3fc2f805ce8e846b4476738a469e69f83cf17",
+          "tuning/3-kneser_ney.json": "cf23a66a36f15511bc1c73a86577050fa5bdeab8ef6e9d4c31327e2c0bcb01a0",
+          "tuning/3-laplace.json": "72420c17815bc3216ec71511a843931e9a7f2cd0c7eba62fe843e8f7d4eb9f18",
+          "tuning/3-modified_kneser_ney.json": "e43236d23dbe83a12696a5e3efb4be44975b330c9e5939d9de3fa7ff0939775c",
+          "tuning/3-stupid_backoff.json": "8ecda27c8ab810352d0316d61fbe41b30ba2fbe97fcfe712744a14f67d01de86",
+          "tuning/3-witten_bell.json": "c643599f3f068a622ad347ecaf70063dbef081c7f87286444c0d88fc3d2f9003"
+        },
+        "documents": 120,
+        "seed": 42,
+        "min_count": 2
+      },
+      "selection": {
+        "baseline": "3-kneser_ney",
+        "best": "3-modified_kneser_ney",
+        "rule": "minimum normalized dev_loss; lexical tie-break"
+      },
+      "autocomplete": {
+        "models": {
+          "1-kneser_ney": {
+            "coverage": 0.85,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 1.2650499993469566,
+            "latency_ms_p95": 1.7823300040618049,
+            "mrr": 0.06827988762621728,
+            "mrr_at_50": 0.06547574080942228,
+            "oov_rate": 0.15,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.0,
+            "top3": 0.05,
+            "top5": 0.12
+          },
+          "3-kneser_ney": {
+            "coverage": 0.85,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 2.813450002577156,
+            "latency_ms_p95": 3.239905008376809,
+            "mrr": 0.2513979585646335,
+            "mrr_at_50": 0.24974540681766846,
+            "oov_rate": 0.15,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.17,
+            "top3": 0.28,
+            "top5": 0.33
+          },
+          "3-modified_kneser_ney": {
+            "coverage": 0.85,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 2.5994499956141226,
+            "latency_ms_p95": 3.111479996732669,
+            "mrr": 0.25142515784938074,
+            "mrr_at_50": 0.2498851005641313,
+            "oov_rate": 0.15,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.17,
+            "top3": 0.28,
+            "top5": 0.31
+          }
+        },
+        "roles": {
+          "dev_winner": "3-modified_kneser_ney",
+          "kneser_ney": "3-kneser_ney",
+          "unigram": "1-kneser_ney"
+        }
+      },
+      "benchmark": {
+        "benchmark_sha256": "8c384323fef6faefdf15fbbdab7a23b1ae2f71c4a4ac3da62c3d3a92e0f76045",
+        "execution": "One new serial subprocess per model; same fixed source-dev targets; no held-out test scoring",
+        "models": {
+          "1-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 20.097000000532717,
+              "p95_ms": 20.389410000643693
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "906237876420affd05052d3d673aab53088c2560cfcd0a3d8f82d4d9b2e922f0",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "1-kneser_ney",
+            "peak_rss_bytes": 64188416,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "7635385b7a04695b216fee8381107571cd980b69891ed618d84f135d00d27ba2",
+            "score_single_target": {
+              "p50_ms": 0.0015999976312741637,
+              "p95_ms": 0.002355003380216658
+            },
+            "source_checkpoint_sha256": "528b0044fd6c02b47a016b515cb455e05f247e2972f3fdc31515e676f108741c",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 1.517450000392273,
+              "p95_ms": 1.9671249996463303
+            },
+            "top_k_sha256": "d612d198ceb674f530e27910a837d9f6e6fa141e166c35f756f61392de39d43d",
+            "vocabulary_sha256": "8e8823ed1af2d81f61e58aa8f93c31c1a007e538978ac752d65db6bd6948775d",
+            "warmup": 1
+          },
+          "2-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 23.979399993550032,
+              "p95_ms": 24.236800002108794
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "906237876420affd05052d3d673aab53088c2560cfcd0a3d8f82d4d9b2e922f0",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "2-kneser_ney",
+            "peak_rss_bytes": 64266240,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "e1ee46492b118324a3bef1645dc1bb466b28edf3f091af026645eacc8e8e58ee",
+            "score_single_target": {
+              "p50_ms": 0.0030999945010989904,
+              "p95_ms": 0.004409989924170077
+            },
+            "source_checkpoint_sha256": "dc851ad57492d0e708c7439c2c5cf40e494aeade1d51a8047a7b55ce59da8890",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 2.47355000465177,
+              "p95_ms": 2.885590001096716
+            },
+            "top_k_sha256": "d00fd6586c4d835070403af3d160f4f4941efb4f0701baae9d643cc21894a5e5",
+            "vocabulary_sha256": "8e8823ed1af2d81f61e58aa8f93c31c1a007e538978ac752d65db6bd6948775d",
+            "warmup": 1
+          },
+          "3-interpolation_em": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 90.8791999972891,
+              "p95_ms": 92.30533999943873
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "906237876420affd05052d3d673aab53088c2560cfcd0a3d8f82d4d9b2e922f0",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-interpolation_em",
+            "peak_rss_bytes": 64614400,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "79ec9d077db3ab936b7aeec5f6039f0ea5d2dd383325ade74f5497e1ea0b4c16",
+            "score_single_target": {
+              "p50_ms": 0.0040000013541430235,
+              "p95_ms": 0.0052549963584169745
+            },
+            "source_checkpoint_sha256": "c65c267c34ae286808cb0332fe8f34c070074763c20e601e6a0a7bbfdd892d54",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 3.0866499946569093,
+              "p95_ms": 3.5055049920629244
+            },
+            "top_k_sha256": "5bb724894291ebd83b6d9ac2dbf0317bf5fcbb22f7bbbd12063abb9ac883f1ee",
+            "vocabulary_sha256": "8e8823ed1af2d81f61e58aa8f93c31c1a007e538978ac752d65db6bd6948775d",
+            "warmup": 1
+          },
+          "3-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 25.69160000712145,
+              "p95_ms": 26.249599999573547
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "906237876420affd05052d3d673aab53088c2560cfcd0a3d8f82d4d9b2e922f0",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-kneser_ney",
+            "peak_rss_bytes": 64118784,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "9373e9d3fc41c8494eb98c6737a418157791473a3a165e3ec871a4573b9bfa2e",
+            "score_single_target": {
+              "p50_ms": 0.003850007487926632,
+              "p95_ms": 0.006820000271545723
+            },
+            "source_checkpoint_sha256": "8052033c87599cd340c5ed782f566d5a665744a69ee2f7a7324180d77dbc2ca6",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 2.962350001325831,
+              "p95_ms": 3.4317099991312716
+            },
+            "top_k_sha256": "92036d0cf40e39338562c288df5b9bfe09ce2e33d70684e9a1684f3ff683691d",
+            "vocabulary_sha256": "8e8823ed1af2d81f61e58aa8f93c31c1a007e538978ac752d65db6bd6948775d",
+            "warmup": 1
+          },
+          "3-modified_kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 29.270099999848753,
+              "p95_ms": 29.575470006966498
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "906237876420affd05052d3d673aab53088c2560cfcd0a3d8f82d4d9b2e922f0",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-modified_kneser_ney",
+            "peak_rss_bytes": 66027520,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "225d9ac476c8a5ca8c44b3d72300f90d23151df27da772d8bb76c51d6f2992dc",
+            "score_single_target": {
+              "p50_ms": 0.0041000021155923605,
+              "p95_ms": 0.006265004049055278
+            },
+            "source_checkpoint_sha256": "ad5a3a9aab9bd88a5d9018eb427301a2c090ba1a79d1d57e2fe1463e21fd2e42",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 2.7282000010018237,
+              "p95_ms": 3.2010700037062634
+            },
+            "top_k_sha256": "361f3f334918da1927859520b80d07c64553e8826a6f594948ac97c974cb50b8",
+            "vocabulary_sha256": "8e8823ed1af2d81f61e58aa8f93c31c1a007e538978ac752d65db6bd6948775d",
+            "warmup": 1
+          },
+          "3-witten_bell": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 21.785100005217828,
+              "p95_ms": 22.534620002261363
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "906237876420affd05052d3d673aab53088c2560cfcd0a3d8f82d4d9b2e922f0",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-witten_bell",
+            "peak_rss_bytes": 64438272,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "c6bee1fac4ba6dddec9955f8ce78cd1c48781800c8c36eaf5d1bfc63c28c19a6",
+            "score_single_target": {
+              "p50_ms": 0.004549998266156763,
+              "p95_ms": 0.005910001345910132
+            },
+            "source_checkpoint_sha256": "e6ebd72ea316173ad820653cf0f96dec0db30aff8708aee30752e99c1be11b67",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 2.718150004511699,
+              "p95_ms": 3.127244994539069
+            },
+            "top_k_sha256": "9c3c3c57191d6e5fd5dcae139d346616808a9550598eb03c9417bdb5d6bb5b26",
+            "vocabulary_sha256": "8e8823ed1af2d81f61e58aa8f93c31c1a007e538978ac752d65db6bd6948775d",
+            "warmup": 1
+          }
+        },
+        "repeats": 3,
+        "source_run": "reuters-doc-v1-20261010",
+        "targets": 30,
+        "warmup": 1
+      },
+      "transfer_group_correction": {
+        "authoritative_group_bootstrap": {
+          "ci95": [
+            -0.010852002627996158,
+            -0.0081562844964148
+          ],
+          "difference": -0.009516648102209828,
+          "documents": 120,
+          "independent_groups": 105,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        },
+        "baseline": "3-kneser_ney",
+        "best": "3-modified_kneser_ney",
+        "correction_code_sha256": "6dee0d100ebaa830b1586e84a7dfcdaa7fe361b424f0ee265d0134a3fb964c44",
+        "raw_bootstrap": {
+          "ci95": [
+            -0.01089707127003347,
+            -0.008142574005405322
+          ],
+          "difference": -0.009516648102209828,
+          "documents": 120,
+          "independent_groups": 120,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        },
+        "reason": "Frozen runner omitted duplicate group tags on target rows; resampled existing losses by source policy groups, no model evaluation repeated",
+        "source_run": "reuters-doc-v1-20261010",
+        "target_sha256": "058db3a7bdd5f8efb5f638ab52f7db42aba0d2fe9f15fca99f1a98777e167e11"
+      }
+    },
+    {
+      "run_id": "idwiki-doc-v1-20261010",
+      "status": "published_summary",
+      "source_name": "Wikipedia Indonesia (40 artikel)",
+      "metrics": [
+        {
+          "n": 1,
+          "method": "laplace",
+          "dev_cross_entropy": 4.399384844523385,
+          "test_cross_entropy": 4.9528848539360135,
+          "test_perplexity": 141.58282109313387
+        },
+        {
+          "n": 1,
+          "method": "add_k",
+          "dev_cross_entropy": 4.350687093543276,
+          "test_cross_entropy": 4.925383909606346,
+          "test_perplexity": 137.74221205188636
+        },
+        {
+          "n": 1,
+          "method": "interpolation",
+          "dev_cross_entropy": 4.351114134520635,
+          "test_cross_entropy": 4.925588443632415,
+          "test_perplexity": 137.77038790243878
+        },
+        {
+          "n": 1,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 4.350639670775674,
+          "test_cross_entropy": 4.925361255113698,
+          "test_perplexity": null
+        },
+        {
+          "n": 1,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 4.350639670775674,
+          "test_cross_entropy": 4.925361255113698,
+          "test_perplexity": 137.73909160730227
+        },
+        {
+          "n": 1,
+          "method": "witten_bell",
+          "dev_cross_entropy": 4.350639670775674,
+          "test_cross_entropy": 4.925361255113698,
+          "test_perplexity": 137.73909160730227
+        },
+        {
+          "n": 1,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 4.350639670775674,
+          "test_cross_entropy": 4.925361255113698,
+          "test_perplexity": 137.73909160730227
+        },
+        {
+          "n": 1,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 4.351114134520635,
+          "test_cross_entropy": 4.925588443632415,
+          "test_perplexity": 137.77038790243878
+        },
+        {
+          "n": 2,
+          "method": "laplace",
+          "dev_cross_entropy": 5.345920380448857,
+          "test_cross_entropy": 5.709870428390355,
+          "test_perplexity": 301.8319568964849
+        },
+        {
+          "n": 2,
+          "method": "add_k",
+          "dev_cross_entropy": 4.628006560662802,
+          "test_cross_entropy": 5.100596323529726,
+          "test_perplexity": 164.1197465916518
+        },
+        {
+          "n": 2,
+          "method": "interpolation",
+          "dev_cross_entropy": 4.161067915259303,
+          "test_cross_entropy": 4.480194971945104,
+          "test_perplexity": 88.25187763859671
+        },
+        {
+          "n": 2,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 4.078350246988226,
+          "test_cross_entropy": 4.330227766152545,
+          "test_perplexity": null
+        },
+        {
+          "n": 2,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 4.0929716110846845,
+          "test_cross_entropy": 4.438088736955981,
+          "test_perplexity": 84.61306920046174
+        },
+        {
+          "n": 2,
+          "method": "witten_bell",
+          "dev_cross_entropy": 4.16445004416177,
+          "test_cross_entropy": 4.464381915008424,
+          "test_perplexity": 86.8673215557008
+        },
+        {
+          "n": 2,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 4.106236886929801,
+          "test_cross_entropy": 4.412103070398258,
+          "test_perplexity": 82.44266404020058
+        },
+        {
+          "n": 2,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 4.157354835086027,
+          "test_cross_entropy": 4.481756956115086,
+          "test_perplexity": 88.38983338873965
+        },
+        {
+          "n": 3,
+          "method": "laplace",
+          "dev_cross_entropy": 6.318824766640161,
+          "test_cross_entropy": 6.462409428644714,
+          "test_perplexity": 640.6026850610887
+        },
+        {
+          "n": 3,
+          "method": "add_k",
+          "dev_cross_entropy": 5.9149896213756925,
+          "test_cross_entropy": 6.200050922347679,
+          "test_perplexity": 492.77413367012645
+        },
+        {
+          "n": 3,
+          "method": "interpolation",
+          "dev_cross_entropy": 4.217898050735243,
+          "test_cross_entropy": 4.581562897333369,
+          "test_perplexity": 97.6669183524685
+        },
+        {
+          "n": 3,
+          "method": "stupid_backoff",
+          "dev_cross_entropy": 4.591743695071765,
+          "test_cross_entropy": 4.914994350753584,
+          "test_perplexity": null
+        },
+        {
+          "n": 3,
+          "method": "kneser_ney",
+          "dev_cross_entropy": 4.097164650658618,
+          "test_cross_entropy": 4.448035420314584,
+          "test_perplexity": 85.45888818106768
+        },
+        {
+          "n": 3,
+          "method": "witten_bell",
+          "dev_cross_entropy": 4.3878498364326735,
+          "test_cross_entropy": 4.675149651972373,
+          "test_perplexity": 107.24861585804724
+        },
+        {
+          "n": 3,
+          "method": "modified_kneser_ney",
+          "dev_cross_entropy": 4.099234475180335,
+          "test_cross_entropy": 4.417884123677388,
+          "test_perplexity": 82.92064977277124
+        },
+        {
+          "n": 3,
+          "method": "interpolation_em",
+          "dev_cross_entropy": 4.157221580952184,
+          "test_cross_entropy": 4.4822511341181706,
+          "test_perplexity": 88.43352449479933
+        }
+      ],
+      "comparison": [
+        {
+          "ci95": [
+            0.0,
+            0.0
+          ],
+          "difference": 0.0,
+          "documents": 4,
+          "independent_groups": 4,
+          "metric": "paired token-weighted CE difference (A minus B)",
+          "resamples": 1000,
+          "seed": 42,
+          "unit": "duplicate/source group; paired resampling"
+        }
+      ],
+      "test_policy": "exploratory; parameters recorded before fitting; prior corpus exposure unknown",
+      "provenance": {
+        "config_sha256": "941fa3d9badf15945e5e6898d71928086b38e7ef1ccfd9d7e8d00e7b16482598",
+        "source_sha256": "d6ad369ddd08d85acbb13ee81545e7b6c1064047ddbd32027cd19921cd7134cf",
+        "code_sha256": {
+          "extensions/experiments/registry.py": "1bb456dab232ef9588e311f6856ee203c5b415663da9e4be2203f51f9325d166",
+          "extensions/experiments/research.py": "89e2f200b3ae513c822f308d052b2f12be70a4ee1383f23ab2da2f3600885fb0",
+          "extensions/src/analytics.py": "c3b928fae7c241871a3fd7948e32b12f53f6231a5042e33c6163ac2d9b68edfe",
+          "extensions/src/cli.py": "1880783d15bcad376c68b9183be2174c86ead31a2232ce6a585120262f6c2fb1",
+          "extensions/src/datasets.py": "120b2e76a7c6c0473af1f278c87e46370b305607fa2c8be0b1ca2c57351bfba2",
+          "extensions/src/models.py": "2a42b52a57fc52eca41ef62ecd42350adc0b84feb994a13565fa83f3f943fab2",
+          "extensions/src/pipeline.py": "cf52d5ae58ca209abdb425bf7681b9d55e7f2c838f69ca63c74cd3fc1f921f0c",
+          "extensions/src/quality.py": "6b3bc07092fa415e9ba7bd50d60e9936ba5bfa8850f035c863b8d65ae1ee56c5"
+        },
+        "outputs_sha256": {
+          "autocomplete.json": "7382208d1734f974d89d4006793da90123885652caff329b35b99e8547020c75",
+          "bootstrap.json": "f79ab89763895e99eff1c7e1df5cda171e9d87fd4e528091a6e747af5ee621fe",
+          "diagnostics.json": "624e4effc50d339d2676531ad7368467913d0d05cfa48e3bdba1c5dfc1d327ac",
+          "generated.json": "482c37b49e46219878d4f2dbe4499621cf32a4226937e09638f552eca6193ddf",
+          "metrics/test-1-add_k.json": "0af857f70433d59dd663812c63e5ef6d404620c670077743a72c83fbf2fa2930",
+          "metrics/test-1-interpolation.json": "a33dd9392ef3b4303b4152fe3a29a40ef47cf94747833bd63905cb393554858e",
+          "metrics/test-1-interpolation_em.json": "a33dd9392ef3b4303b4152fe3a29a40ef47cf94747833bd63905cb393554858e",
+          "metrics/test-1-kneser_ney.json": "4d2584bc531e79d986651be9676d6df211baa055e444c2a65804c76ec146e93a",
+          "metrics/test-1-laplace.json": "7afe23c3b21016e0e7cdd1e3384a592dc0d9fe96d171ce7b165b1782175d8b0a",
+          "metrics/test-1-modified_kneser_ney.json": "4d2584bc531e79d986651be9676d6df211baa055e444c2a65804c76ec146e93a",
+          "metrics/test-1-stupid_backoff.json": "4d2584bc531e79d986651be9676d6df211baa055e444c2a65804c76ec146e93a",
+          "metrics/test-1-witten_bell.json": "4d2584bc531e79d986651be9676d6df211baa055e444c2a65804c76ec146e93a",
+          "metrics/test-2-add_k.json": "285af681b9361e1f23d5c31592ec838a65bb08a69ec8a44389a76d21e0a66f67",
+          "metrics/test-2-interpolation.json": "fbe4d34be138fd3b3f34664da179e17efdc5d52ac97f1aee5d1019faf19e8789",
+          "metrics/test-2-interpolation_em.json": "5ea54464f3314154662231d8ddedec46b634506e103ede5604927737e01105b5",
+          "metrics/test-2-kneser_ney.json": "517bfbbd7fe2193f75421f600304e6a667d39d6d5ada96864df8a3fb1a1c11b1",
+          "metrics/test-2-laplace.json": "2b2611668cf9a92afa4a78e761f8be544b82886f47cda596a257c1eb467b0da1",
+          "metrics/test-2-modified_kneser_ney.json": "2d4f7a46a170694bbd102a9c46f6eb0fb70e99d189d9a4de0b2b551383bd6d67",
+          "metrics/test-2-stupid_backoff.json": "830286e90d452e09e3274e179ebff9189b5c2a0b3fd50fd1fb606c2eaca2a1c7",
+          "metrics/test-2-witten_bell.json": "03daa7052fd799225ca4cea4469bd9f9156b18c057911e458d100f86d926b71a",
+          "metrics/test-3-add_k.json": "525872ea843315f75bdb34a9e451ee1751ce5eab23744c8ed503a9a5ab51c4a4",
+          "metrics/test-3-interpolation.json": "1c4123c6391119f09621a8c75d406ea1591df84fe759ceb9386c1b4c8afff87e",
+          "metrics/test-3-interpolation_em.json": "e66a9431eac10d295aed403d65490a04c8aa946b9b6a6e7a4b16bb2bf68bc649",
+          "metrics/test-3-kneser_ney.json": "c6112631cbb59c24b4d81aad74744d4142bf099d4613b6d2b779aae611780284",
+          "metrics/test-3-laplace.json": "aa75c689a8f119fe4b8a586ddf906d0af2da63e45449777ad91fe3a2b8151d85",
+          "metrics/test-3-modified_kneser_ney.json": "8d83c3555b2ee33b3f3b2b905d913d9a85935fad7a884fe380f929946bd559d5",
+          "metrics/test-3-stupid_backoff.json": "6f3d86276d35a4b65360a9d3d9a4413db1e6a7212d2215e41ff7c73941ec6ddb",
+          "metrics/test-3-witten_bell.json": "a5a7b3559a137291a8f546c71339fb93cc5799526015f4f9578220a31c3780f4",
+          "models/1-add_k.json.gz": "32a5fe3b1df7455d0d646d22e7b7589a5d2b7374d7f927f46f7b7ab3c998a2d3",
+          "models/1-add_k.json.gz.meta.json": "353510714ff6b9583bf998a142739449efc2d67abcc8c4fb9c7e03bb545f2a73",
+          "models/1-interpolation.json.gz": "fe2cff0574ab814182cdf4e6a2596c1be187b27f1f7069b88dbacb8582cee919",
+          "models/1-interpolation.json.gz.meta.json": "b67cdbe5f82cab95a392b394bb03c3cccd13e19b73334cc0a8404d69d6f17416",
+          "models/1-interpolation_em.json.gz": "1056fe3b6b2f1a6cb2c449601df24a945b839fb448926786c3e4296c1365ab92",
+          "models/1-interpolation_em.json.gz.meta.json": "79f1ca343c5642e0fe781b9c211280fbbb4cf255192287a6e3f3d1f51aa3d567",
+          "models/1-kneser_ney.json.gz": "936857dea4af72c3ee64541f05f235ee04a8a8f544b0ae679049dde4551703ad",
+          "models/1-kneser_ney.json.gz.meta.json": "82a1a1423add4627893140248dcc8308f0a724d32ac6c74fddf65234dd90a07a",
+          "models/1-laplace.json.gz": "5ce16e6befba812b57a9f26573a73ffbf502294be775e2272c4544841482b92b",
+          "models/1-laplace.json.gz.meta.json": "2c3ab3ce636ba20b0d12af82a04685b3eb86f7e04d61331afa758968b19e436f",
+          "models/1-modified_kneser_ney.json.gz": "15c4bbe62a02083abbccfdd68a24d1b6c99c7819eaaf33d12f37b0f733a38846",
+          "models/1-modified_kneser_ney.json.gz.meta.json": "7a1ac860947dba3e54d23f008071bf6b7df615990effd779893c687caf818893",
+          "models/1-stupid_backoff.json.gz": "6c66e5c902ee419d52829baa5600b12d3d108803c22b4e716e2c5b2550c9633f",
+          "models/1-stupid_backoff.json.gz.meta.json": "e630494a96c16db6f5ab208f334355e0bc0ed706abf0b2f80c7b852e90ab55a9",
+          "models/1-witten_bell.json.gz": "0f5efa564d125c1a8f72ad6e3028b5e31650502482a84e6aefb39be157ab33b5",
+          "models/1-witten_bell.json.gz.meta.json": "d116ba6e98f8593fbc5ef1738aaa11d267d004dfc8eecf244184ba8163ceaea1",
+          "models/2-add_k.json.gz": "75791aa5ae5f1da0d8ec1d977db00c15817c8fb5e5d4644c705e68e19eb5a208",
+          "models/2-add_k.json.gz.meta.json": "3fcd7d1846f8777c20140d1e9e3f6f403a014a336994bf934d4632a45ee7bb86",
+          "models/2-interpolation.json.gz": "1133032d80d00453153dd91b26bc72375e2d000e98fe72b4e7edbd126f7f538d",
+          "models/2-interpolation.json.gz.meta.json": "2a905deca42abff2a8e44bbd1093c4f5ccbffed6035ea7cdd5235e11814e495a",
+          "models/2-interpolation_em.json.gz": "08fa76ad8eeee33fc1ab0d54f143bd8257fce5c6738536f03df36b6f5012e8ee",
+          "models/2-interpolation_em.json.gz.meta.json": "b350e7586039bb424f1ed4740ac2932f219aeb496b72f3f40e99d37a49915ed6",
+          "models/2-kneser_ney.json.gz": "c4717e9a7c00d8c2d357941c7b67fac4b07a33bd98a0465c4605934c0c720837",
+          "models/2-kneser_ney.json.gz.meta.json": "fe98e46817c05c1b20094ea6132d9f8c633bd3b934341065c9b8caf00d16cfe4",
+          "models/2-laplace.json.gz": "988fdd349344aaaed039d29475a64f3bbc292e6ae28c00771e5ad168b8480dcd",
+          "models/2-laplace.json.gz.meta.json": "931fcfc6e3e9d849748211a5e2b2ab595676efd24bf55b13af6e04644f9367ec",
+          "models/2-modified_kneser_ney.json.gz": "cf379be3c9a34f4964bde42765409e77e791667c978e251810e22882cd5a7644",
+          "models/2-modified_kneser_ney.json.gz.meta.json": "76ea3e8a8fa994f01cd35214aaf05e52302797958ea674e83b330287ec1343b6",
+          "models/2-stupid_backoff.json.gz": "356cfe3a518f4455c54bb2eb9376e1cccb1c40e784f360b99d58152ab9da335b",
+          "models/2-stupid_backoff.json.gz.meta.json": "c4b7032412af1f046f2d4ef71804cce0b4dd15092380a5c0e844f5a3e519ed55",
+          "models/2-witten_bell.json.gz": "39f73c5e3b20e32b6390df51997043f6b8110bcaf8499e19d20a0aa0013d0aae",
+          "models/2-witten_bell.json.gz.meta.json": "ac430768128c2296a7c43909a52581b31b6ca4bcc403717983cca16b45bd3514",
+          "models/3-add_k.json.gz": "ebbcc58222a4d44c3d64c06696bd463390c7c6a6f8ab909e85749a9819dda34e",
+          "models/3-add_k.json.gz.meta.json": "18ce0e85d5c642121623e7eec8039297728f0fbc28a264698d235287521a70ca",
+          "models/3-interpolation.json.gz": "8fe6e2f160d5a96a10d6698d1d6fee47ba35e89f0f1f1c5ed01bf9e054de01ff",
+          "models/3-interpolation.json.gz.meta.json": "1be77a8092beb5171714c7187f1444e005060c8cb91a769eaf4e5f679d1ace3e",
+          "models/3-interpolation_em.json.gz": "ac1ffee13e471b874636c3e8d75119cd048b140835210f8ce27843b81f36e3cf",
+          "models/3-interpolation_em.json.gz.meta.json": "c65aa918b18c07b3b03dd1cdf17f0436d059db68d7d5b2df4d9054b8ab134c5c",
+          "models/3-kneser_ney.json.gz": "482223eef83a5d247608b984dc20e03817a32e2fad6f12827d1f954288a3660d",
+          "models/3-kneser_ney.json.gz.meta.json": "e2bade8bfed4d7d754f2a8dd558058371e5d46c1866997a78e8c25a5a4af1437",
+          "models/3-laplace.json.gz": "08c63e59108b113ab29a51927a4d629aaf76c84edacd87e19d0a37ea3e0600de",
+          "models/3-laplace.json.gz.meta.json": "63b5f6dda18a235776148bf23928f1d2bfa0b3103b80463cacd55722ffb4ea6c",
+          "models/3-modified_kneser_ney.json.gz": "5f98286292c73d288f262b12620035c99e0580c02214d80fa9e3cc0be528f4c1",
+          "models/3-modified_kneser_ney.json.gz.meta.json": "e38a0740d73e0dbb967c9379e4352884cae47a050bfd5ea8c99ba9f70a696f84",
+          "models/3-stupid_backoff.json.gz": "96b08951daddb0255ca03b040dddaea275b9d66220b2bb4aaeb0493e47cc23e3",
+          "models/3-stupid_backoff.json.gz.meta.json": "50def6064c9f976450d6e6cbf8b7596ea659e07979dcf795f6ad7b284dcffd91",
+          "models/3-witten_bell.json.gz": "0f8fa7c164d4e44fcc621e67a9c12ae2ff8df6162b4fad073de021b8b977f9d5",
+          "models/3-witten_bell.json.gz.meta.json": "127a2fcdeeb95961924d95bad64195dcc751f8f4171bef1ca697a81794cd987d",
+          "protocol.json": "0d575a0a0015eb3264397804114117dae6784cd0293342582b99a1bbba2d46e1",
+          "receipts/test-1-add_k.json": "4402c45f71d8135ffa587127034639a7eee322ba907a118df3ed0e57a46a3f38",
+          "receipts/test-1-interpolation.json": "083eab0e2223b206f55a30bde1769931c7003f6a33e0c1d9308370d034667c55",
+          "receipts/test-1-interpolation_em.json": "d714f23fe90dc35a45baf951d15b09c656cdbe2b0e91349de5841cc26c98c0f6",
+          "receipts/test-1-kneser_ney.json": "3ab991e30d29f9788f74f1d26467e909664880764c06362f155366fcd95c58f9",
+          "receipts/test-1-laplace.json": "52f8ff6deea65a39748c844b32d963629ec46141be604d0beae2bd7a12e6f3a3",
+          "receipts/test-1-modified_kneser_ney.json": "ff0f28facc010525636ff5118d3c2445260f078b92a5a848c5ea69fe2d1bdf14",
+          "receipts/test-1-stupid_backoff.json": "01a25d0c1603c779ee99475a01f6ed60aa374e0220a2343a6a56780575b00cea",
+          "receipts/test-1-witten_bell.json": "0979833d58617bcda81f972a1c530d639f9a54c0e014a2944b5f5d907c67589b",
+          "receipts/test-2-add_k.json": "b0d02058d208276e25b80c9ac14860d4049f0730dbc4ea49f89f36766ab1897e",
+          "receipts/test-2-interpolation.json": "874a61d243fd7f9781780df6481a8109e83c4cf7d6bfc698ca49197fa3aa2d89",
+          "receipts/test-2-interpolation_em.json": "8e70607394d46281470a3f6e7ac633dfcf4eb4d531405daa181a365b39f8d6c2",
+          "receipts/test-2-kneser_ney.json": "4af20342fafbfeaca905c03b7dd6b99ca1f35a128d668834ed7c7ee0935cf117",
+          "receipts/test-2-laplace.json": "43085ddbf3d6b03c6c2c00235f2d06c000333aa66773ff270a3b042d72507b36",
+          "receipts/test-2-modified_kneser_ney.json": "f8f92a225386a0862b3f996cb1b7409e8f6311a6e291a6181c9294528042d18a",
+          "receipts/test-2-stupid_backoff.json": "7a16369126e1b7e5568abe8d504638af2581c979791cabadba7e0fcaac1c5d7f",
+          "receipts/test-2-witten_bell.json": "33be5379f3006a3769e2270dd388f2aa2f73147902e069c005ad7fd65adc1c00",
+          "receipts/test-3-add_k.json": "1e705362dc33a38f0f13fcbadc67a22e0e6d1d91ddc6c9b0512c215b5dbec640",
+          "receipts/test-3-interpolation.json": "50134ec390709d98d0ea75ee6388cd31bf709fcb511636a24866f82fa197a669",
+          "receipts/test-3-interpolation_em.json": "727925f13d127c060c7dfb0054b59409978d1e822c84ca4568273a5ffe7a21e7",
+          "receipts/test-3-kneser_ney.json": "e348bce2b4fda1ee9892d4f021f62ac5362dd88f1102a6168cb43d94897594ad",
+          "receipts/test-3-laplace.json": "ff43b1c7a1a8eeeffcd62a94704d6f74030ca7c73240509f1fdc0f44b7dd5210",
+          "receipts/test-3-modified_kneser_ney.json": "e8c3d586bca455b83f14d7d3754d1110fc1befc237e0d2891ed6c71d943d438a",
+          "receipts/test-3-stupid_backoff.json": "cf25b260f0bd63fa3fc8f0ef3149ce7aa2385593f965af9a8055964f29e96a59",
+          "receipts/test-3-witten_bell.json": "e8ba67a4ed1aaa586371431d4e9e2fe5b891eeb3d0e0b1d03ea0a59091f2dbe3",
+          "selection.json": "56ef339b9bb0393ba6630cec1805504682f2affb55db941960dd4508de3bba25",
+          "source_documents.json": "f75b1251aed7a0ae08a1c7d47b5afb025a124fee034795f987027a645ae5d423",
+          "splits.json": "df9bca78f73f7553811804d77fe027d261b1eb2500bb159cdab4a1acd1be1407",
+          "stage_research.claim": "3083de4b8b918cc9f4623c31fabcedf06ed464935203389d48fa5739a44beeb3",
+          "summary.json": "0df27a84012e5c34ae5c08d1c7ba25f6231f214d4d6f9d19a06d4890bc6d98df",
+          "tuning/1-add_k.json": "0ddd6753f5ed8785a01cd7b6bc55cdc13e8b582f8ac6ee39b9edf78e6e69f0e8",
+          "tuning/1-interpolation.json": "4bfb38c2f8a878f85b8f5306ba8ad04fee69df607e975800c2f3a62882c2277d",
+          "tuning/1-interpolation_em.json": "a3af94e3022cb37ed85bfd2a35e96a54972482fbdda11593678e786b6b8c1945",
+          "tuning/1-kneser_ney.json": "dcf1713db3073da02950a36b12c8c33d3e10a81006f18f417d669ff08ffab761",
+          "tuning/1-laplace.json": "47532f71f7c6876e8c6f12728210275511b14b9def08b1e427189b7d66344c68",
+          "tuning/1-modified_kneser_ney.json": "139ab231998bfe04e6c4e9e76317685b53c5841625b94deb2faa4d7da5db64f2",
+          "tuning/1-stupid_backoff.json": "139ab231998bfe04e6c4e9e76317685b53c5841625b94deb2faa4d7da5db64f2",
+          "tuning/1-witten_bell.json": "139ab231998bfe04e6c4e9e76317685b53c5841625b94deb2faa4d7da5db64f2",
+          "tuning/2-add_k.json": "6edf4d934523d29aa406fb3d5095b62f7ec047dea3875efa6dff897c93b19ae2",
+          "tuning/2-interpolation.json": "e026c5d4412acbcf027b8e091c4365e3fac8a50322a0612938bbf40e7f258563",
+          "tuning/2-interpolation_em.json": "82e4c4b55c69c15a3a0e7d6c7b2d7211f21d5372590ab1c53ae98277e219fed5",
+          "tuning/2-kneser_ney.json": "b7b10cc9a57e8f393139ae483481e1280140e9b9b998f777c0fd2888a4ddd309",
+          "tuning/2-laplace.json": "970e11cb0908c759a17d8d3711bfe1da94cac5b7fe0b610b5c657e24ec07a624",
+          "tuning/2-modified_kneser_ney.json": "6d595846a2b971d1690322648674e9e2dea08b250e55c5667f73f443cba575bd",
+          "tuning/2-stupid_backoff.json": "e7bd81d46c94562bc33c0340d630799eddc46ea3c16fc3ab0ace1948b5b70ba6",
+          "tuning/2-witten_bell.json": "eda637356c2664f06bccd93d04de5927925309f35e0bc8d93f5b96931cad0c81",
+          "tuning/3-add_k.json": "62f4f6f16a8663e98c780d7f1b21ccba973eb9875f2e1b2fe305d76e9e4f4b09",
+          "tuning/3-interpolation.json": "1d47f843b1e04e7cf11ee0f1179d52e4cda4b24ad8476a9c5174ddb3a1dc8a1c",
+          "tuning/3-interpolation_em.json": "01832d1860e750ba229770ef5de03dcc7c333d16fb8cc5ede3195adc598cfe2a",
+          "tuning/3-kneser_ney.json": "81ade68a5f70ca2ee6e6a62632f3b0071a5bc96cb0719a270c740b02be72c6da",
+          "tuning/3-laplace.json": "405f8d4bc310fe493fc5f63a252369df3fbf76316a41e99f9a22d2de76b2e591",
+          "tuning/3-modified_kneser_ney.json": "c571ef7209f471b626b1cf5290594de38b7c0f485c6cdcd4a13a79bc5d056d2b",
+          "tuning/3-stupid_backoff.json": "6f1f27805fbf4372f45c08ad1edbf27192b7c51e04f6c2bb364e0733fed5aa8e",
+          "tuning/3-witten_bell.json": "75029b18cded1d1df4410ad625a71e49a07c417e484a35e7d5f18488180b7e7e"
+        },
+        "documents": 40,
+        "seed": 42,
+        "min_count": 2
+      },
+      "selection": {
+        "baseline": "2-kneser_ney",
+        "best": "2-kneser_ney",
+        "rule": "minimum normalized dev_loss; lexical tie-break"
+      },
+      "autocomplete": {
+        "models": {
+          "1-kneser_ney": {
+            "coverage": 0.72,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 0.9754999919096008,
+            "latency_ms_p95": 1.4906350050296169,
+            "mrr": 0.044332708289412784,
+            "mrr_at_50": 0.04079037773801929,
+            "oov_rate": 0.28,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.0,
+            "top3": 0.04,
+            "top5": 0.13
+          },
+          "2-kneser_ney": {
+            "coverage": 0.72,
+            "latency_kind": "exact CPU vocabulary scan; end-to-end ranking; no warmup",
+            "latency_ms_p50": 1.6191999966395088,
+            "latency_ms_p95": 2.150955000979593,
+            "mrr": 0.11102548246123005,
+            "mrr_at_50": 0.10894072488052768,
+            "oov_rate": 0.28,
+            "queries": 100,
+            "sampling": "first fixed targets by sorted document ID; includes OOV",
+            "top1": 0.05,
+            "top3": 0.13,
+            "top5": 0.19
+          }
+        },
+        "roles": {
+          "dev_winner": "2-kneser_ney",
+          "kneser_ney": "2-kneser_ney",
+          "unigram": "1-kneser_ney"
+        }
+      },
+      "benchmark": {
+        "benchmark_sha256": "8c384323fef6faefdf15fbbdab7a23b1ae2f71c4a4ac3da62c3d3a92e0f76045",
+        "execution": "One new serial subprocess per model; same fixed source-dev targets; no held-out test scoring",
+        "models": {
+          "1-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 11.11490000039339,
+              "p95_ms": 11.20597999979509
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "cca2fdd0480688d7940de9e21d4e3759b55b4685d06981a38d0aa78c694b29d6",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "1-kneser_ney",
+            "peak_rss_bytes": 60928000,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "3d42f2f97a05f8217eb5ae64751014d491c753634b3d5e93724a3c4bd3478b23",
+            "score_single_target": {
+              "p50_ms": 0.0013000026228837669,
+              "p95_ms": 0.0018999999156221747
+            },
+            "source_checkpoint_sha256": "936857dea4af72c3ee64541f05f235ee04a8a8f544b0ae679049dde4551703ad",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 0.8793499946477823,
+              "p95_ms": 1.1188349955773447
+            },
+            "top_k_sha256": "0ac6436296631eaec37f46fc579104af71187344ce1303bcca9830f645274806",
+            "vocabulary_sha256": "63f5f88d48d8ab08cc21e97dcdf949ba5dbaa31284b138e653f0bf9dab96bf6d",
+            "warmup": 1
+          },
+          "2-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 11.798699997598305,
+              "p95_ms": 11.828400001104455
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "cca2fdd0480688d7940de9e21d4e3759b55b4685d06981a38d0aa78c694b29d6",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "2-kneser_ney",
+            "peak_rss_bytes": 60858368,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "e5007ceddf9bd28b3e5cdaaf3a62d8b8401f1f72f8ae1602416d8d34f5f905b1",
+            "score_single_target": {
+              "p50_ms": 0.0021000014385208488,
+              "p95_ms": 0.0031550014682579786
+            },
+            "source_checkpoint_sha256": "c4717e9a7c00d8c2d357941c7b67fac4b07a33bd98a0465c4605934c0c720837",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 1.5123500052141026,
+              "p95_ms": 1.758285000687465
+            },
+            "top_k_sha256": "e5ccfbc2d23b8cdacb800653134a41e841acced225721bcef8555b565fdfb727",
+            "vocabulary_sha256": "63f5f88d48d8ab08cc21e97dcdf949ba5dbaa31284b138e653f0bf9dab96bf6d",
+            "warmup": 1
+          },
+          "3-interpolation_em": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 51.63289999472909,
+              "p95_ms": 250.46710999595234
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "cca2fdd0480688d7940de9e21d4e3759b55b4685d06981a38d0aa78c694b29d6",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-interpolation_em",
+            "peak_rss_bytes": 60960768,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "46a56ad34a099c512cd0247a603f5407fdde05b17561e5a3f44d2a4c7c1c243a",
+            "score_single_target": {
+              "p50_ms": 0.0041000021155923605,
+              "p95_ms": 0.01755499470164068
+            },
+            "source_checkpoint_sha256": "ac1ffee13e471b874636c3e8d75119cd048b140835210f8ce27843b81f36e3cf",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 2.1726000049966387,
+              "p95_ms": 6.933274995390093
+            },
+            "top_k_sha256": "485156810dc519b8f14aae069f788ed7c0794087954a24bdd1c61c99348e4da3",
+            "vocabulary_sha256": "63f5f88d48d8ab08cc21e97dcdf949ba5dbaa31284b138e653f0bf9dab96bf6d",
+            "warmup": 1
+          },
+          "3-kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 15.528499992797151,
+              "p95_ms": 17.194940004264936
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "cca2fdd0480688d7940de9e21d4e3759b55b4685d06981a38d0aa78c694b29d6",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-kneser_ney",
+            "peak_rss_bytes": 60948480,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "39f9f5844729a600c0a71ac5933477045f91215e07e98cac1be61d174cfa93db",
+            "score_single_target": {
+              "p50_ms": 0.004999994416721165,
+              "p95_ms": 0.007484998786821961
+            },
+            "source_checkpoint_sha256": "482223eef83a5d247608b984dc20e03817a32e2fad6f12827d1f954288a3660d",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 2.1122999969520606,
+              "p95_ms": 2.622584996424848
+            },
+            "top_k_sha256": "cd80e94a39c4776017448cd6a291a7c62d5b35580b3ab57ef28e3bd7f30b23d7",
+            "vocabulary_sha256": "63f5f88d48d8ab08cc21e97dcdf949ba5dbaa31284b138e653f0bf9dab96bf6d",
+            "warmup": 1
+          },
+          "3-modified_kneser_ney": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 19.050899994908832,
+              "p95_ms": 20.56973999569891
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "cca2fdd0480688d7940de9e21d4e3759b55b4685d06981a38d0aa78c694b29d6",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-modified_kneser_ney",
+            "peak_rss_bytes": 61878272,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "9152e727ecc60030505493aa08d305c0dca20d4061a382ebd2da4a8a9c279fa7",
+            "score_single_target": {
+              "p50_ms": 0.0043000036384910345,
+              "p95_ms": 0.009805008448893204
+            },
+            "source_checkpoint_sha256": "5f98286292c73d288f262b12620035c99e0580c02214d80fa9e3cc0be528f4c1",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 1.7953499991563149,
+              "p95_ms": 2.3516000037488993
+            },
+            "top_k_sha256": "9b13a80ff9847ffd2249b247a477f49dda01834a3a947d51e844336d5425d8ea",
+            "vocabulary_sha256": "63f5f88d48d8ab08cc21e97dcdf949ba5dbaa31284b138e653f0bf9dab96bf6d",
+            "warmup": 1
+          },
+          "3-witten_bell": {
+            "build_countbank_and_dev_tune": {
+              "p50_ms": 11.935300004552118,
+              "p95_ms": 11.988220001512673
+            },
+            "cpu": 0,
+            "fixed_targets_sha256": "cca2fdd0480688d7940de9e21d4e3759b55b4685d06981a38d0aa78c694b29d6",
+            "memory_scope": "Whole isolated worker peak RSS/working set including imports, warmup and all repeats; not object size or incremental model memory",
+            "model": "3-witten_bell",
+            "peak_rss_bytes": 60833792,
+            "platform": "Windows-10-10.0.26200-SP0",
+            "python": "3.11.15 (main, Jun 11 2026, 04:59:07) [MSC v.1944 64 bit (AMD64)]",
+            "repeats": 3,
+            "score_sha256": "8182a548264a8f67dcfda7ae68f722310d1d65e1e135418a3e93a108c8760b2b",
+            "score_single_target": {
+              "p50_ms": 0.0035999983083456755,
+              "p95_ms": 0.0049549940740689635
+            },
+            "source_checkpoint_sha256": "0f8fa7c164d4e44fcc621e67a9c12ae2ff8df6162b4fad073de021b8b977f9d5",
+            "target_domain": "source dev",
+            "targets": 30,
+            "timing_scope": "CPU pinned; single BLAS thread; build train CountBank + dev counts + dev-only tuning; scores include token/context mapping; top-k exact vocabulary scan",
+            "top_k_five_single_context": {
+              "p50_ms": 1.6680999979143962,
+              "p95_ms": 1.9734249915927649
+            },
+            "top_k_sha256": "c6efa17164a6ab8ae9e505eebfc3c3237342d8c2f7157caf2c0e64faf026221c",
+            "vocabulary_sha256": "63f5f88d48d8ab08cc21e97dcdf949ba5dbaa31284b138e653f0bf9dab96bf6d",
+            "warmup": 1
+          }
+        },
+        "repeats": 3,
+        "source_run": "idwiki-doc-v1-20261010",
+        "targets": 30,
+        "warmup": 1
+      },
+      "transfer_group_correction": null
+    }
+  ]
+}

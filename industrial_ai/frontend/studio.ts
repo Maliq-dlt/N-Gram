@@ -7,7 +7,7 @@ interface QueueRow {frame:number;text:string;disabled:boolean;current:boolean;se
 interface OptionRow {value:string;text:string}
 interface StudioViews {evidence(rows:EvidenceRow[]):void;details(rows:string[][]):void;appendMessage(row:MessageRow):void;clearMessages():void;overlay(rows:OverlayRow[]):void;boxes(rows:BoxRow[]):void;queue(rows:QueueRow[]):void;options(id:string,rows:OptionRow[]):void}
 declare const studioViews:StudioViews;
-type View = 'analysis'|'evidence'|'annotation'|'profile';
+type View = 'analysis'|'evidence'|'annotation'|'profile'|'ngram';
 type Counts = Record<string,number>;
 interface Box {label:string;name?:string|null;color?:string|null;bbox:[number,number,number,number];track_id?:number;source?:string}
 interface Frame {frame_index:number;boxes:Box[];lost?:Box[];merged?:boolean;complete?:boolean;helmets_complete?:boolean}
@@ -47,6 +47,7 @@ interface StudioDom {
  'mainContent':HTMLElement;
  'authError':HTMLElement;
  'videoWorkspace':HTMLElement;
+ 'ngramPane':HTMLElement;
  'workspaceTitle':HTMLElement;
  'newVideoButton':HTMLButtonElement;
  'historySelect':HTMLSelectElement;
@@ -251,9 +252,9 @@ async function setView(view:View) {
   if(view==='profile')previousWorkspaceView=currentView;
   if(currentView==='profile')workspaceAuth.resetPasswordForm();
   currentView=view; reviewVideo.pause();
-  $('videoWorkspace').hidden=view==='profile'; $('profilePane').hidden=view!=='profile';
+  $('videoWorkspace').hidden=view==='profile'||view==='ngram'; $('profilePane').hidden=view!=='profile'; $('ngramPane').hidden=view!=='ngram';
   $('analysisPane').hidden=view!=='analysis'; $('evidencePane').hidden=view!=='evidence'; $('reviewPanel').hidden=view!=='annotation';
-  $('pageTitle').textContent={analysis:'Analisis video',evidence:'Bukti & hasil',annotation:'Anotasi manual',profile:'Profil'}[view];
+  $('pageTitle').textContent={analysis:'Analisis video',evidence:'Bukti & hasil',annotation:'Anotasi manual',profile:'Profil',ngram:'Lab N-gram'}[view];
   for(const button of document.querySelectorAll<HTMLButtonElement>('[data-view]')) {if(button.dataset.view===view) button.setAttribute('aria-current','page'); else button.removeAttribute('aria-current');}
   syncControls();
   document.dispatchEvent?.(new Event('workspace-view'));

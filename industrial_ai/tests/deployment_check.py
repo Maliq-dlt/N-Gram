@@ -27,7 +27,11 @@ def main():
     env = dict(os.environ, INSIGHT_DATA_ROOT=str(data), PYTHONDONTWRITEBYTECODE="1")
     for name in ("TEMP", "TMP", "TMPDIR"):
         env[name] = str(base)
-    origin = "http://127.0.0.1:8877"
+    # Native ephemeral port keeps concurrent local/browser checks independent.
+    with socket.socket() as probe:
+        probe.bind(("127.0.0.1", 0))
+        port = probe.getsockname()[1]
+    origin = f"http://127.0.0.1:{port}"
     env.pop("INSIGHT_PUBLIC_URL", None)
     env["INSIGHT_HOSTS"] = "127.0.0.1,localhost"
     resolved = subprocess.run(
@@ -58,9 +62,6 @@ def main():
     database.create_user(
         "deployment-viewer", "viewer-long-password", "viewer", database.workspace()
     )
-    # Avoid accidentally exercising an unrelated server already bound to this port.
-    with socket.socket() as probe:
-        probe.bind(("127.0.0.1", 8877))
     jar = http.cookiejar.CookieJar()
     client = build_opener(HTTPCookieProcessor(jar))
     checks = []
@@ -90,7 +91,16 @@ def main():
 
     with (base / "server.log").open("w", encoding="utf-8") as log:
         server = subprocess.Popen(
-            [sys.executable, "-m", "uvicorn", "app:app", "--host", "127.0.0.1", "--port", "8877"],
+            [
+                sys.executable,
+                "-m",
+                "uvicorn",
+                "app:app",
+                "--host",
+                "127.0.0.1",
+                "--port",
+                str(port),
+            ],
             cwd=ROOT,
             env=env,
             stdout=log,

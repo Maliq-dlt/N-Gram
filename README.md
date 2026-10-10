@@ -21,6 +21,14 @@
 
 > Video Insight ditujukan untuk demonstrasi lokal. Hasil deteksi tetap perlu ditinjau manusia. Bagian akademik mempertahankan core dan hasil eksperimen yang dibekukan.
 
+## Pengembangan N-gram akademik
+
+[Status dan hubungan ke CCTV/absensi](tasks/ngram_academic/plan.md) · [Checklist berfase](tasks/ngram_academic/todo.md) · [Metode dan pilot](extensions/README.md) · [Verifikasi](extensions/reports/VERIFICATION.md).
+
+Witten–Bell, Modified Kneser–Ney dan interpolation EM, run registry/checkpoint v2, grouped research, bootstrap, autocomplete dan benchmark CPU sudah diimplementasikan. Lab browser, ledger kejadian dan absensi manual tersedia. Core dan hasil historis dipertahankan.
+
+Tiga pilot eksploratif memakai 120 dokumen Brown, 120 Reuters dan 40 introduction Wikipedia Indonesia CC BY-SA 4.0. Kandidat dipilih dev dan setiap model dinilai sekali pada holdout. Brown/Reuters memilih trigram MKN; Indonesia memilih bigram KN biasa. Holdout kecil/prior exposure unknown belum merupakan konfirmasi generalisasi populasi. Dataset, checkpoint, video dan identitas lokal tidak dipublikasi sebagai ringkasan.
+
 ## Peta repository
 
 ```text
@@ -66,20 +74,20 @@ Evaluasi ulang hanya pemeriksaan model tetap, tanpa tuning pada test. Unigram di
 ## Reproduksi Fase 2 secara berurutan
 
 Fase 1 wajib lulus lebih dulu. Notebook membuat `.cache/core_frozen.json`; seluruh langkah ekstensi memeriksa hash core sebelum/sesudah run.
-Manifest `verifikasi/core_manifest.json` menyediakan pembekuan core ketika cache belum ada. Hasil run nyata sudah disertakan. Runner menolak menimpa hasil eksperimen lama. Untuk run baru, pindahkan **hanya folder `extensions/results`** ke folder backup di repository, lalu jalankan urutan ini. Jangan mengubah core selama Fase 2.
+Manifest `verifikasi/core_manifest.json` menyediakan pembekuan core ketika cache belum ada. Hasil historis tetap utuh. Setiap reproduksi baru wajib memakai `--run-id` unik; output masuk `extensions/results/runs/<run_id>/`. Tidak perlu memindahkan atau menghapus hasil lama. Rangkaian berikut mereproduksi baseline historis, bukan protokol grouped document pilot baru.
 
 ```powershell
 . .\setup_lokal.ps1
-uv run python -m extensions.experiments.run --stage 21
-uv run python -m extensions.experiments.run --stage 22
-uv run python -m extensions.experiments.analyze
-uv run python -m extensions.experiments.profile
-uv run python -m extensions.experiments.compare_nltk
+uv run python -m extensions.experiments.run --run-id baseline-baru --stage 21
+uv run python -m extensions.experiments.run --run-id baseline-baru --stage 22
+uv run python -m extensions.experiments.analyze --run-id baseline-baru
+uv run python -m extensions.experiments.profile --run-id baseline-baru
+uv run python -m extensions.experiments.compare_nltk --run-id baseline-baru
 ```
 
 Stage 21 menilai lima metode pada trigram seed 42/min_count 2. Stage 22 memakai ulang baris tersebut, lalu melengkapi 120 konfigurasi (n=1..4, lima metode, threshold 2/3, seed 42/43/44). Hyperparameter selalu dipilih dari dev. Test winner hanya sekali dalam grid; analisis test tidak mengubah model. STD memakai ddof=1.
 
-Stupid Backoff adalah skor tak ternormalisasi: PP N/A, `score_cross_entropy` dilaporkan terpisah. Interpolation menggunakan komponen add-0.01. KN memakai single absolute discount, continuation counts, dan floor unigram 1e-8; bukan Modified KN multi-discount.
+Stupid Backoff adalah skor tak ternormalisasi: PP N/A, `score_cross_entropy` dilaporkan terpisah. Interpolation menggunakan komponen add-0.01. Metode `kneser_ney` memakai single absolute discount, continuation counts, dan floor unigram 1e-8; `modified_kneser_ney` adalah metode terpisah dengan tiga bucket diskon. Perbandingan NLTK memvalidasi ordinary KN saja.
 
 ## CLI dan checkpoint
 
@@ -90,9 +98,9 @@ uv run ngram-lm evaluate --model .tmp/model.json.gz
 uv run ngram-lm generate --model .tmp/model.json.gz --seed 42 --count 5 --max-length 40
 ```
 
-`train` memisahkan 80/10/10, fit train, tuning dev, lalu menyimpan tanpa menilai test. `evaluate` memakai held-out split dan memeriksa digest corpus. Ganti path checkpoint untuk run baru; file yang sudah ada ditolak. JSON-gzip divalidasi, tidak menggunakan pickle. Semua output/cache berada di repository. Untuk menjalankan dari source tanpa entry point, gunakan `uv run python -m extensions.src.cli ...`.
+`train` memisahkan 80/10/10, fit train, tuning dev, lalu menyimpan tanpa menilai test. `evaluate` memakai held-out split dan memeriksa digest corpus. Ganti path checkpoint untuk run baru; file yang sudah ada ditolak. Checkpoint JSON-gzip v2 dan sidecar provenance divalidasi; pembaca v1 tetap tersedia. Tidak menggunakan pickle. Semua output/cache berada di repository. Untuk menjalankan dari source tanpa entry point, gunakan `uv run python -m extensions.src.cli ...`.
 
-YAML memiliki tepat lima key: `corpus` (brown/reuters), `seed` (uint32), `n` (1..4), `method` (laplace/add_k/interpolation/stupid_backoff/kneser_ney), `min_count` (>=1). Hyperparameter tuned oleh train, bukan disalin dari test. Config default trigram KN/seed 42/threshold 2.
+YAML memiliki tepat lima key: `corpus` (brown/reuters), `seed` (uint32), `n` (1..4), `method` (laplace/add_k/interpolation/stupid_backoff/kneser_ney/witten_bell/modified_kneser_ney/interpolation_em), `min_count` (>=1). Hyperparameter tuned oleh train, bukan disalin dari test. Config default trigram KN/seed 42/threshold 2.
 
 ## Verifikasi dan build
 
@@ -124,7 +132,7 @@ git diff --stat
 - `extensions/results/models`: checkpoint hasil train Brown dan mini smoke test.
 - `verifikasi`: rekaman command verifikasi, hashes core dan wheel smoke test.
 
-Batas: random split kalimat, satu corpus Inggris, tiga seed saling berbagi corpus, vocabulary berubah antar threshold, metrik generasi leksikal tanpa penilai manusia. Array diukur pada count index saja; hasil waktu bukan benchmark lintas mesin.
+Batas hasil historis: random split kalimat, Brown, tiga seed yang berbagi corpus, vocabulary berbeda antar threshold, serta metrik generasi tanpa penilai manusia. Pilot baru memakai grouped document split dan whole-process peak memory; hasil CPU tetap pengukuran workstation lokal. Lihat [batas pilot dan biaya](extensions/README.md).
 
 ## Paket pengumpulan
 

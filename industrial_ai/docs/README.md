@@ -20,14 +20,21 @@ serta chat lokal yang merujuk hasil rekaman. UI React/TypeScript mendukung
 keyboard, tema, mobile, reduced motion dan fullscreen. Lihat verifikasi untuk
 batas bukti; fitur tersedia tidak berarti akurasi CCTV atau produksi tervalidasi.
 
-Input foto untuk analisis, CCTV/webcam live, OCR plat, absensi QR/wajah dan
+Absensi tersedia sebagai catatan yang diverifikasi administrator secara manual.
+Input foto untuk analisis, CCTV/webcam live, OCR plat, scanner QR/pengenalan wajah dan
 pencarian SOP masih roadmap. Unggah avatar bukan analisis foto umum.
 
 ## Hubungan dengan N-gram dan susunan source
 
 [N-gram di repository induk](../../README.md) adalah proyek akademik terpisah:
-notebook/CLI probabilitas bahasa, smoothing dan perplexity. Chat video memakai
-model Qwen lokal dan metadata rekaman; tidak menjalankan model N-gram akademik.
+notebook/CLI probabilitas bahasa, smoothing dan perplexity. Studio kini menjalankan
+Lab N-gram lewat API terautentikasi, serta menyimpan ledger kejadian terverifikasi.
+Runner offline dapat menilai urutan simbol kejadian; chat fakta memakai query
+deterministik dari ledger. Qwen tetap menangani bahasa pada alur video yang sesuai.
+N-gram tidak mendeteksi piksel atau mengenali wajah.
+
+[Laporan akademik](../../extensions/reports/ACADEMIC_LAB.md) ·
+[Verifikasi implementasi](../../extensions/reports/VERIFICATION.md)
 
 `frontend/` menyatukan komponen React, controller auth/studio/motion TypeScript
 serta konfigurasi kompilasinya. Bundle `app.js`, `auth.js`, `dashboard.js` dan

@@ -1,5 +1,6 @@
 """Disjoint sentence split and dev-only hyperparameter selection."""
 
+import math
 import random
 
 from .models import ExtensionLM, evaluate_counts
@@ -35,7 +36,74 @@ def candidates(n, method):
     return [{}]
 
 
+def fit_interpolation_em(bank, n, dev_counts, max_iterations=200, tolerance=1e-10):
+    """Fit global add-k component weights on dev event frequencies only."""
+    if (
+        type(max_iterations) is not int
+        or max_iterations < 1
+        or not math.isfinite(tolerance)
+        or tolerance < 0
+    ):
+        raise ValueError("EM requires positive iteration cap and finite nonnegative tolerance")
+    if not dev_counts or any(type(f) is not int or f <= 0 for f in dev_counts.values()):
+        raise ValueError("Dev event frequencies must be positive integers")
+    model = ExtensionLM(bank, n, "interpolation_em")
+    rows = []
+    for gram, frequency in dev_counts.items():
+        if (
+            not isinstance(gram, tuple)
+            or len(gram) != n
+            or gram[-1] not in bank.vocab_set
+            or any(w not in bank.vocab_set and w != "<s>" for w in gram[:-1])
+        ):
+            raise ValueError("Dev events must use the model order and mapped vocabulary")
+        rows.append(
+            (
+                frequency,
+                tuple(model._add(gram[-1], gram[:-1], order, model.k) for order in range(1, n + 1)),
+            )
+        )
+    total = sum(dev_counts.values())
+    weights = model.weights
+
+    def loss(values):
+        return (
+            -math.fsum(
+                f * math.log(math.fsum(w * p for w, p in zip(values, probabilities)))
+                for f, probabilities in rows
+            )
+            / total
+        )
+
+    previous = loss(weights)
+    trace = [{"iteration": 0, "weights": weights, "dev_loss": previous}]
+    for iteration in range(1, max_iterations + 1):
+        expected = [0.0] * n
+        for frequency, probabilities in rows:
+            mixture = math.fsum(w * p for w, p in zip(weights, probabilities))
+            for j, probability in enumerate(probabilities):
+                expected[j] += frequency * weights[j] * probability / mixture
+        denominator = math.fsum(expected)
+        weights = tuple(value / denominator for value in expected)
+        current = loss(weights)
+        if current > previous + 1e-12:
+            raise ArithmeticError("EM dev loss increased")
+        trace.append({"iteration": iteration, "weights": weights, "dev_loss": current})
+        if previous - current <= tolerance:
+            break
+        previous = current
+    return ExtensionLM(bank, n, "interpolation_em", weights=weights), trace
+
+
 def tune(bank, n, method, dev_counts):
+    if method == "interpolation_em":
+        model, trace = fit_interpolation_em(bank, n, dev_counts)
+        winner = {
+            "parameters": {"weights": model.weights},
+            "dev_loss": trace[-1]["dev_loss"],
+            "em_trace": trace,
+        }
+        return model, winner, [winner]
     trials = []
     for parameters in candidates(n, method):
         model = ExtensionLM(bank, n, method, **parameters)

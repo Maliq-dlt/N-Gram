@@ -1,5 +1,6 @@
 """Phase 2.5: NLTK sanity check on 1,000 training sentences, identical event counts."""
 
+import argparse
 import math
 import random
 
@@ -8,7 +9,12 @@ from nltk.lm import KneserNeyInterpolated, Vocabulary
 from core.src.data import load_corpus
 from core.src.ngram import events
 from core.src.preprocess import BOS, preprocess
-from extensions.experiments.run import OUT, assert_core_frozen, dump
+from extensions.experiments.registry import (
+    complete_derived,
+    derived_directory,
+    legacy_analysis_source,
+)
+from extensions.experiments.run import assert_core_frozen, dump
 from extensions.src.models import CountBank, ExtensionLM
 from extensions.src.pipeline import split_three
 
@@ -52,6 +58,11 @@ def compare(train):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run-id", required=True)
+    args = parser.parse_args()
+    legacy_analysis_source(args.run_id)
+    OUT = derived_directory(args.run_id, "compare_nltk")
     assert_core_frozen()
     sentences, _ = preprocess(load_corpus("brown"))
     train, _, _, _ = split_three(sentences, 42)
@@ -68,6 +79,8 @@ def main():
     )
     print(rows)
     assert_core_frozen()
+
+    complete_derived(OUT)
 
 
 if __name__ == "__main__":

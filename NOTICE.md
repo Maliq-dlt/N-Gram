@@ -11,6 +11,7 @@ ketiga. Distribusi aplikasi gabungan harus memenuhi ketentuan komponennya.
 | Model helm keremberke | Model card belum menyatakan lisensi bobot eksplisit; verifikasi sebelum redistribusi/komersialisasi |
 | HeroUI styles | Metadata MIT, LICENSE bawaan Apache-2.0; perbedaan dicatat, belum terselesaikan |
 | Tailwind | MIT; atribusi asli disimpan |
+| Wikipedia Indonesia pilot | CC BY-SA 4.0; URL/history/revision/rightsinfo/hash disimpan importer, extract tidak dibundel; lihat [sumber data akademik](extensions/reports/DATA_SOURCES.md) |
 | Brown/Reuters dan footage publik | Ketentuan sumber masing-masing, bukan MIT source proyek |
 
 [Teks lisensi UI](industrial_ai/assets/THIRD_PARTY_LICENSES.txt) ·

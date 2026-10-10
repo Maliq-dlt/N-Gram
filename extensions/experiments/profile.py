@@ -1,5 +1,6 @@
 """Phase 2.4: full-train count index memory/time, ID keys shared by both forms."""
 
+import argparse
 import gc
 import statistics
 import time
@@ -11,7 +12,12 @@ import pandas as pd
 from core.src.data import load_corpus
 from core.src.ngram import ngrams
 from core.src.preprocess import BOS, EOS, fit_vocabulary, preprocess, replace_unknown
-from extensions.experiments.run import OUT, assert_core_frozen
+from extensions.experiments.registry import (
+    complete_derived,
+    derived_directory,
+    legacy_analysis_source,
+)
+from extensions.experiments.run import assert_core_frozen
 from extensions.src.pipeline import split_three
 from extensions.src.sparse import SparseCounts, deep_size
 
@@ -26,6 +32,11 @@ def timed_lookup(function, queries):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run-id", required=True)
+    args = parser.parse_args()
+    legacy_analysis_source(args.run_id)
+    OUT = derived_directory(args.run_id, "profile")
     assert_core_frozen()
     sentences, _ = preprocess(load_corpus("brown"))
     train, _, _, _ = split_three(sentences, 42)
@@ -76,6 +87,8 @@ def main():
     fig.savefig(OUT / "profile.png", dpi=150)
     plt.close(fig)
     assert_core_frozen()
+
+    complete_derived(OUT)
 
 
 if __name__ == "__main__":

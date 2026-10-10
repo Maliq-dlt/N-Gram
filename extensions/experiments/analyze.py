@@ -1,5 +1,6 @@
 """Phase 2.3: dev-selected model; test inspection never feeds tuning."""
 
+import argparse
 import gc
 import json
 import math
@@ -11,7 +12,12 @@ import pandas as pd
 from core.src.data import load_corpus
 from core.src.ngram import events
 from core.src.preprocess import preprocess
-from extensions.experiments.run import OUT, assert_core_frozen, dump
+from extensions.experiments.registry import (
+    complete_derived,
+    derived_directory,
+    legacy_analysis_source,
+)
+from extensions.experiments.run import assert_core_frozen, dump
 from extensions.src.models import CountBank, ExtensionLM
 from extensions.src.pipeline import split_three
 from extensions.src.quality import Sampler, generation_metrics
@@ -22,8 +28,13 @@ def model_from_row(bank, row):
 
 
 def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--run-id", required=True)
+    args = parser.parse_args()
+    source = legacy_analysis_source(args.run_id)
+    OUT = derived_directory(args.run_id, "analyze")
     assert_core_frozen()
-    frame = pd.read_csv(OUT / "experiments.csv")
+    frame = pd.read_csv(source / "experiments.csv")
     assert len(frame) == 120
     candidates = frame[
         (frame.seed == 42) & (frame.min_count == 2) & (frame.method != "stupid_backoff")
@@ -144,6 +155,8 @@ def main():
         OUT / "top20_clean_words.csv", index=False
     )
     assert_core_frozen()
+
+    complete_derived(OUT)
 
 
 if __name__ == "__main__":

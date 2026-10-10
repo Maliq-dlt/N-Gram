@@ -1837,3 +1837,56 @@ html { scroll-behavior:auto; }
 .theme-reveal * { transition:none !important; }
 .theme-snapshot { position:fixed; inset:0; z-index:130; overflow:hidden; pointer-events:none; background:var(--paper); color:var(--ink); }
 .theme-snapshot .theme-toggle-btn { pointer-events:none; }
+
+/* N-gram lab shares the studio's native controls and restrained data layout. */
+.ngram-lab {max-width:1400px;margin:auto;padding:24px 0 48px;}
+.ngram-heading {margin-bottom:24px;}
+.ngram-heading h1 {font-size:28px;line-height:1.25;letter-spacing:-.035em;margin:8px 0;}
+.ngram-heading p,.ngram-lab .hint {color:var(--muted);max-width:72ch;}
+.ngram-columns {display:grid;grid-template-columns:minmax(260px,.85fr) minmax(300px,1.15fr);gap:40px;margin:32px 0;}
+.ngram-lab h2 {font-size:20px;margin:0 0 20px;}
+.ngram-lab h3 {font-size:15px;margin:24px 0 12px;}
+.ngram-lab fieldset {border:0;padding:0;margin:0;min-width:0;}
+.ngram-lab label {display:block;margin:16px 0 6px;font-weight:600;}
+.ngram-lab select,.ngram-lab input,.ngram-lab textarea {width:100%;background:var(--field);color:var(--ink);border:1px solid var(--line);border-radius:8px;padding:10px 12px;}
+.ngram-lab textarea {resize:vertical;}
+.ngram-lab button[type=submit] {margin-top:20px;}
+.ngram-inline {display:grid;grid-template-columns:1fr 1fr;gap:16px;}
+.ngram-probabilities,.ngram-steps {list-style:none;padding:0;margin:0;}
+.ngram-probabilities li {display:grid;grid-template-columns:minmax(60px,1fr) minmax(60px,2fr) 90px;gap:12px;align-items:center;padding:8px 0;}
+.ngram-probabilities meter {width:100%;accent-color:var(--accent);}
+.ngram-probabilities span,.ngram-steps>li>span:last-child {text-align:right;font-variant-numeric:tabular-nums;}
+.ngram-steps li {display:flex;justify-content:space-between;gap:16px;border-bottom:1px solid var(--line);padding:9px 0;}
+.ngram-steps small {display:block;color:var(--muted);}
+.ngram-metrics {margin:24px 0;}
+.ngram-metrics>div {display:flex;justify-content:space-between;gap:16px;padding:8px 0;border-bottom:1px solid var(--line);}
+.ngram-metrics dd {margin:0;font-variant-numeric:tabular-nums;}
+.ngram-lab details {margin-top:16px;}
+.ngram-lab summary {cursor:pointer;font-weight:600;}
+.ngram-table {overflow:auto;margin-top:16px;}
+.ngram-table table {border-collapse:collapse;width:100%;text-align:left;font-variant-numeric:tabular-nums;}
+.ngram-table caption {text-align:left;color:var(--muted);padding-bottom:12px;}
+.ngram-table th,.ngram-table td {padding:8px;border-bottom:1px solid var(--line);}
+.ngram-lab code,.ngram-lab pre,.ngram-run dd {overflow-wrap:anywhere;white-space:pre-wrap;}
+.ngram-experiments {border-top:1px solid var(--line);padding-top:28px;}
+.ngram-experiments select {max-width:440px;}
+.ngram-run>div {display:grid;grid-template-columns:180px 1fr;gap:20px;border-bottom:1px solid var(--line);padding:12px 0;}
+.ngram-run dd {margin:0;}
+@media(max-width:900px) {.ngram-columns {grid-template-columns:1fr;gap:32px;}.ngram-heading h1 {font-size:23px;}.ngram-run>div {grid-template-columns:1fr;gap:4px;}}
+
+.ngram-word {background:none;border:0;color:var(--accent);padding:4px 0;text-align:left;cursor:pointer;}
+.ngram-word:hover {text-decoration:underline;}
+.ngram-word:disabled {color:var(--muted);cursor:default;text-decoration:none;}
+
+.event-ledger {border-top:1px solid var(--line);padding-top:24px;}
+.event-ledger>summary {font-size:20px;}
+.event-ledger fieldset {margin:16px 0 28px;}
+.event-ledger .ledger-check {width:auto;accent-color:var(--accent);}
+.event-ledger td {vertical-align:top;}
+.event-ledger td small {display:block;color:var(--muted);max-width:30ch;}
+.event-ledger label>input,.event-ledger label>select {display:block;margin-top:6px;}
+
+.ngram-step-controls {display:flex;align-items:center;justify-content:space-between;gap:8px;}
+.ngram-lab mark {background:var(--selection);color:var(--selection-ink);padding:2px 4px;border-radius:4px;}
+.ngram-steps [aria-current=step] {background:var(--selection);}
+@media(max-width:760px) {.sidebar nav {flex-wrap:wrap;}.ngram-step-controls {flex-wrap:wrap;}}

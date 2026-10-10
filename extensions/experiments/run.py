@@ -14,6 +14,13 @@ import pandas as pd
 
 from core.src.data import DATA_DIR, ROOT, load_corpus, set_seed
 from core.src.preprocess import oov_rate, preprocess
+from extensions.experiments.registry import (
+    atomic_json,
+    complete_stage,
+    create_run,
+    read_run,
+    start_stage,
+)
 from extensions.src.models import METHODS, CountBank, evaluate_counts
 from extensions.src.pipeline import split_three, tune
 
@@ -30,10 +37,15 @@ def assert_core_frozen():
 
 
 def dump(path, obj):
-    path.parent.mkdir(parents=True, exist_ok=True)
-    path.write_text(
-        json.dumps(obj, ensure_ascii=False, indent=2, allow_nan=False), encoding="utf-8"
-    )
+    ensure_run_output(path)
+    atomic_json(path, obj)
+
+
+def ensure_run_output(path):
+    from extensions.experiments.registry import RUNS
+
+    if not path.resolve().is_relative_to(RUNS.resolve()) or path.resolve() == RUNS.resolve():
+        raise ValueError("Historical results are read-only; select a fresh --run-id.")
 
 
 def final_row(bank, n, method, dev_counts, test_counts, seed, threshold):
@@ -58,6 +70,7 @@ def final_row(bank, n, method, dev_counts, test_counts, seed, threshold):
 
 
 def run21(sentences):
+    ensure_run_output(OUT)
     train, dev, test, ids = split_three(sentences, seed=42)
     dump(OUT / "splits" / "split_42.json", ids)
     bank = CountBank(train, max_n=3, min_count=2)
@@ -68,9 +81,11 @@ def run21(sentences):
 
 
 def run22(sentences, rows):
+    ensure_run_output(OUT)
     for seed in (42, 43, 44):
         train, dev, test, ids = split_three(sentences, seed)
-        dump(OUT / "splits" / f"split_{seed}.json", ids)
+        if seed != 42:
+            dump(OUT / "splits" / f"split_{seed}.json", ids)
         for threshold in (2, 3):
             started = time.perf_counter()
             bank = CountBank(train, max_n=4, min_count=threshold)
@@ -138,32 +153,40 @@ def run22(sentences, rows):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
+    global OUT
+    parser.add_argument("--run-id", required=True)
     parser.add_argument("--stage", choices=("21", "22"), required=True)
     args = parser.parse_args()
     assert_core_frozen()
-    OUT.mkdir(parents=True, exist_ok=True)
     set_seed(42)
     sentences, dropped = preprocess(load_corpus("brown"))
-    dump(
-        OUT / "manifest.json",
-        {
-            "corpus": "brown",
-            "sentences": len(sentences),
-            "empty_dropped": dropped,
-            "corpus_sha256": hashlib.sha256(
-                (DATA_DIR / "corpora/brown.zip").read_bytes()
-            ).hexdigest(),
-            "python": platform.python_version(),
-            "versions": {x: version(x) for x in ("nltk", "numpy", "pandas", "matplotlib")},
-            "seeds": [42, 43, 44],
-            "thresholds": [2, 3],
-            "orders": [1, 2, 3, 4],
-            "train_ratio": 0.8,
-            "dev_ratio": 0.1,
-            "test_ratio": 0.1,
-            "test_policy": "One evaluation per dev-selected configuration; pilot rows reused.",
-        },
-    )
+    config = {
+        "corpus": "brown",
+        "sentences": len(sentences),
+        "empty_dropped": dropped,
+        "corpus_sha256": hashlib.sha256((DATA_DIR / "corpora/brown.zip").read_bytes()).hexdigest(),
+        "python": platform.python_version(),
+        "versions": {x: version(x) for x in ("nltk", "numpy", "pandas", "matplotlib")},
+        "seeds": [42, 43, 44],
+        "thresholds": [2, 3],
+        "orders": [1, 2, 3, 4],
+        "train_ratio": 0.8,
+        "dev_ratio": 0.1,
+        "test_ratio": 0.1,
+        "test_policy": "One evaluation per dev-selected configuration; pilot rows reused.",
+    }
+    config["code_sha256"] = {
+        str(path.relative_to(ROOT)): hashlib.sha256(path.read_bytes()).hexdigest()
+        for folder in (ROOT / "core/src", ROOT / "extensions/src", ROOT / "extensions/experiments")
+        for path in sorted(folder.glob("*.py"))
+    }
+    if args.stage == "21":
+        create_run(args.run_id, config)
+    else:
+        prior = read_run(args.run_id)
+        if prior["stages"].get("21") != "completed":
+            raise ValueError("Stage 22 requires completed stage 21 of the same run.")
+    OUT = start_stage(args.run_id, args.stage, config)
     if args.stage == "21":
         if (OUT / "phase21.csv").exists():
             raise FileExistsError("phase21.csv sudah ada; simpan run lama sebelum run baru")
@@ -181,6 +204,7 @@ def main():
         del pilot_bank
         run22(sentences, rows)
     assert_core_frozen()
+    complete_stage(args.run_id, args.stage)
 
 
 if __name__ == "__main__":

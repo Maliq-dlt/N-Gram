@@ -9,8 +9,12 @@ from pathlib import Path
 root = Path(__file__).resolve().parents[1]
 output = Path(sys.argv[1]) if len(sys.argv) > 1 else root / ".tmp/packages"
 modules = tomllib.loads((root / "pyproject.toml").read_text())["tool"]["setuptools"]["py-modules"]
-wheel = next(output.glob("*.whl"))
+wheel = next(output.glob("industrial_video_workspace*.whl"))
 with zipfile.ZipFile(wheel) as archive:
+    metadata = archive.read(
+        next(p for p in archive.namelist() if p.endswith(".dist-info/METADATA"))
+    ).decode()
+    assert "Requires-Dist: ngram-assignment==0.1.0" in metadata
     for name in modules:
         assert archive.read(name + ".py") == (root / (name + ".py")).read_bytes(), name
     for name in [
@@ -32,6 +36,8 @@ with zipfile.ZipFile(wheel) as archive:
         "frontend/VideoPanel.tsx",
         "frontend/Workspace.tsx",
         "frontend/LiveViews.tsx",
+        "frontend/NgramLab.tsx",
+        "frontend/EventLedger.tsx",
         "motion.js",
         "frontend/motion.ts",
         "frontend/tsconfig.motion.json",
@@ -49,7 +55,7 @@ with zipfile.ZipFile(wheel) as archive:
         "/models/" in p or p.startswith("data/") or "/.tmp/" in p or "/.cache/" in p
         for p in archive.namelist()
     )
-with tarfile.open(next(output.glob("*.tar.gz"))) as archive:
+with tarfile.open(next(output.glob("industrial_video_workspace*.tar.gz"))) as archive:
     for name in (
         "docs/README.md",
         "assets/brand.svg",
@@ -71,6 +77,8 @@ with tarfile.open(next(output.glob("*.tar.gz"))) as archive:
         "frontend/VideoPanel.tsx",
         "frontend/Workspace.tsx",
         "frontend/LiveViews.tsx",
+        "frontend/NgramLab.tsx",
+        "frontend/EventLedger.tsx",
     ):
         member = next(p for p in archive.getmembers() if p.name.endswith("/" + name))
         extracted = archive.extractfile(member)

@@ -1,6 +1,8 @@
 services:
   app:
-    build: .
+    build:
+      context: ..
+      dockerfile: industrial_ai/Dockerfile
     restart: unless-stopped
     environment:
       INSIGHT_PUBLIC_URL: "${INSIGHT_PUBLIC_URL:-https://localhost}"
@@ -13,11 +15,11 @@ services:
     cap_drop: [ALL]
     security_opt: [no-new-privileges:true]
     tmpfs:
-      - /app/.tmp:uid=10001,gid=10001,mode=0700
+      - /workspace/industrial_ai/.tmp:uid=10001,gid=10001,mode=0700
     volumes:
-      - data:/app/data
-      - models:/app/models
-      - cache:/app/.cache
+      - data:/workspace/industrial_ai/data
+      - models:/workspace/industrial_ai/models
+      - cache:/workspace/industrial_ai/.cache
   proxy:
     image: caddy:2.10.2-alpine
     restart: unless-stopped

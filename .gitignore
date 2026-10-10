@@ -28,3 +28,6 @@ Tugas_Ngram_Language_Model.zip
 
 # Verification logs
 verifikasi/logs/
+
+# Research checkpoints, source documents and private event exports remain local.
+extensions/results/runs/

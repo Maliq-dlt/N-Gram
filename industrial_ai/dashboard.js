@@ -53,12 +53,13 @@ async function setView(view) {
         workspaceAuth.resetPasswordForm();
     currentView = view;
     reviewVideo.pause();
-    $('videoWorkspace').hidden = view === 'profile';
+    $('videoWorkspace').hidden = view === 'profile' || view === 'ngram';
     $('profilePane').hidden = view !== 'profile';
+    $('ngramPane').hidden = view !== 'ngram';
     $('analysisPane').hidden = view !== 'analysis';
     $('evidencePane').hidden = view !== 'evidence';
     $('reviewPanel').hidden = view !== 'annotation';
-    $('pageTitle').textContent = { analysis: 'Analisis video', evidence: 'Bukti & hasil', annotation: 'Anotasi manual', profile: 'Profil' }[view];
+    $('pageTitle').textContent = { analysis: 'Analisis video', evidence: 'Bukti & hasil', annotation: 'Anotasi manual', profile: 'Profil', ngram: 'Lab N-gram' }[view];
     for (const button of document.querySelectorAll('[data-view]')) {
         if (button.dataset.view === view)
             button.setAttribute('aria-current', 'page');

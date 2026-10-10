@@ -1,5 +1,6 @@
 import { AccountGate, Profile } from './Account';
 import { Workspace } from './Workspace';
+import { NgramLab } from './NgramLab';
 
 export function App() {
  return (<>
@@ -12,6 +13,7 @@ export function App() {
        <p id="authError" className="error" role="alert" hidden />
        <Workspace />
        <Profile />
+       <div id="ngramPane" hidden><NgramLab /></div>
      </main>
    </div>
    <UploadDialog />
@@ -47,6 +49,7 @@ export function Sidebar() {
                 <path d="M4 9V4h5M15 4h5v5M20 15v5h-5M9 20H4v-5M9 9h6v6H9z" /></svg
               >Anotasi manual
             </button>
+            <button className="button nav-item" data-view="ngram"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16v16H4zM8 8h8M8 12h5M8 16h8" /></svg>Lab N-gram</button>
           </nav>
           <div className="sidebar-bottom">
             <span className="local-dot"></span> Semua data di perangkat ini<span

@@ -1,12 +1,15 @@
 FROM ghcr.io/astral-sh/uv:0.11.23 AS uv
 FROM python:3.11-slim
 COPY --from=uv /uv /usr/local/bin/uv
-WORKDIR /app
-ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UV_CACHE_DIR=/app/.cache/uv UV_PYTHON_DOWNLOADS=never PATH=/app/.venv/bin:$PATH
+WORKDIR /workspace/industrial_ai
+ENV PYTHONDONTWRITEBYTECODE=1 PYTHONUNBUFFERED=1 UV_CACHE_DIR=/workspace/industrial_ai/.cache/uv UV_PYTHON_DOWNLOADS=never PATH=/workspace/industrial_ai/.venv/bin:$PATH
 RUN apt-get update && apt-get install -y --no-install-recommends ffmpeg libgl1 libglib2.0-0 && rm -rf /var/lib/apt/lists/*
-COPY pyproject.toml uv.lock ./
+COPY pyproject.toml README.md /workspace/
+COPY core /workspace/core
+COPY extensions /workspace/extensions
+COPY industrial_ai/pyproject.toml industrial_ai/uv.lock ./
 RUN mkdir -p .tmp .cache && uv venv --python 3.11 && uv export --frozen --no-hashes --no-emit-project --no-dev --no-emit-package torch --no-emit-package torchvision -o .tmp/requirements.txt && python -c "from pathlib import Path; p=Path('.tmp/requirements.txt'); p.write_text('\n'.join(s for s in p.read_text().splitlines() if not s.startswith(('nvidia-', 'cuda-', 'triton==')))+'\n')" && uv pip install torch==2.14.1 torchvision==0.29.1 --index-url https://download.pytorch.org/whl/cpu && uv pip install -r .tmp/requirements.txt
-COPY . .
+COPY industrial_ai .
 RUN groupadd --gid 10001 workspace && useradd --uid 10001 --gid workspace --no-create-home workspace && mkdir -p data models .cache .tmp && chown -R 10001:10001 data models .cache .tmp
 USER 10001:10001
 EXPOSE 8765

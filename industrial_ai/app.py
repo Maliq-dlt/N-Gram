@@ -228,6 +228,13 @@ app.add_middleware(
 )
 access.install(app, MAX_UPLOAD)
 
+import academic
+import event_ledger
+import fact_query
+
+academic.install(app)
+event_ledger.install(app)
+
 
 @app.get("/")
 def home():
@@ -958,6 +965,14 @@ async def chat(request: ChatRequest):
         if read_state(folder)["status"] != "done":
             raise HTTPException(409, "Analisis video ini belum selesai.")
         summary = result_summary(folder)
+    ledger_answer = fact_query.answer_ledger(
+        request.message,
+        event_ledger.Ledger(access.store()).rows(),
+        access.actor()["role"],
+        request.job_id,
+    )
+    if ledger_answer is not None:
+        return ledger_answer
     facts = answer_facts(request.message, summary)
     if facts:
         return facts

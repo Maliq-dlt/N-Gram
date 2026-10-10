@@ -1,12 +1,13 @@
 """Shared raw counts and normalized interpolated absolute-discount Kneser-Ney."""
 
 import math
-from collections import Counter
+from collections import Counter, defaultdict
 
 from core.src.ngram import events
 from core.src.preprocess import BOS, UNK, fit_vocabulary, replace_unknown
 
 METHODS = ("laplace", "add_k", "interpolation", "stupid_backoff", "kneser_ney")
+ALL_METHODS = METHODS + ("witten_bell", "modified_kneser_ney", "interpolation_em")
 
 
 def context_stats(counts):
@@ -97,7 +98,7 @@ class ExtensionLM:
         backoff=0.4,
         epsilon=1e-8,
     ):
-        if not 1 <= n <= bank.max_n or method not in METHODS:
+        if not 1 <= n <= bank.max_n or method not in ALL_METHODS:
             raise ValueError("Orde/metode tidak valid")
         if not math.isfinite(k) or k <= 0 or not 0 < discount < 1:
             raise ValueError("k >0 finite; discount antara 0 dan 1")
@@ -112,6 +113,34 @@ class ExtensionLM:
         self.k, self.discount, self.weights = k, discount, weights
         self.backoff, self.epsilon = backoff, epsilon
         self.vocabulary, self.vocab_set = bank.vocabulary, bank.vocab_set
+        self.mkn_discounts, self.mkn_mass = {}, {}
+        if method == "modified_kneser_ney":
+            for order in range(2, n + 1):
+                counts = bank.raw[order] if order == n else bank.continuation[order]
+                frequencies = Counter(counts.values())
+                fallback = None
+                if all(frequencies[c] for c in (1, 2, 3, 4)):
+                    y = frequencies[1] / (frequencies[1] + 2 * frequencies[2])
+                    discounts = tuple(
+                        c - (c + 1) * y * frequencies[c + 1] / frequencies[c] for c in (1, 2, 3)
+                    )
+                    if any(
+                        not math.isfinite(d) or not 0 < d < c for c, d in enumerate(discounts, 1)
+                    ):
+                        fallback = "invalid count-of-counts estimate"
+                else:
+                    fallback = "sparse count-of-counts (requires N1..N4)"
+                if fallback:
+                    discounts = (0.75, 0.75, 0.75)
+                self.mkn_discounts[order] = {
+                    "discounts": discounts,
+                    "count_of_counts": {c: frequencies[c] for c in (1, 2, 3, 4)},
+                    "fallback": fallback,
+                }
+                mass = defaultdict(float)
+                for gram, count in counts.items():
+                    mass[gram[:-1]] += discounts[min(count, 3) - 1]
+                self.mkn_mass[order] = mass
 
     def map_sentence(self, sentence):
         return self.bank.map_sentence(sentence)
@@ -132,9 +161,11 @@ class ExtensionLM:
         )
 
     def score_mapped(self, word, context):
+        if self.method not in METHODS and word == BOS:
+            return 0.0
         if self.method in ("laplace", "add_k"):
             return self._add(word, context, self.n, 1 if self.method == "laplace" else self.k)
-        if self.method == "interpolation":
+        if self.method in ("interpolation", "interpolation_em"):
             return math.fsum(
                 weight * self._add(word, context, order, self.k)
                 for order, weight in enumerate(self.weights, 1)
@@ -148,7 +179,19 @@ class ExtensionLM:
                     return factor * count / self.bank.totals[order][ctx]
                 factor *= self.backoff
             return factor * self._add(word, (), 1, self.epsilon or 1e-8)
+        if self.method == "witten_bell":
+            return 0.0 if word == BOS else self._wb(word, context, self.n)
         return self._kn(word, context, self.n)
+
+    def _wb(self, word, context, order):
+        if order == 1:
+            return self._add(word, (), 1, self.epsilon)
+        ctx = context[-(order - 1) :]
+        total, types = self.bank.totals[order][ctx], self.bank.types[order][ctx]
+        lower = self._wb(word, context, order - 1)
+        if not total:
+            return lower
+        return (self.bank.raw[order][ctx + (word,)] + types * lower) / (total + types)
 
     def _kn(self, word, context, order):
         if order == 1:
@@ -166,6 +209,11 @@ class ExtensionLM:
         total = totals[ctx]
         if not total:
             return lower
+        if self.method == "modified_kneser_ney":
+            count = counts[ctx + (word,)]
+            discounts = self.mkn_discounts[order]["discounts"]
+            direct = max(count - discounts[min(count, 3) - 1], 0) / total if count else 0.0
+            return direct + self.mkn_mass[order][ctx] / total * lower
         direct = max(counts[ctx + (word,)] - self.discount, 0) / total
         return direct + self.discount * types[ctx] / total * lower
 

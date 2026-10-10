@@ -4,6 +4,7 @@ version = "0.1.0"
 description = "Local video tracking and grounded chat"
 requires-python = ">=3.11,<3.12"
 dependencies = [
+  "ngram-assignment==0.1.0",
   "fastapi>=0.115",
   "uvicorn>=0.30",
   "python-multipart>=0.0.18",
@@ -22,6 +23,7 @@ url = "https://download.pytorch.org/whl/cu130"
 explicit = true
 
 [tool.uv.sources]
+ngram-assignment = { path = "..", editable = true }
 torch = { index = "pytorch-cuda" }
 torchvision = { index = "pytorch-cuda" }
 
@@ -30,11 +32,11 @@ requires = ["setuptools>=83"]
 build-backend = "setuptools.build_meta"
 
 [tool.setuptools]
-py-modules = ["app", "vision", "chat", "runtime", "setup_models", "fine_tune_chat", "detector_training", "prompt_tracking", "corrections", "video_finetune", "operations", "review", "access", "storage"]
+py-modules = ["app", "vision", "chat", "runtime", "setup_models", "fine_tune_chat", "detector_training", "prompt_tracking", "corrections", "video_finetune", "operations", "review", "access", "storage", "academic", "event_ledger", "fact_query"]
 
 [tool.setuptools.data-files]
 "share/industrial-video-workspace" = ["index.html", "dashboard.js", "auth.js", "theme.js", "motion.js", "app.js", "Dockerfile", "compose.yaml", "Caddyfile.example", ".dockerignore"]
-"share/industrial-video-workspace/frontend" = ["frontend/App.tsx", "frontend/main.tsx", "frontend/studio.ts", "frontend/Account.tsx", "frontend/Annotation.tsx", "frontend/ChatPanel.tsx", "frontend/VideoPanel.tsx", "frontend/Workspace.tsx", "frontend/LiveViews.tsx", "frontend/auth.ts", "frontend/motion.ts", "frontend/tsconfig.auth.json", "frontend/tsconfig.studio.json", "frontend/tsconfig.json", "frontend/tsconfig.motion.json"]
+"share/industrial-video-workspace/frontend" = ["frontend/App.tsx", "frontend/main.tsx", "frontend/studio.ts", "frontend/Account.tsx", "frontend/Annotation.tsx", "frontend/ChatPanel.tsx", "frontend/VideoPanel.tsx", "frontend/Workspace.tsx", "frontend/LiveViews.tsx", "frontend/NgramLab.tsx", "frontend/EventLedger.tsx", "frontend/auth.ts", "frontend/motion.ts", "frontend/tsconfig.auth.json", "frontend/tsconfig.studio.json", "frontend/tsconfig.json", "frontend/tsconfig.motion.json"]
 "share/industrial-video-workspace/docs" = ["docs/HARDENING.md", "docs/VERIFICATION_SECURITY.md", "docs/README.md"]
 "share/industrial-video-workspace/assets" = ["assets/dashboard.css", "assets/brand.svg", "assets/crowd.png", "assets/THIRD_PARTY_LICENSES.txt"]
 

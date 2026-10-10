@@ -1,0 +1,23 @@
+'use strict';
+const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
+(async()=>{
+ const markup=require('./ui_markup.cjs');
+ assert(/data-view="ngram"/.test(markup));
+ assert(/id="ngramPane" hidden/.test(markup),'Lab stays outside the visible video workspace initially');
+ for(const id of ['ngramModel','ngramMethod','ngramOrder','ngramText','ngramSeed','ngramLimit','ngramRun'])assert(new RegExp(`for="${id}"`).test(markup),'Lab controls have explicit labels');
+ const source=fs.readFileSync('dashboard.js','utf8'),nodes={};
+ const $=id=>nodes[id]??={hidden:false,setAttribute(){},removeAttribute(){}};
+ const context={$,currentView:'annotation',previousWorkspaceView:'analysis',uploading:false,sending:false,reviewBusy:false,summary:{frames:100,fps:10},original:{currentTime:4.2},reviewVideo:{pause(){}},workspaceAuth:{resetPasswordForm(){}},document:{fullscreenElement:null,querySelectorAll(){return [];}},persistReview:async()=>false,cancelDrawing(){},pauseComparison(){},stopReviewTracking:async()=>{},syncControls(){},loadManualFrame:async()=>{},showError(){}};
+ vm.createContext(context);
+ vm.runInContext(source.slice(source.indexOf('async function setView('),source.indexOf("for (const button of document.querySelectorAll('[data-view]'))\n    button.onclick")),context);
+ assert.equal(await context.setView('ngram'),false,'unsaved annotation cannot be abandoned');
+ assert.equal(context.currentView,'annotation');
+ context.persistReview=async()=>true;
+ assert.equal(await context.setView('ngram'),true);
+ assert.equal($('ngramPane').hidden,false);assert.equal($('videoWorkspace').hidden,true);
+ assert.equal($('pageTitle').textContent,'Lab N-gram');assert.equal(context.original.currentTime,4.2);
+ assert.equal(await context.setView('profile'),true);assert.equal($('ngramPane').hidden,true);
+ assert.equal(await context.setView('ngram'),true);assert.equal($('ngramPane').hidden,false);
+ assert.equal(await context.setView('analysis'),true);assert.equal($('ngramPane').hidden,true);assert.equal($('videoWorkspace').hidden,false);
+ console.log('PASS: accessible Lab, guarded navigation, profile return and preserved video timestamp.');
+})().catch(error=>{console.error(error);process.exitCode=1;});

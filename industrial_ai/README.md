@@ -12,6 +12,20 @@ Demo/portofolio untuk unggah video, bandingkan rekaman asli dengan tracking AI,
 koreksi objek, dan tanya hasilnya lewat chatbot lokal. Subproyek `industrial_ai`
 terpisah dari artefak akademik N-gram di root repository.
 
+## Lab N-gram, ledger, dan absensi manual
+
+Buka **Lab N-gram** di workspace untuk probability explorer, top-k, sliding context dan generasi bertahap. Nilai dihitung backend Python; demo kecil mengajarkan mekanisme dan bukan hasil riset. Tab eksperimen membaca completed pilot metrics dan jejak dev; tidak melatih atau membuka ulang test saat kontrol UI berubah. Checkpoint hanya dibagikan dengan opt-in `public_models`; raw path/upload model bebas tidak diterima. [Metode dan pilot terukur](../extensions/README.md) · [Verifikasi akademik/integrasi](../extensions/reports/VERIFICATION.md).
+
+Alur CCTV adalah **piksel video → detector/tracker → review manusia → ledger kejadian → urutan simbol N-gram**. Reviewer mengesahkan crossing/observasi dari job dan revisi sumber yang sesuai. Ledger SQLite menyimpan sumber, waktu, workspace, verifier dan status; sumber stale atau retracted tidak menjadi fakta aktif. `HELMET_UNKNOWN` adalah ketidakcukupan observasi, bukan pelanggaran. Track ID hanya ID pengamatan dalam satu rekaman, bukan pegawai atau orang unik.
+
+Panel ledger menyediakan catatan absensi **manual yang disahkan admin** dengan subject/source/evidence. Badge/QR adalah keterangan sumber yang dimasukkan manusia; aplikasi belum memindai atau memvalidasi perangkat badge/QR. Linkage track ambigu tetap unknown. Viewer tidak mendapat identitas/verifier sensitif. Fakta crossing/track/record absensi berasal query ledger yang terdefinisi; Qwen dan N-gram tidak menciptakan angka atau identitas.
+
+Adapter sequence memisahkan track/session, mengurutkan waktu dan kejadian simultan, melakukan dedupe, dan menandai gap. Runner novelty offline memakai simbol dengan boundaries sendiri, grouping seluruh rekaman dalam satu split, dev-only selection/calibration, serta frequency baseline. Ini **implementasi dan tes correctness**, belum pembuktian kualitas CCTV nyata: belum ada rekaman berlabel independen, exposure hours/onset untuk false alerts/hour atau delay, maupun causal live replay. Rare sequence tidak berarti bahaya.
+
+Face recognition/enrollment, liveness/anti-spoofing, OCR plat dan CCTV live tidak tersedia. Pertanyaan absensi dengan filter subjek/tanggal/jam atau temporal chat di luar grammar fakta yang didukung harus dikembalikan sebagai unsupported; count total bukan jawaban atas filter yang belum diterapkan. Absensi manual tidak membuktikan kehadiran sepanjang shift.
+
+Verifikasi video/chat terisolasi terbaru menjalankan **71 E2E checks** pada CPU/RTX; fixture pengguna existing dipertahankan. Hasil ini tidak mengukur akurasi detector pada pabrik, face/liveness, maupun mutu novelty pada rekaman independen. Rincian batas dan gate terpisah ada di [checklist akademik](../tasks/ngram_academic/todo.md).
+
 ## Mulai di Windows
 
 Prasyarat: Node.js 20+, npm, [uv](https://docs.astral.sh/uv/getting-started/installation/),
@@ -352,6 +366,8 @@ video asal pada split yang sama, termasuk setelah analisis ulang.
 | `operations.py` | Pembatalan serta proses native |
 | `index.html` / `dashboard.js` / `frontend/auth.ts` / `ui.css` | Dashboard, anotasi, dan auth DOM bertipe |
 | `storage.py` / `access.py` | SQLite, sesi, workspace/role, audit, dan CLI akses |
+| `academic.py` / `event_ledger.py` | Lab Python read-only, ledger observasi dan absensi manual |
+| `frontend/NgramLab.tsx` / `frontend/EventLedger.tsx` | UI lab, metric tables dan review ledger |
 | `tests/` | Regresi API, media, playback, dan training nyata |
 
 [Panduan kontribusi dan tes](../CONTRIBUTING.md) · [Keamanan](../SECURITY.md) ·
