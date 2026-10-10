@@ -208,7 +208,7 @@ Dependency: fase 1–5 serta 6.1–6.2 selesai. Scope: M, 3–5 file. Lokasi: la
 
 - [x] Rumus, hasil aktual, efek/CI, biaya, sumber/lisensi, ancaman validitas dan hasil negatif jelas; hasil historis tidak ditulis ulang sebagai hasil baru.
 - [x] Dua wheel dipasang ke environment baru, memakai dependency lokal existing; smoke corpus mini/API/assets lulus. Lock root/studio diverifikasi.
-- [ ] Hasil CI remote pada commit publik (termasuk container/HTTPS) belum diverifikasi sebelum publikasi; pemeriksaan lokal tidak diganti label CI lulus.
+- [x] CI remote [38038065071](https://github.com/Maliq-dlt/N-Gram/actions/runs/38038065071) pada commit `47dacf8` lulus: academic, studio dan container/HTTPS. Audit NLTK memakai exception spesifik serta guard, bukan klaim dependency patched.
 - [x] Source/docs penting dipublikasi ke main setelah review; private data, weights dan cache tidak ikut. Audit 188 berkas core/hasil/perubahan pengguna tetap identik.
 
 Verifikasi: root pytest/Ruff/format/Ty/build/package audit; reproducibility pada source mini; exact published commit CI bila publikasi dilakukan. **Checkpoint 6:** proyek akademik kuat selesai; CCTV/absensi berikut adalah aplikasi tambahan.
