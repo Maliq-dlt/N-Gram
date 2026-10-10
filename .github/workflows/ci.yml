@@ -85,7 +85,11 @@ jobs:
           npm run build
           npm audit --audit-level=high
       - name: Python dependency audit
-        run: uvx pip-audit==2.10.1 --path .venv/lib/python3.11/site-packages --skip-editable
+        run: |
+          .venv/bin/python ../extensions/tests/test_nltk_boundary.py
+          # Unpatched, unreachable model-path APIs only; evidence/upgrade trigger: SECURITY.md#nltk-model-path-advisory-exception
+          # https://osv.dev/vulnerability/GHSA-8mgp-746c-j5xp (alias PYSEC-2026-3740)
+          uvx pip-audit==2.10.1 --path .venv/lib/python3.11/site-packages --skip-editable --ignore-vuln PYSEC-2026-3740
       - name: Audit public versions of CPU/CUDA wheel variants
         run: |
           printf 'torch==2.14.1\ntorchvision==0.29.1\n' > .tmp/requirements-ai-audit.txt

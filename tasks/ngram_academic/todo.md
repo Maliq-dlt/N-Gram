@@ -13,7 +13,7 @@ Tanggal: **10 Oktober 2026**. Checklist diperbarui setelah implementasi, tiga pi
 | CCTV/ledger | Review→ledger, workspace/revisi/stale/retract, per-track symbols dan novelty runner offline | Belum mutu novelty berlabel nyata, exposure/onset, false alerts/hour/delay atau causal live |
 | Absensi | Linkage manual admin, ambiguous identity unknown, facts dengan provenance | Scanner badge/QR, face/liveness, arbitrary time/subject-filtered chat belum tersedia |
 
-**166 tes akademik lulus** pada verifikasi akhir. Coverage source akademik **80,83%** gabungan line+branch; bukan coverage seluruh repo atau akurasi model. Video/chat isolated E2E **71 passed**, bukan validasi kualitas pabrik. Source delapan file tiap pilot diarsipkan sebelum future target-group fix; hasil lama tidak direvaluasi. Original blueprint berikut dipertahankan, tetapi dependency/gate tidak berarti seluruh cakupan domain selesai.
+**167 tes akademik lulus** pada verifikasi akhir. Coverage source akademik **80,83%** gabungan line+branch; bukan coverage seluruh repo atau akurasi model. Video/chat isolated E2E **71 passed**, bukan validasi kualitas pabrik. Source delapan file tiap pilot diarsipkan sebelum future target-group fix; hasil lama tidak direvaluasi. Original blueprint berikut dipertahankan, tetapi dependency/gate tidak berarti seluruh cakupan domain selesai.
 
 Setiap task baru wajib lolos tes yang material, `git diff --check`, lint/typecheck source yang berubah, dan build bila packaging terpengaruh. Hash core/hasil lama diperiksa pada setiap checkpoint. Command akademik diawali `. .\setup_lokal.ps1`. Angka keberhasilan ilmiah tidak dijanjikan sebelum eksperimen.
 
@@ -209,7 +209,7 @@ Dependency: fase 1–5 serta 6.1–6.2 selesai. Scope: M, 3–5 file. Lokasi: la
 - [x] Rumus, hasil aktual, efek/CI, biaya, sumber/lisensi, ancaman validitas dan hasil negatif jelas; hasil historis tidak ditulis ulang sebagai hasil baru.
 - [x] Dua wheel dipasang ke environment baru, memakai dependency lokal existing; smoke corpus mini/API/assets lulus. Lock root/studio diverifikasi.
 - [ ] Hasil CI remote pada commit publik (termasuk container/HTTPS) belum diverifikasi sebelum publikasi; pemeriksaan lokal tidak diganti label CI lulus.
-- [ ] Source/docs penting dipublikasi hanya setelah review; private data, weights dan cache tidak ikut. Core/hash dan perubahan pengguna tetap utuh.
+- [x] Source/docs penting dipublikasi ke main setelah review; private data, weights dan cache tidak ikut. Audit 188 berkas core/hasil/perubahan pengguna tetap identik.
 
 Verifikasi: root pytest/Ruff/format/Ty/build/package audit; reproducibility pada source mini; exact published commit CI bila publikasi dilakukan. **Checkpoint 6:** proyek akademik kuat selesai; CCTV/absensi berikut adalah aplikasi tambahan.
 

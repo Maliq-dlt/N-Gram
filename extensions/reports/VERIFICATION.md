@@ -6,7 +6,7 @@ Diperiksa pada Windows, 10 Oktober 2026. Ini bukti implementasi lokal dan pilot 
 
 | Pemeriksaan | Hasil |
 | --- | --- |
-| Root `pytest -q`, core dan extensions | 166 tes lulus (11.05 detik), termasuk regresi worker benchmark dan metode baru |
+| Root `pytest -q`, core dan extensions | 167 tes lulus, termasuk guard NLTK, regresi worker benchmark dan metode baru |
 | Ruff lint/format dan Ty root | Lulus pada core, extensions, serta launcher notebook |
 | UI `npm run typecheck`, `npm run check`, `npm run build` | Lulus; React/TS Lab terintegrasi dengan studio lama |
 | API akademik | Login/CSRF, input terbatas, parity angka, seeded generation, checkpoint/cache integrity, metadata dev, CSV dan ringkasan publik lulus |
@@ -18,6 +18,7 @@ Diperiksa pada Windows, 10 Oktober 2026. Ini bukti implementasi lokal dan pilot 
 | Tracking | 31 pemeriksaan lulus |
 | Deployment HTTP | 36 pemeriksaan lulus, port ephemeral dan server terisolasi |
 | Wheel/sdist | Root dan studio dibangun, konten dibandingkan dengan source, kedua wheel dipasang ke environment baru dengan dependency lokal yang sudah tersedia |
+| Audit dependency | npm: 0 temuan; Python: satu exception NLTK yang belum diperbaiki upstream, guard lulus; public versions Torch/torchvision diaudit tanpa exception |
 | Lock dependency | `uv lock --check` root dan studio lulus |
 
 Coverage line+branch untuk **core/src dan extensions/src** adalah 80.83%; tidak mencakup seluruh backend/runner dan bukan akurasi AI. Import/HTTP akademik tidak memuat Torch atau Transformers. Tes video/chat/training di atas memang memuat model nyata pada fixture terpisah.
@@ -63,4 +64,4 @@ Studio membutuhkan environment sendiri (`npm run setup` pada Windows); root pack
 - Test lama sudah pernah dilihat, Wikipedia hanya empat dokumen test. Klaim konfirmatori memerlukan protokol dan holdout independen baru.
 - Novelty belum diuji pada kejadian nyata berlabel independen; false alert/jam dan detection delay belum tersedia tanpa exposure/onset truth. Duration bins belum ditambahkan.
 - Absensi adalah verifikasi manual administrator. Belum ada scanner badge/QR, pengenalan wajah, liveness, CCTV live atau bukti hadir sepanjang shift.
-- Docker daemon lokal tidak tersedia: Compose/config/source-boundary lulus, image/runtime/HTTPS menunggu hasil job container CI. Jangan menganggap static checks sebagai container yang telah dijalankan.
+- Docker daemon lokal tidak tersedia. Pada commit `8b52f82`, job container CI telah membangun image, menjalankan restricted runtime dan membuktikan HTTPS dengan CA Caddy, Secure/HttpOnly cookie, CSRF serta logout. Job akademik lulus. Job studio awal berhenti pada advisory NLTK; CI berikutnya memakai guard boundary dan exception advisory NLTK yang dijelaskan pada [SECURITY](../../SECURITY.md#nltk-model-path-advisory-exception). Dependency upstream tetap belum patched, bukan nol kerentanan Python.
