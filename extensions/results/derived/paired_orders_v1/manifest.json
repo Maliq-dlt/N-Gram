@@ -1,0 +1,32 @@
+{
+  "schema": 1,
+  "status": "completed",
+  "analysis": "post_hoc_paired_orders",
+  "source_commit": "34e3df8e3298b6d73fb50d03a2a36d09bd9d79c3",
+  "source_path": "extensions/results/experiments.csv",
+  "source_git_blob": "86db4a6332ada15d1ffc314f4e1726f89f8a86e6",
+  "input_sha256": "a38e17a988a58e8db06d01acf666e129308ec4a44d5b23ff7b62dc100f9719a8",
+  "lf_normalized_input_sha256": "a38e17a988a58e8db06d01acf666e129308ec4a44d5b23ff7b62dc100f9719a8",
+  "crlf_normalized_for_snapshot_check": false,
+  "script_sha256": "f8195c52a98900d04cdc7186a77350d295707910703d726bab9745057932ae95",
+  "python_version": "3.13.5",
+  "created_at_utc": "2026-10-10T09:26:41.487724+00:00",
+  "method": "kneser_ney",
+  "orders": [
+    3,
+    4
+  ],
+  "input_rows": 120,
+  "paired_rows": 6,
+  "delta_definition": "pp_n3 - pp_n4",
+  "relative_definition": "100 * (pp_n3 - pp_n4) / pp_n3",
+  "summary_definition": "Arithmetic means of paired differences; sample std ddof=1",
+  "selection": "Fixed order contrast; no selection or fitting on test",
+  "split_identity": "Inherited from source protocol; metadata checks do not prove split identity",
+  "inference": "Descriptive only; shared corpus across seeds; no p-values or confidence intervals",
+  "output_sha256": {
+    "paired_orders.csv": "8d3b9a3420ec78e89acd576a35fe2ab66c26b15daec648059fe33a4867a47744",
+    "paired_summary.csv": "ad9d9999c60905efafdbc1536915d82a41269959195ba7808bcf543fe57c5dc1"
+  },
+  "input_unchanged": true
+}
