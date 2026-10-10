@@ -13,7 +13,7 @@ class Media {
  const original=new Media(),tracked=new Media(),buttons={},errors=[];
  const context={original,tracked,currentView:'analysis',updateMoment(){},showError:(id,msg)=>msg && errors.push(msg),$:id=>buttons[id]??={},console};
  vm.createContext(context);
- vm.runInContext(code.slice(code.indexOf('let playbackEpoch='),code.indexOf('function addMessage')),context);
+ vm.runInContext(code.slice(code.indexOf('let playbackEpoch ='),code.indexOf('function addMessage')),context);
  // An old peer play is interrupted by leaving the panel. Its rejection arrives after a new play.
  original.paused=false;original.emit('play');
  original.pause();original.emit('pause');

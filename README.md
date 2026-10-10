@@ -16,7 +16,7 @@
 | --- | --- |
 | Unggah video, koreksi kotak, dan bertanya tentang rekaman | **[Video Insight](industrial_ai/README.md)** — dashboard, tracking, review, dan fine-tuning lokal |
 | Memahami probabilitas kata, smoothing, dan perplexity | **[Proyek N-gram](#mulai-di-windows-powershell)** — notebook dan CLI Python |
-| Menilai implementasi dan hasil pengujian | [Verifikasi studio](industrial_ai/reports/WORKFLOW_REVIEW_BELAJAR.md) · [Spesifikasi akademik](SPESIFIKASI_TUGAS.md) |
+| Menilai implementasi dan hasil pengujian | [Peta dokumentasi studio](industrial_ai/docs/README.md) · [Verifikasi studio](industrial_ai/reports/WORKFLOW_REVIEW_BELAJAR.md) · [Spesifikasi akademik](SPESIFIKASI_TUGAS.md) |
 | Berkontribusi atau memahami batas lisensi | [Panduan kontribusi](CONTRIBUTING.md) · [Komponen pihak ketiga](NOTICE.md) |
 
 > Video Insight ditujukan untuk demonstrasi lokal. Hasil deteksi tetap perlu ditinjau manusia. Bagian akademik mempertahankan core dan hasil eksperimen yang dibekukan.

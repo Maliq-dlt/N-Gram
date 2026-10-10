@@ -4,7 +4,7 @@
 
 **Unggah. Tinjau. Koreksi. Tanya rekamannya.**
 
-[Mulai](#mulai-di-windows) · [Cara kerja belajar](#kapan-ai-benar-benar-belajar) · [Verifikasi](#verifikasi) · [Keamanan](../SECURITY.md)
+[Mulai](#mulai-di-windows) · [Cara kerja belajar](#kapan-ai-benar-benar-belajar) · [Verifikasi](#verifikasi) · [Keamanan](../SECURITY.md) · [Peta dokumentasi](docs/README.md)
 
 </div>
 
@@ -47,15 +47,21 @@ Akun owner dibuat dengan password interaktif; tidak ada password bawaan. Launche
 membuat akses awal lokal melalui bootstrap `--generate`; berkas `data/security/first-access.txt`
 harus diperlakukan sebagai rahasia dan tidak masuk Git. Masuk sebelum membuka rekaman.
 
-CSS dan JavaScript hasil build disertakan. `npm run build` mengompilasi auth TypeScript
-strict dan HeroUI/Tailwind; `npm run typecheck` memeriksa kontrak auth. Dashboard memakai
-DOM native tanpa React; playback/editor lama masih JavaScript dan diuji terpisah. Inferensi setelah setup memakai model
-lokal tanpa API key/cloud chat. Cache/temp/upload/hasil berada dalam subproyek.
+Seluruh tampilan studio dipindahkan ke React 19.3.0 dan TypeScript strict:
+komponen halaman berada di `frontend/*.tsx`, tampilan data dinamis di
+`frontend/LiveViews.tsx`, dan controller playback/editor di `frontend/studio.ts`.
+Auth memakai `frontend/auth.ts` strict; konfigurasi kompilasi berada di
+`frontend/tsconfig*.json`. `npm run build` memeriksa TypeScript lalu
+membundel React dan motion secara lokal dengan esbuild serta membangun CSS.
+`app.js` production sekitar 260 KB; tidak memakai CDN. Pemutar video tetap
+terpasang saat berganti tampilan. Inferensi setelah setup memakai model lokal
+tanpa API key/cloud chat; cache/temp/upload/hasil berada dalam subproyek.
 
 ## Profil dan password
 
-Menu akun membuka profil dengan username, peran dan workspace dari sesi server;
-identitas ditampilkan hanya baca. Form **Ubah password** meminta password saat ini,
+Menu akun membuka profil dengan username, peran dan workspace dari sesi server.
+Username/peran/workspace hanya baca; nama tampilan dan foto profil dapat diubah
+serta disimpan privat per akun di SQLite. Form **Ubah password** meminta password saat ini,
 password baru minimal 12 karakter dan konfirmasi. Password disimpan sebagai hash
 scrypt bersalt, bukan enkripsi yang dapat dibuka kembali.
 
@@ -69,7 +75,26 @@ Dashboard mempertahankan pemutar dan inspector native. Susunan avatar/aksi akun
 mengadaptasi [Origin UI dropdown-menu, 21st.dev #393](https://21st.dev/@originui/components/dropdown-menu)
 ke profil inline; pilihan mode hasil mengadaptasi
 [segmented-control #23552](https://21st.dev/@ddoemonn/components/segmented-control)
-ke radio native. Tidak diperlukan runtime React/Radix/Motion untuk kedua adaptasi.
+ke radio native dalam komponen React, tanpa menambahkan Radix.
+
+## Motion dan loading workspace
+
+Loader kerumunan hanya tampil pada login dan logout eksplisit, minimal 3,2 detik
+sambil menunggu operasi nyata jika lebih lama. Refresh/restorasi sesi tidak
+menampilkan kerumunan atau tambahan delay. Reduced motion melewati durasi tambahan;
+kegagalan langsung menampilkan retry, dan sesi kedaluwarsa membatalkan reveal.
+
+Framer Motion 14.1.0 (`dom/mini`) dan Lenis 1.3.26 dibundel lokal dengan esbuild
+0.28.2. Tema memakai circle reveal 900 ms dari tombol tema: snapshot UI nyata
+memakai palet tujuan, lalu tema live diterapkan setelah reveal. Snapshot inert
+memiliki ID terpisah, mengosongkan input file/password, dan menampilkan frame
+video tanpa mengganti node media live. Reduced motion dan fullscreen melewati
+animasi; kegagalan animasi tetap menerapkan tema.
+
+Lenis memakai satu autoRaf dan lerp 0,22. Pembalikan arah wheel membuang target
+lama lewat `scrollTo(actualScroll, {immediate: true, force: true})`. Smoothing
+berhenti saat signed-out, dialog terbuka, fullscreen, tab tersembunyi atau
+reduced motion; chat, editor dan kontrol input bersarang memakai scroll native.
 
 ## Akses dan deployment
 
@@ -325,7 +350,7 @@ video asal pada split yang sama, termasuk setelah analisis ulang.
 | `review.py` / `corrections.py` | Antrean review / ekspor MP4 |
 | `detector_training.py` | Dataset lintas-sumber dan training kandidat |
 | `operations.py` | Pembatalan serta proses native |
-| `index.html` / `dashboard.js` / `auth.ts` / `ui.css` | Dashboard, anotasi, dan auth DOM bertipe |
+| `index.html` / `dashboard.js` / `frontend/auth.ts` / `ui.css` | Dashboard, anotasi, dan auth DOM bertipe |
 | `storage.py` / `access.py` | SQLite, sesi, workspace/role, audit, dan CLI akses |
 | `tests/` | Regresi API, media, playback, dan training nyata |
 

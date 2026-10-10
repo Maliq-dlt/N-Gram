@@ -37,7 +37,10 @@ di header berdampingan dengan profil; pilihan sistem tetap tersedia di profil.
 Orb berisi titik pada bola berputar hanya selama request chat; tempatnya di
 kolom chat tanpa overlay pada video. Loading login memakai kerumunan Open Peeps
 yang diadaptasi dari Skiper39, terikat pemuatan workspace sebenarnya. Tidak ada
-progress atau jeda buatan. Semua loop berhenti saat selesai/gagal; reduced-motion
+progress buatan. Sesuai permintaan pengguna, loader tampil minimal 3,2 detik
+pada login/logout eksplisit dan menunggu operasi nyata jika lebih lama; refresh
+atau restorasi sesi tidak memakai kerumunan/tambahan delay; reduced motion
+melewati durasi tambahan, error langsung terlihat dan sesi kedaluwarsa membatalkan reveal. Semua loop berhenti saat selesai/gagal; reduced-motion
 menampilkan pose statis dan callback gambar terlambat dibatalkan secara logis.
 
 Nama dan avatar merupakan data akun di SQLite, bukan localStorage. Avatar harus
@@ -47,4 +50,27 @@ segmen animasi, checklist serta pengumuman aksesibel. Batas server 12-256
 karakter dan rotasi scrypt/session/CSRF tetap otoritatif.
 
 Sumber rinci dan atribusi: assets/THIRD_PARTY_LICENSES.txt. Panduan logo:
-docs/brand/guidelines.md. Tidak menambahkan React/Motion/GSAP untuk adaptasi native ini.
+docs/brand/guidelines.md. Canvas tetap native di dalam tampilan React.
+
+## Migrasi React dan revisi motion — 2026-10-10
+
+Seluruh markup halaman dan tampilan data dinamis memakai React 19.3.0 +
+TypeScript strict, dengan controller auth/media/editor typed. Entry HTML hanya
+memuat root dan bundle lokal; render awal flushSync selesai sebelum controller
+mengikat kontrol. Pergantian panel tidak mengganti node video atau inspector.
+Produksi app.js sekitar 260 KB, dibangun esbuild 0.28.2 tanpa CDN.
+
+Framer Motion 14.1.0 dom/mini menangani entrance, Lenis 1.3.26 menangani scroll.
+Tema memakai snapshot UI nyata dalam palet tujuan, circle 900 ms dari toggle,
+lalu commit tema live. Snapshot inert dan ID terpisah menjaga controller tetap
+mengarah ke tree live; input file/password kosong dan frame video disalin.
+Reduced motion/fullscreen memakai pergantian langsung, tanpa snapshot animasi.
+
+Satu loop autoRaf Lenis memakai lerp 0,22. Saat arah wheel berbalik, target lama
+dibuang ke actualScroll secara immediate/force sebelum menerima arah baru.
+Dialog/fullscreen/signed-out/tab hidden/reduced motion menghentikan smoothing;
+chat, review/editor dan input bersarang tetap memakai scroll native.
+
+Bukti verifikasi migrasi berada di VERIFICATION_UI.md. Sembilan suite UI, strict
+typecheck/build/audit, browser, backend dan wheel/sdist telah diverifikasi pada
+source akhir; status setiap commit tersedia di [GitHub Actions](https://github.com/Maliq-dlt/N-Gram/actions/workflows/ci.yml).

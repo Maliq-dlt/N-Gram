@@ -117,3 +117,30 @@ tersedia secara terpisah. Hasil lama tidak dihapus atau ditimpa oleh publikasi.
 - [x] Indikator password, pengungkapan password dan rotasi sesi tetap berfungsi.
 - [x] Orb lokal dalam chat dan loading kerumunan selama proses yang sebenarnya.
 - [x] Regression profil/animasi masuk CI; aset lokal masuk wheel/sdist.
+
+## Penambahan motion — 2026-10-10 (milestone sebelum migrasi React)
+
+- [x] Loader minimum 3,2 detik sesuai permintaan pengguna, menunggu data nyata;
+  reduced motion tanpa tambahan durasi, error langsung dan pembatalan sesi stale.
+- [x] Lenis 1.3.26 dan Framer Motion 14.1.0 dom/mini, bundle lokal ~30,5 KB
+  oleh esbuild 0.28.2; tanpa React runtime.
+- [x] Circle tema native 720 ms; fallback WebView wipe 560 ms + fade 160 ms.
+- [x] Lifecycle scroll dialog/fullscreen/hidden/signed-out/reduced motion dan
+  cleanup animasi stale diuji; area scroll bersarang tetap native.
+- [x] Verifikasi lokal: tujuh suite UI, typecheck, build dan audit lulus;
+  baseline HTTP terakhir 32 pemeriksaan, terpisah dari suite motion.
+Milestone motion ini digabungkan ke publikasi migrasi React di bawah.
+
+## Migrasi React dan perbaikan scroll/tema — 2026-10-10
+
+- [x] React/react-dom/types exact 19.3.0, bundle production lokal; audit dependency 0.
+- [x] Halaman React TSX, auth/controller media/editor TypeScript strict.
+- [x] Tampilan data dinamis LiveViews.tsx dan regression controller.
+- [x] Circle snapshot UI nyata 900 ms, file/password kosong, inert/ID terpisah.
+- [x] Wheel reversal Lenis membuang target lama; nested scroll tetap native.
+- [x] HTTP deployment 36 pemeriksaan lulus pada snapshot React lokal.
+- [x] Sembilan suite UI, strict typecheck/build dan audit 0.
+- [x] Backend91 security/36 HTTP, profil/storage dan wheel/sdist source equality setelah auth akhir.
+- [x] Browser circle kedua arah, scroll, refresh tanpa loader, login/logout, chat React dan fullscreen.
+- [x] Loader hanya login/logout eksplisit; refresh/restorasi sesi tanpa delay.
+- [x] Pipeline CI academic/studio/container aktif pada main; hasil setiap commit tersedia di [GitHub Actions](https://github.com/Maliq-dlt/N-Gram/actions/workflows/ci.yml).

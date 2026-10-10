@@ -18,8 +18,26 @@ with zipfile.ZipFile(wheel) as archive:
         "dashboard.js",
         "auth.js",
         "theme.js",
+        "app.js",
+        "frontend/auth.ts",
+        "frontend/tsconfig.auth.json",
+        "frontend/tsconfig.json",
+        "frontend/tsconfig.studio.json",
+        "frontend/App.tsx",
+        "frontend/main.tsx",
+        "frontend/studio.ts",
+        "frontend/Account.tsx",
+        "frontend/Annotation.tsx",
+        "frontend/ChatPanel.tsx",
+        "frontend/VideoPanel.tsx",
+        "frontend/Workspace.tsx",
+        "frontend/LiveViews.tsx",
+        "motion.js",
+        "frontend/motion.ts",
+        "frontend/tsconfig.motion.json",
         "assets/dashboard.css",
         "assets/THIRD_PARTY_LICENSES.txt",
+        "docs/README.md",
         "assets/brand.svg",
         "assets/crowd.png",
     ]:
@@ -32,7 +50,28 @@ with zipfile.ZipFile(wheel) as archive:
         for p in archive.namelist()
     )
 with tarfile.open(next(output.glob("*.tar.gz"))) as archive:
-    for name in ("assets/brand.svg", "assets/crowd.png"):
+    for name in (
+        "docs/README.md",
+        "assets/brand.svg",
+        "assets/crowd.png",
+        "app.js",
+        "motion.js",
+        "frontend/motion.ts",
+        "frontend/tsconfig.motion.json",
+        "frontend/auth.ts",
+        "frontend/tsconfig.auth.json",
+        "frontend/tsconfig.json",
+        "frontend/tsconfig.studio.json",
+        "frontend/App.tsx",
+        "frontend/main.tsx",
+        "frontend/studio.ts",
+        "frontend/Account.tsx",
+        "frontend/Annotation.tsx",
+        "frontend/ChatPanel.tsx",
+        "frontend/VideoPanel.tsx",
+        "frontend/Workspace.tsx",
+        "frontend/LiveViews.tsx",
+    ):
         member = next(p for p in archive.getmembers() if p.name.endswith("/" + name))
         extracted = archive.extractfile(member)
         assert extracted is not None and extracted.read() == (root / name).read_bytes(), name

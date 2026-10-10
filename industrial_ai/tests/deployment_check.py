@@ -123,6 +123,19 @@ def main():
                         response.headers.get("X-Content-Type-Options") == "nosniff",
                         "asset headers " + asset,
                     )
+            for bundle in ("motion.js", "app.js"):
+                with client.open(origin + "/assets/" + bundle, timeout=5) as response:
+                    check(response.status == 200, "anonymous bundle " + bundle)
+                    check(
+                        response.headers.get_content_type()
+                        in {"text/javascript", "application/javascript"},
+                        "bundle MIME " + bundle,
+                    )
+                    check(response.read() == (ROOT / bundle).read_bytes(), "bundle bytes " + bundle)
+                    check(
+                        response.headers.get("X-Content-Type-Options") == "nosniff",
+                        "bundle headers " + bundle,
+                    )
             try:
                 client.open(origin + "/assets/studio.sqlite3", timeout=5)
                 raise AssertionError("unknown asset must be denied")

@@ -2,6 +2,9 @@
 const workspaceAuth = (() => {
     let session = null;
     let entered = false;
+    let explicitTransition = false, loadingStarted = 0, loadingGeneration = 0, loadingTimer, resolveLoading;
+    function authTransition(active) { document.dispatchEvent(new CustomEvent('workspace-auth-transition', { detail: { active } })); }
+    function cancelLoading() { loadingGeneration++; window.clearTimeout(loadingTimer); loadingTimer = undefined; resolveLoading?.(); resolveLoading = undefined; }
     const nativeFetch = window.fetch.bind(window);
     function el(id, type) { const node = document.getElementById(id); if (!(node instanceof type))
         throw new Error(`Missing element ${id}`); return node; }
@@ -10,7 +13,7 @@ const workspaceAuth = (() => {
         event.preventDefault();
         event.stopImmediatePropagation();
     } }, true);
-    function showLogin() { session = null; el('loginTransitionLoader', HTMLElement).hidden = true; gate.hidden = false; document.body.classList.add('signed-out'); el('loginUsername', HTMLInputElement).focus(); }
+    function showLogin() { cancelLoading(); authTransition(false); session = null; el('loginTransitionLoader', HTMLElement).hidden = true; gate.hidden = false; document.body.classList.add('signed-out'); el('loginUsername', HTMLInputElement).focus(); }
     function applyRole() { if (session?.user.role !== 'viewer')
         return; document.getElementById('reviewSvg')?.setAttribute('aria-label', 'Kotak anotasi tersimpan. Akun viewer hanya dapat melihat.'); for (const id of ['newVideoButton', 'emptyUploadButton', 'uploadButton', 'reanalyzeButton', 'retryJob', 'cancelJob', 'saveReview', 'suggestBoxes', 'applyBoxButton', 'learnDetector', 'exportCorrectedVideo', 'cancelExport', 'cancelLearning', 'startTraining', 'openReview', 'prepareCorrections', 'resultCorrections', 'reviewPlayback', 'boxControls', 'metadataControls']) {
         const node = document.getElementById(id);
@@ -58,23 +61,61 @@ const workspaceAuth = (() => {
         el('profileWorkspace', HTMLElement).textContent = user.tenant_name;
         el('profileRole', HTMLElement).textContent = { admin: 'Administrator', reviewer: 'Reviewer', viewer: 'Viewer' }[user.role];
     }
-    function signedIn(value) {
+    async function signedIn(value, explicit = false) {
         if (entered) {
-            location.reload();
-            return;
+            if (!explicit) {
+                location.reload();
+                return false;
+            }
+            cancelLoading();
+            session = value;
+            explicitTransition = true;
+            loadingStarted = Date.now();
+            const generation = loadingGeneration, loader = el('loginTransitionLoader', HTMLElement);
+            loader.hidden = false;
+            gate.hidden = true;
+            document.body.classList.add('signed-out');
+            const heading = loader.querySelector('h1');
+            if (heading)
+                heading.textContent = 'Menyiapkan studio Anda.';
+            el('loginTransitionStatus', HTMLElement).textContent = 'Memuat rekaman dan pengaturan workspace…';
+            el('loginTransitionRetry', HTMLButtonElement).hidden = true;
+            authTransition(true);
+            if (!matchMedia('(prefers-reduced-motion: reduce)').matches)
+                await new Promise(resolve => { resolveLoading = resolve; loadingTimer = window.setTimeout(() => { loadingTimer = undefined; resolveLoading = undefined; resolve(); }, 3200); });
+            if (session && generation === loadingGeneration)
+                location.reload();
+            return false;
         }
         entered = true;
         session = value;
+        explicitTransition = explicit;
+        loadingStarted = Date.now();
+        loadingGeneration++;
         gate.hidden = true;
-        el('loginTransitionLoader', HTMLElement).hidden = false;
+        el('loginTransitionLoader', HTMLElement).hidden = !explicit;
+        if (explicit) {
+            const heading = el('loginTransitionLoader', HTMLElement).querySelector('h1');
+            if (heading)
+                heading.textContent = 'Menyiapkan studio Anda.';
+            el('loginTransitionStatus', HTMLElement).textContent = 'Memuat rekaman dan pengaturan workspace…';
+            el('loginTransitionRetry', HTMLButtonElement).hidden = true;
+            authTransition(true);
+        }
+        else
+            document.body.classList.remove('signed-out');
         renderProfile();
         applyRole();
+        return true;
     }
-    function finishLoading(error) {
-        if (!session)
+    async function finishLoading(error) {
+        if (!session || logoutPending)
             return;
         const loader = el('loginTransitionLoader', HTMLElement);
         if (error) {
+            cancelLoading();
+            authTransition(false);
+            loader.hidden = false;
             const status = el('loginTransitionStatus', HTMLElement);
             status.textContent = error;
             const retry = document.getElementById('loginTransitionRetry');
@@ -84,46 +125,99 @@ const workspaceAuth = (() => {
             }
             return;
         }
+        const generation = loadingGeneration, remaining = !explicitTransition || matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : Math.max(0, 3200 - (Date.now() - loadingStarted));
+        if (remaining)
+            await new Promise(resolve => { resolveLoading = resolve; loadingTimer = window.setTimeout(() => { loadingTimer = undefined; resolveLoading = undefined; resolve(); }, remaining); });
+        if (!session || generation !== loadingGeneration)
+            return;
         loader.hidden = true;
+        authTransition(false);
         document.body.classList.remove('signed-out');
         applyRole();
         (document.getElementById('workspaceTitle') || document.getElementById('mainContent'))?.focus();
+        document.dispatchEvent(new Event('workspace-ready'));
     }
     const ready = (async () => { try {
-        signedIn(await readSession(await nativeFetch('/api/auth/session', { credentials: 'same-origin' })));
+        await signedIn(await readSession(await nativeFetch('/api/auth/session', { credentials: 'same-origin' })));
     }
     catch {
         showLogin();
         await new Promise(resolve => document.addEventListener('workspace-login', () => resolve(), { once: true }));
     } })();
-    el('loginForm', HTMLFormElement).onsubmit = async (event) => { event.preventDefault(); const button = el('loginSubmit', HTMLButtonElement), error = el('loginError', HTMLElement); button.disabled = true; error.hidden = true; try {
-        signedIn(await readSession(await nativeFetch('/api/auth/login', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: el('loginUsername', HTMLInputElement).value, password: el('loginPassword', HTMLInputElement).value }) })));
-        el('loginPassword', HTMLInputElement).value = '';
-        document.dispatchEvent(new Event('workspace-login'));
-    }
-    catch (reason) {
-        error.textContent = reason instanceof Error ? reason.message : 'Tidak dapat masuk.';
-        error.hidden = false;
-    }
-    finally {
-        button.disabled = false;
-    } };
-    el('logoutButton', HTMLButtonElement).onclick = async () => { try {
-        const response = await request('/api/auth/logout', { method: 'POST' });
-        if (!response.ok)
-            throw new Error('Gagal keluar.');
-        location.reload();
-    }
-    catch (reason) {
-        const alert = el('authError', HTMLElement);
-        alert.textContent = reason instanceof Error ? reason.message : 'Gagal keluar.';
-        alert.hidden = false;
-    } };
+    el('loginForm', HTMLFormElement).onsubmit = async (event) => {
+        event.preventDefault();
+        const button = el('loginSubmit', HTMLButtonElement), error = el('loginError', HTMLElement);
+        button.disabled = true;
+        error.hidden = true;
+        try {
+            const value = await readSession(await nativeFetch('/api/auth/login', { method: 'POST', credentials: 'same-origin', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ username: el('loginUsername', HTMLInputElement).value, password: el('loginPassword', HTMLInputElement).value }) }));
+            el('loginPassword', HTMLInputElement).value = '';
+            if (await signedIn(value, true))
+                document.dispatchEvent(new Event('workspace-login'));
+        }
+        catch (reason) {
+            error.textContent = reason instanceof Error ? reason.message : 'Tidak dapat masuk.';
+            error.hidden = false;
+        }
+        finally {
+            button.disabled = false;
+        }
+    };
+    el('logoutButton', HTMLButtonElement).onclick = async () => {
+        if (logoutPending || profilePending || passwordPending)
+            return;
+        logoutPending = true;
+        syncProfilePending();
+        cancelLoading();
+        explicitTransition = true;
+        loadingStarted = Date.now();
+        const generation = loadingGeneration, loader = el('loginTransitionLoader', HTMLElement);
+        loader.hidden = false;
+        const heading = loader.querySelector('h1');
+        if (heading)
+            heading.textContent = 'Sampai jumpa.';
+        gate.hidden = true;
+        document.body.classList.add('signed-out');
+        el('loginTransitionStatus', HTMLElement).textContent = 'Mengakhiri sesi…';
+        authTransition(true);
+        try {
+            const response = await request('/api/auth/logout', { method: 'POST' });
+            if (!response.ok)
+                throw new Error('Gagal keluar.');
+            const remaining = matchMedia('(prefers-reduced-motion: reduce)').matches ? 0 : Math.max(0, 3200 - (Date.now() - loadingStarted));
+            if (remaining)
+                await new Promise(resolve => { resolveLoading = resolve; loadingTimer = window.setTimeout(() => { loadingTimer = undefined; resolveLoading = undefined; resolve(); }, remaining); });
+            if (generation !== loadingGeneration)
+                return;
+            session = null;
+            authTransition(false);
+            location.reload();
+        }
+        catch (reason) {
+            cancelLoading();
+            authTransition(false);
+            loader.hidden = true;
+            if (session)
+                document.body.classList.remove('signed-out');
+            const alert = el(session ? 'authError' : 'loginError', HTMLElement);
+            alert.textContent = session ? (reason instanceof Error ? reason.message : 'Gagal keluar.') : 'Sesi berakhir. Silakan masuk kembali.';
+            alert.hidden = false;
+            if (session)
+                el('logoutButton', HTMLButtonElement).focus();
+            else
+                el('loginUsername', HTMLInputElement).focus();
+        }
+        finally {
+            logoutPending = false;
+            syncProfilePending();
+        }
+    };
     const passwordForm = el('passwordForm', HTMLFormElement);
     const passwordSubmit = el('passwordSubmit', HTMLButtonElement);
-    let passwordPending = false, profilePending = false;
+    let passwordPending = false, profilePending = false, logoutPending = false;
     function syncProfilePending() {
-        const pending = passwordPending || profilePending;
+        const pending = passwordPending || profilePending || logoutPending;
+        el('logoutButton', HTMLButtonElement).disabled = pending;
         passwordSubmit.disabled = pending;
         for (const id of ['saveNameBtn', 'removeAvatarBtn', 'avatarFileInput']) {
             const node = el(id, HTMLElement);
@@ -155,7 +249,7 @@ const workspaceAuth = (() => {
     el('confirmPassword', HTMLInputElement).oninput = () => el('confirmPassword', HTMLInputElement).setCustomValidity('');
     passwordForm.onsubmit = async (event) => {
         event.preventDefault();
-        if (passwordPending || profilePending)
+        if (passwordPending || profilePending || logoutPending)
             return;
         const status = el('passwordStatus', HTMLElement), confirmation = el('confirmPassword', HTMLInputElement);
         const newPassword = el('newPassword', HTMLInputElement).value;
@@ -248,7 +342,7 @@ const workspaceAuth = (() => {
         }
     }
     async function saveProfile(input, init, statusId, success) {
-        if (profilePending || passwordPending)
+        if (profilePending || passwordPending || logoutPending)
             return;
         profilePending = true;
         const status = el(statusId, HTMLElement);
@@ -299,6 +393,6 @@ const workspaceAuth = (() => {
         button.setAttribute('aria-pressed', String(show));
         button.setAttribute('aria-label', show ? 'Sembunyikan password' : 'Tampilkan password');
     });
-    // ponytail: playback/editor remains JavaScript; migrate feature contracts when they change.
+    // The typed media controller keeps the same DOM nodes during session rotation.
     return { ready, request, applyRole, resetPasswordForm, renderProfile, finishLoading };
 })();

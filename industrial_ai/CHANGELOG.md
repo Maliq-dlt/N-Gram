@@ -1,6 +1,31 @@
 # Changelog
 
-## 2026-10-10
+## 2026-10-10 — migrasi React terbaru
+
+- Seluruh halaman dan tampilan data dinamis dipindahkan ke React 19.3.0 dan
+  TypeScript strict; controller auth/media/editor typed, bundle production lokal
+  tanpa CDN, pemutar tetap terpasang.
+- Circle tema 900 ms memakai snapshot UI nyata dalam palet tujuan lalu commit;
+  snapshot inert/ID terpisah, input file/password kosong, frame video disalin.
+- Wheel reversal Lenis membuang target lama sebelum menerima arah baru;
+  nested scroll native, dialog/fullscreen/reduced motion tanpa smoothing.
+- Sembilan suite UI, strict typecheck/build, audit 0 dan browser fixture lulus;
+  backend 91 security/36 HTTP, profil/storage dan wheel/sdist exact source lulus;
+  hasil CI commit belum tersedia.
+- Kerumunan hanya pada login/logout eksplisit; refresh/restorasi sesi tanpa delay.
+
+## 2026-10-10 — milestone sebelum migrasi React
+
+- Loader login minimal 3,2 detik sesuai permintaan pengguna, menunggu data nyata
+  lebih lama bila perlu; reduced motion melewati tambahan waktu, error langsung
+  tampil, sesi kedaluwarsa membatalkan reveal.
+- Lenis 1.3.26 dan Framer Motion 14.1.0 dom/mini dibundel lokal dengan esbuild
+  0.28.2 (sekitar 30,5 KB), tanpa React. Scroll halus berhenti saat dialog,
+  fullscreen, signed-out, tab hidden dan reduced motion; scroll bersarang tetap native.
+- Reveal tema circle native 720 ms, fallback WebView color wipe 560 ms + fade
+  160 ms; entrance dan cleanup diuji terhadap callback stale.
+- Verifikasi lokal motion: tujuh suite UI, typecheck/build/audit lulus;
+  belum ada hasil CI untuk commit tambahan ini.
 
 - Login dan dashboard dirapikan mengikuti referensi 21st.dev; logo Split V,
   tema ProMotor Wow dan terang lembut, toggle tema di samping avatar.

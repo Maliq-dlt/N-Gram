@@ -6,7 +6,7 @@ const media={paused:true,currentTime:0,playCount:0,play(){this.paused=false;this
 const ui={};
 const context={reviewVideo:media,summary:{fps:10,frames:30},job:{id:'video'},currentView:'annotation',api:()=>new Promise(resolve=>pending.push(resolve)),$:id=>ui[id]??={},showError(){},renderReviewOverlay(){},loadManualFrame(){},Map,Set,console};
 vm.createContext(context);
-vm.runInContext(code.slice(code.indexOf('let reviewPlaybackEpoch='),code.indexOf('reviewVideo.onpause=')),context);
+vm.runInContext(code.slice(code.indexOf('let reviewPlaybackEpoch ='),code.indexOf('reviewVideo.onpause =')),context);
 const run=s=>vm.runInContext(s,context);
 (async()=>{
  run("reviewPlaybackEpoch=1;trackingSession='a';trackingJob='video';trackingWanted=true;trackingCursor=0;");

@@ -241,6 +241,8 @@ def ui_asset(name: str):
         "dashboard.js",
         "auth.js",
         "theme.js",
+        "motion.js",
+        "app.js",
         "brand.svg",
         "crowd.png",
     }:

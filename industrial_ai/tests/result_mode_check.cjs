@@ -2,13 +2,13 @@
 const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
 (async()=>{
  const source=fs.readFileSync('dashboard.js','utf8'),elements={},timers=[],calls=[];
- const $=id=>elements[id]??={value:'',checked:false,disabled:false,dataset:{},hidden:true,removeAttribute(){}};
+ const $=id=>elements[id]??={value:'',checked:false,disabled:false,dataset:{},hidden:true,removeAttribute(){},dispatchEvent(){this.onchange();}};
  $('resultMode').value='ai';$('resultAi').value='ai';$('resultCorrections').value='corrections';$('correctedOption').disabled=true;
  const responses=[{id:'export1'},{status:'processing',progress:30,message:'Exporting'},{status:'done',progress:100,message:'Done',media_url:'/corrections.mp4'}];
- const context={$,summary:{model_id:''},job:{id:'job1'},generation:1,uploading:false,sending:false,reviewBusy:false,exporting:false,original:{currentTime:7},tracked:{src:'ai.mp4',addEventListener(){}},pauseComparison(){},mediaUrl(){return 'ai.mp4';},api:async(url,options)=>{calls.push({url,options});return responses.shift();},setTimeout(fn){timers.push(fn);return timers.length;},clearTimeout(){},document:{createElement(){throw new Error('No download expected');}}};
+ const context={$,summary:{model_id:''},job:{id:'job1'},generation:1,uploading:false,sending:false,reviewBusy:false,exporting:false,original:{currentTime:7},tracked:{src:'ai.mp4',addEventListener(){}},pauseComparison(){},mediaUrl(){return 'ai.mp4';},api:async(url,options)=>{calls.push({url,options});return responses.shift();},setTimeout(fn){timers.push(fn);return timers.length;},clearTimeout(){},Event,document:{createElement(){throw new Error('No download expected');}}};
  vm.createContext(context);
  vm.runInContext(source.slice(source.indexOf('function syncResultSwitch()'),source.indexOf('function syncControls()')),context);
- vm.runInContext(source.slice(source.indexOf('let exportPoll='),source.indexOf('let queueData=')),context);
+ vm.runInContext(source.slice(source.indexOf('let exportPoll'),source.indexOf('let queueData')),context);
  context.syncResultSwitch();assert.equal($('resultAi').checked,true);assert.equal($('resultCorrections').disabled,false);
  $('resultCorrections').checked=true;$('resultCorrections').onchange();
  assert.equal($('resultMode').value,'ai','AI remains actual mode until correction artifact exists');assert.equal($('resultAi').checked,true);assert.equal($('resultAi').disabled,true,'export locks switches immediately');
@@ -20,6 +20,6 @@ const assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('nod
  Object.assign(context.original,{removeAttribute(){},load(){}});Object.assign(context.tracked,{removeAttribute(){},load(){}});
  vm.runInContext(source.slice(source.indexOf('function clearResults()'),source.indexOf('async function refreshHistory(')),context);
  $('resultMode').value='corrections';context.clearResults();assert.equal($('resultMode').value,'ai');assert.equal($('resultAi').checked,true);assert.equal($('correctedOption').disabled,true);assert.equal($('resultCorrections').disabled,true);
- assert.match(source,/function displayResults\(data\) \{\s*\$\('progressArea'\)\.hidden=true;/,'completed display hides progress');
+ assert.match(source,/function displayResults\(data\) \{\s*\$\('progressArea'\)\.hidden\s*=\s*true;/,'completed display hides progress');
  console.log('PASS: native result radios, pending export authority, completion, switching and busy/empty locks.');
 })().catch(error=>{console.error(error);process.exitCode=1;});

@@ -9,7 +9,7 @@
     "strict": true,
     "noEmitOnError": true,
     "module": "none",
-    "outDir": ".",
+    "outDir": "..",
     "skipLibCheck": true
   },
   "files": [

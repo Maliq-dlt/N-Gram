@@ -1,0 +1,37 @@
+# Panduan dokumentasi Video Insight
+
+[Mulai dan instalasi](../README.md) · [Riwayat perubahan](../CHANGELOG.md)
+
+| Tujuan | Dokumen |
+| --- | --- |
+| Memahami pengguna, batas produk dan desain | [PRODUCT](PRODUCT.md), [DESIGN](DESIGN.md) |
+| Akses, penyimpanan, deployment dan keamanan | [HARDENING](HARDENING.md), [verifikasi keamanan](VERIFICATION_SECURITY.md) |
+| Melihat bukti UI terkini dan keterbatasannya | [Verifikasi UI](VERIFICATION_UI.md) |
+| Logo dan atribusi | [Panduan logo](brand/guidelines.md), [lisensi komponen](../assets/THIRD_PARTY_LICENSES.txt) |
+| Bukti publikasi, referensi dan workflow belajar | [Laporan publikasi](../reports/VERIFIKASI_PUBLIK.md), [referensi](../reports/REFERENSI_GITHUB.md), [workflow](../reports/WORKFLOW_REVIEW_BELAJAR.md) |
+| Roadmap dan status implementasi | [Checklist](../../tasks/todo.md), [roadmap rinci](../../tasks/roadmap_checklist.md) |
+
+## Yang tersedia sekarang
+
+Studio lokal menyediakan login/peran/workspace, profil privat, unggah video,
+perbandingan asli/tracking AI, counting, bukti objek, koreksi/anotasi/tracking,
+ekspor video, antrean review dan persetujuan dataset, fine-tuning/reanalisis,
+serta chat lokal yang merujuk hasil rekaman. UI React/TypeScript mendukung
+keyboard, tema, mobile, reduced motion dan fullscreen. Lihat verifikasi untuk
+batas bukti; fitur tersedia tidak berarti akurasi CCTV atau produksi tervalidasi.
+
+Input foto untuk analisis, CCTV/webcam live, OCR plat, absensi QR/wajah dan
+pencarian SOP masih roadmap. Unggah avatar bukan analisis foto umum.
+
+## Hubungan dengan N-gram dan susunan source
+
+[N-gram di repository induk](../../README.md) adalah proyek akademik terpisah:
+notebook/CLI probabilitas bahasa, smoothing dan perplexity. Chat video memakai
+model Qwen lokal dan metadata rekaman; tidak menjalankan model N-gram akademik.
+
+`frontend/` menyatukan komponen React, controller auth/studio/motion TypeScript
+serta konfigurasi kompilasinya. Bundle `app.js`, `auth.js`, `dashboard.js` dan
+`motion.js` tetap di root subproyek karena digunakan server/distribusi.
+Backend Python mempertahankan modul yang ada; hasil, model dan bukti verifikasi
+berada pada lokasi semula. Dokumentasi menjadi pintu masuk tanpa perlu landing
+page tambahan untuk pemakaian studio lokal.

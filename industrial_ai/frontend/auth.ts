@@ -4,11 +4,14 @@ interface AuthSession {user:WorkspaceUser;csrf_token:string}
 const workspaceAuth=(()=>{
  let session:AuthSession|null=null;
  let entered=false;
+ let explicitTransition=false,loadingStarted=0,loadingGeneration=0,loadingTimer:number|undefined,resolveLoading:(()=>void)|undefined;
+ function authTransition(active:boolean):void{document.dispatchEvent(new CustomEvent('workspace-auth-transition',{detail:{active}}));}
+ function cancelLoading():void{loadingGeneration++;window.clearTimeout(loadingTimer);loadingTimer=undefined;resolveLoading?.();resolveLoading=undefined;}
  const nativeFetch=window.fetch.bind(window);
  function el<T extends HTMLElement>(id:string,type:{new():T}):T{const node=document.getElementById(id);if(!(node instanceof type))throw new Error(`Missing element ${id}`);return node;}
  const gate=el('authGate',HTMLElement);
  document.getElementById('reviewSvg')?.addEventListener('pointerdown',event=>{if(session?.user.role==='viewer'){event.preventDefault();event.stopImmediatePropagation();}},true);
- function showLogin():void{session=null;el('loginTransitionLoader',HTMLElement).hidden=true;gate.hidden=false;document.body.classList.add('signed-out');el('loginUsername',HTMLInputElement).focus();}
+ function showLogin():void{cancelLoading();authTransition(false);session=null;el('loginTransitionLoader',HTMLElement).hidden=true;gate.hidden=false;document.body.classList.add('signed-out');el('loginUsername',HTMLInputElement).focus();}
  function applyRole():void{if(session?.user.role!=='viewer')return;document.getElementById('reviewSvg')?.setAttribute('aria-label','Kotak anotasi tersimpan. Akun viewer hanya dapat melihat.');for(const id of ['newVideoButton','emptyUploadButton','uploadButton','reanalyzeButton','retryJob','cancelJob','saveReview','suggestBoxes','applyBoxButton','learnDetector','exportCorrectedVideo','cancelExport','cancelLearning','startTraining','openReview','prepareCorrections','resultCorrections','reviewPlayback','boxControls','metadataControls']){const node=document.getElementById(id);if((node instanceof HTMLButtonElement||node instanceof HTMLFieldSetElement||node instanceof HTMLInputElement)&&!node.disabled)node.disabled=true;}for(const node of document.querySelectorAll<HTMLButtonElement>('[data-view=annotation]')){if(!node.disabled)node.disabled=true;node.title='Viewer dapat melihat hasil; koreksi membutuhkan reviewer.';}for(const node of document.querySelectorAll<HTMLButtonElement>('#boxList button'))if(!node.disabled)node.disabled=true;}
  async function request(input:RequestInfo|URL,init:RequestInit={}):Promise<Response>{const headers=new Headers(init.headers),method=(init.method||'GET').toUpperCase();if(!['GET','HEAD','OPTIONS'].includes(method)){if(!session){showLogin();throw new Error('Silakan masuk kembali.');}const url=input instanceof Request?input.url:String(input);if(session.user.role==='viewer'&&!url.includes('/api/auth/')&&url!=='/api/chat')throw new Error('Akun viewer hanya dapat melihat hasil.');headers.set('X-CSRF-Token',session.csrf_token);}const response=await nativeFetch(input,{...init,headers,credentials:'same-origin'});if(response.status===401)showLogin();return response;}
  async function readSession(response:Response):Promise<AuthSession>{const data:unknown=await response.json();if(!response.ok)throw new Error(typeof data==='object'&&data!==null&&'detail'in data?String(data.detail):'Tidak dapat masuk.');if(typeof data!=='object'||data===null||!('user'in data)||!('csrf_token'in data))throw new Error('Respons sesi tidak valid.');const user:unknown=data.user;if(typeof user!=='object'||user===null||!('role'in user)||!['admin','reviewer','viewer'].includes(String(user.role))||typeof data.csrf_token!=='string'||!data.csrf_token)throw new Error('Respons sesi tidak valid.');for(const field of ['id','username','tenant_id','tenant_name'])if(!(field in user)||typeof Reflect.get(user,field)!=='string')throw new Error('Respons akun tidak valid.');if(!('display_name'in user)||typeof user.display_name!=='string'||!('avatar_url'in user)||(user.avatar_url!==null&&(typeof user.avatar_url!=='string'||!/^\/api\/auth\/avatar\?v=[a-f0-9]+$/.test(user.avatar_url))))throw new Error('Respons profil tidak valid.');return data as AuthSession;}
@@ -27,26 +30,61 @@ const workspaceAuth=(()=>{
    el('profileWorkspace',HTMLElement).textContent=user.tenant_name;
    el('profileRole',HTMLElement).textContent={admin:'Administrator',reviewer:'Reviewer',viewer:'Viewer'}[user.role];
  }
- function signedIn(value:AuthSession):void{
-   if(entered){location.reload();return;}
-   entered=true;session=value;gate.hidden=true;
-   el('loginTransitionLoader',HTMLElement).hidden=false;
-   renderProfile();applyRole();
+ async function signedIn(value:AuthSession,explicit=false):Promise<boolean>{
+   if(entered){
+     if(!explicit){location.reload();return false;}
+     cancelLoading();session=value;explicitTransition=true;loadingStarted=Date.now();
+     const generation=loadingGeneration,loader=el('loginTransitionLoader',HTMLElement);loader.hidden=false;gate.hidden=true;document.body.classList.add('signed-out');
+     const heading=loader.querySelector('h1');if(heading)heading.textContent='Menyiapkan studio Anda.';el('loginTransitionStatus',HTMLElement).textContent='Memuat rekaman dan pengaturan workspace…';el('loginTransitionRetry',HTMLButtonElement).hidden=true;authTransition(true);
+     if(!matchMedia('(prefers-reduced-motion: reduce)').matches)await new Promise<void>(resolve=>{resolveLoading=resolve;loadingTimer=window.setTimeout(()=>{loadingTimer=undefined;resolveLoading=undefined;resolve();},3200);});
+     if(session&&generation===loadingGeneration)location.reload();
+     return false;
+   }
+   entered=true;session=value;explicitTransition=explicit;loadingStarted=Date.now();loadingGeneration++;gate.hidden=true;
+   el('loginTransitionLoader',HTMLElement).hidden=!explicit;
+   if(explicit){const heading=el('loginTransitionLoader',HTMLElement).querySelector('h1');if(heading)heading.textContent='Menyiapkan studio Anda.';el('loginTransitionStatus',HTMLElement).textContent='Memuat rekaman dan pengaturan workspace…';el('loginTransitionRetry',HTMLButtonElement).hidden=true;authTransition(true);}else document.body.classList.remove('signed-out');
+   renderProfile();applyRole();return true;
  }
- function finishLoading(error?:string):void{
-   if(!session)return;
+ async function finishLoading(error?:string):Promise<void>{
+   if(!session||logoutPending)return;
    const loader=el('loginTransitionLoader',HTMLElement);
-   if(error){const status=el('loginTransitionStatus',HTMLElement);status.textContent=error;const retry=document.getElementById('loginTransitionRetry');if(retry){retry.hidden=false;retry.focus();}return;}
-   loader.hidden=true;document.body.classList.remove('signed-out');applyRole();(document.getElementById('workspaceTitle')||document.getElementById('mainContent'))?.focus();
+   if(error){cancelLoading();authTransition(false);loader.hidden=false;const status=el('loginTransitionStatus',HTMLElement);status.textContent=error;const retry=document.getElementById('loginTransitionRetry');if(retry){retry.hidden=false;retry.focus();}return;}
+   const generation=loadingGeneration,remaining=!explicitTransition||matchMedia('(prefers-reduced-motion: reduce)').matches?0:Math.max(0,3200-(Date.now()-loadingStarted));
+   if(remaining)await new Promise<void>(resolve=>{resolveLoading=resolve;loadingTimer=window.setTimeout(()=>{loadingTimer=undefined;resolveLoading=undefined;resolve();},remaining);});
+   if(!session||generation!==loadingGeneration)return;
+   loader.hidden=true;authTransition(false);document.body.classList.remove('signed-out');applyRole();(document.getElementById('workspaceTitle')||document.getElementById('mainContent'))?.focus();
+   document.dispatchEvent(new Event('workspace-ready'));
  }
- const ready=(async()=>{try{signedIn(await readSession(await nativeFetch('/api/auth/session',{credentials:'same-origin'})));}catch{showLogin();await new Promise<void>(resolve=>document.addEventListener('workspace-login',()=>resolve(),{once:true}));}})();
- el('loginForm',HTMLFormElement).onsubmit=async event=>{event.preventDefault();const button=el('loginSubmit',HTMLButtonElement),error=el('loginError',HTMLElement);button.disabled=true;error.hidden=true;try{signedIn(await readSession(await nativeFetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:el('loginUsername',HTMLInputElement).value,password:el('loginPassword',HTMLInputElement).value})})));el('loginPassword',HTMLInputElement).value='';document.dispatchEvent(new Event('workspace-login'));}catch(reason:unknown){error.textContent=reason instanceof Error?reason.message:'Tidak dapat masuk.';error.hidden=false;}finally{button.disabled=false;}};
- el('logoutButton',HTMLButtonElement).onclick=async()=>{try{const response=await request('/api/auth/logout',{method:'POST'});if(!response.ok)throw new Error('Gagal keluar.');location.reload();}catch(reason:unknown){const alert=el('authError',HTMLElement);alert.textContent=reason instanceof Error?reason.message:'Gagal keluar.';alert.hidden=false;}};
+ const ready=(async()=>{try{await signedIn(await readSession(await nativeFetch('/api/auth/session',{credentials:'same-origin'})));}catch{showLogin();await new Promise<void>(resolve=>document.addEventListener('workspace-login',()=>resolve(),{once:true}));}})();
+ el('loginForm',HTMLFormElement).onsubmit=async event=>{
+   event.preventDefault();const button=el('loginSubmit',HTMLButtonElement),error=el('loginError',HTMLElement);button.disabled=true;error.hidden=true;
+   try{
+     const value=await readSession(await nativeFetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:el('loginUsername',HTMLInputElement).value,password:el('loginPassword',HTMLInputElement).value})}));
+     el('loginPassword',HTMLInputElement).value='';
+     if(await signedIn(value,true))document.dispatchEvent(new Event('workspace-login'));
+   }catch(reason:unknown){error.textContent=reason instanceof Error?reason.message:'Tidak dapat masuk.';error.hidden=false;}
+   finally{button.disabled=false;}
+ };
+ el('logoutButton',HTMLButtonElement).onclick=async()=>{
+   if(logoutPending||profilePending||passwordPending)return;
+   logoutPending=true;syncProfilePending();cancelLoading();explicitTransition=true;loadingStarted=Date.now();
+   const generation=loadingGeneration,loader=el('loginTransitionLoader',HTMLElement);loader.hidden=false;const heading=loader.querySelector('h1');if(heading)heading.textContent='Sampai jumpa.';gate.hidden=true;document.body.classList.add('signed-out');el('loginTransitionStatus',HTMLElement).textContent='Mengakhiri sesi…';authTransition(true);
+   try{
+     const response=await request('/api/auth/logout',{method:'POST'});if(!response.ok)throw new Error('Gagal keluar.');
+     const remaining=matchMedia('(prefers-reduced-motion: reduce)').matches?0:Math.max(0,3200-(Date.now()-loadingStarted));
+     if(remaining)await new Promise<void>(resolve=>{resolveLoading=resolve;loadingTimer=window.setTimeout(()=>{loadingTimer=undefined;resolveLoading=undefined;resolve();},remaining);});
+     if(generation!==loadingGeneration)return;
+     session=null;authTransition(false);location.reload();
+   }catch(reason:unknown){
+     cancelLoading();authTransition(false);loader.hidden=true;if(session)document.body.classList.remove('signed-out');
+     const alert=el(session?'authError':'loginError',HTMLElement);alert.textContent=session?(reason instanceof Error?reason.message:'Gagal keluar.'):'Sesi berakhir. Silakan masuk kembali.';alert.hidden=false;if(session)el('logoutButton',HTMLButtonElement).focus();else el('loginUsername',HTMLInputElement).focus();
+   }finally{logoutPending=false;syncProfilePending();}
+ };
  const passwordForm=el('passwordForm',HTMLFormElement);
  const passwordSubmit=el('passwordSubmit',HTMLButtonElement);
- let passwordPending=false,profilePending=false;
+ let passwordPending=false,profilePending=false,logoutPending=false;
  function syncProfilePending():void{
-   const pending=passwordPending||profilePending;passwordSubmit.disabled=pending;
+   const pending=passwordPending||profilePending||logoutPending;el('logoutButton',HTMLButtonElement).disabled=pending;passwordSubmit.disabled=pending;
    for(const id of ['saveNameBtn','removeAvatarBtn','avatarFileInput']){const node=el(id,HTMLElement);if(pending)node.setAttribute('disabled','');else node.removeAttribute('disabled');}
  }
  function resetPasswordForm():void {
@@ -63,7 +101,7 @@ const workspaceAuth=(()=>{
  el('confirmPassword',HTMLInputElement).oninput=()=>el('confirmPassword',HTMLInputElement).setCustomValidity('');
  passwordForm.onsubmit=async event=>{
    event.preventDefault();
-   if(passwordPending||profilePending)return;
+   if(passwordPending||profilePending||logoutPending)return;
    const status=el('passwordStatus',HTMLElement),confirmation=el('confirmPassword',HTMLInputElement);
    const newPassword=el('newPassword',HTMLInputElement).value;
    status.textContent='';
@@ -131,7 +169,7 @@ const workspaceAuth=(()=>{
    }
  }
  async function saveProfile(input:string,init:RequestInit,statusId:string,success:string):Promise<void>{
-   if(profilePending||passwordPending)return;
+   if(profilePending||passwordPending||logoutPending)return;
    profilePending=true;
    const status=el(statusId,HTMLElement);status.textContent='Menyimpan...';
    syncProfilePending();
@@ -158,6 +196,6 @@ const workspaceAuth=(()=>{
    const input=el('loginPassword',HTMLInputElement),button=el('toggleLoginPassword',HTMLButtonElement),show=input.type==='password';
    input.type=show?'text':'password';button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'Sembunyikan password':'Tampilkan password');
  });
- // ponytail: playback/editor remains JavaScript; migrate feature contracts when they change.
+ // The typed media controller keeps the same DOM nodes during session rotation.
  return {ready,request,applyRole,resetPasswordForm,renderProfile,finishLoading};
 })();
