@@ -58,7 +58,7 @@ async function api(url, options) {
   if (!response.ok) throw new Error(typeof data.detail === 'string' ? data.detail : 'Input tidak valid. Periksa isian dan coba lagi.');
   return data;
 }
-function resetChat() { history = []; $('messages').replaceChildren(); showError('chatError',''); }
+function resetChat() { history = []; $('messages').replaceChildren(); showError('chatError',''); stopThinkingOrb(); }
 function clearResults() {
   $('workspaceTitle').textContent='Analisis rekaman'; $('workspaceTitle').removeAttribute('title');
   pauseComparison(); original.removeAttribute('src'); tracked.removeAttribute('src'); original.load(); tracked.load(); summary = null;
@@ -212,18 +212,68 @@ function addMessage(role,text,detail,evidence=[]) {
   $('messages').append(div); $('messages').scrollTop = $('messages').scrollHeight;
 }
 $('clearChat').onclick = resetChat;
+// Dotted sphere adapted from anark17r/ai-thiking-orb-and-input, confined to chat.
+let orbAnimId=null;
+const orbMotion=matchMedia('(prefers-reduced-motion: reduce)');
+const orbPoints=[];
+for(let ring=1;ring<16;ring++) {
+ const latitude=Math.PI*ring/16, count=Math.max(5,Math.round(30*Math.sin(latitude)));
+ for(let i=0;i<count;i++){const longitude=2*Math.PI*i/count;orbPoints.push({x:Math.sin(latitude)*Math.cos(longitude),y:Math.cos(latitude),z:Math.sin(latitude)*Math.sin(longitude),phase:longitude});}
+}
+function startThinkingOrb() {
+ stopThinkingOrb();
+ const container=$('chatThinkingOrb'),canvas=$('chatOrbCanvas');container.hidden=false;
+ const ctx=canvas.getContext('2d');if(!ctx)return;
+ const started=performance.now();
+ function render(now) {
+  if(container.hidden){orbAnimId=null;return;}
+  const time=orbMotion.matches?0:(now-started)/1000,yaw=time*.4,pitch=.3;
+  const points=orbPoints.map(p=>{const x=p.x*Math.cos(yaw)+p.z*Math.sin(yaw),z=-p.x*Math.sin(yaw)+p.z*Math.cos(yaw);return {x,y:p.y*Math.cos(pitch)-z*Math.sin(pitch),z:p.y*Math.sin(pitch)+z*Math.cos(pitch),phase:p.phase};}).sort((a,b)=>a.z-b.z);
+  ctx.clearRect(0,0,canvas.width,canvas.height);
+  const dark=document.documentElement.dataset.theme==='dark';
+  for(const p of points){const scale=1+p.z*.14,pulse=(Math.sin(p.phase-time*2.2)+1)/2,alpha=.16+(p.z+1)*.27+pulse*.15;ctx.beginPath();ctx.arc(72+p.x*49*scale,72+p.y*49*scale,1.1+(p.z+1)*.45,0,Math.PI*2);ctx.fillStyle=`rgba(${dark?'126,167,255':'31,97,221'},${Math.min(1,alpha)})`;ctx.fill();}
+  orbAnimId=orbMotion.matches?null:requestAnimationFrame(render);
+ }
+ render(started);
+}
+function stopThinkingOrb() {
+ if(orbAnimId!==null)cancelAnimationFrame(orbAnimId);orbAnimId=null;
+ const container=$('chatThinkingOrb');if(container)container.hidden=true;
+}
+orbMotion.addEventListener('change',()=>{if(!$('chatThinkingOrb').hidden)startThinkingOrb();if(crowdWanted)startLoginCrowd();});
+// Native canvas adaptation of Skiper UI skiper39 (Open Peeps), only while real startup runs.
+let crowdAnimId=null,crowdGeneration=0,crowdWanted=false;
+function startLoginCrowd() {
+ stopLoginCrowd();crowdWanted=true;const current=crowdGeneration;
+ const canvas=$('loginCrowdCanvas'),ctx=canvas.getContext('2d'),image=new Image();if(!ctx)return;
+ image.onload=()=>{
+  if(current!==crowdGeneration || !crowdWanted || $('loginTransitionLoader').hidden)return;
+  const sw=image.naturalWidth/15,sh=image.naturalHeight/7,started=performance.now();
+  function render(now){
+   if(current!==crowdGeneration || !crowdWanted || $('loginTransitionLoader').hidden){crowdAnimId=null;return;}
+   const time=orbMotion.matches?0:(now-started)/1000;ctx.clearRect(0,0,900,280);
+   for(let i=0;i<12;i++){const h=138+(i%4)*20,w=sw/sh*h,x=((i*89+time*(18+(i%3)*7))%1080)-100,y=280-h-8-Math.abs(Math.sin(time*5+i))*4,index=(i*7+3)%105;ctx.drawImage(image,(index%15)*sw,Math.floor(index/15)*sh,sw,sh,x,y,w,h);}
+   crowdAnimId=orbMotion.matches?null:requestAnimationFrame(render);
+  }
+  render(started);
+ };
+ image.src='/assets/crowd.png';
+}
+function stopLoginCrowd(){crowdWanted=false;crowdGeneration++;if(crowdAnimId!==null)cancelAnimationFrame(crowdAnimId);crowdAnimId=null;}
+$('loginTransitionRetry').onclick=()=>location.reload();
 let sending = false;
 $('chatForm').onsubmit = async event => {
   event.preventDefault(); if(currentView==='annotation'){if(trackingWanted || !reviewVideo.paused)await pauseReview();if(!(await persistReview(false)))return;} let message=$('chatInput').value.trim(); if(currentView==='annotation' && !/\b(detik|second|menit|minute)\b/i.test(message) && /(berapa|jumlah|siapa)/i.test(message)) message+=` pada detik ${(reviewFrame/summary.fps).toFixed(2)}`; if (!message || sending) return;
   sending=true; syncControls(); const current=generation; $('sendChat').disabled=true; $('clearChat').disabled=true; $('historySelect').disabled=true; showError('chatError','');
   addMessage('user',message); $('chatInput').value=''; $('chatStatus').textContent='AI sedang menyiapkan jawaban…';
+  startThinkingOrb();
   try {
     const data=await api('/api/chat',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({message,device:$('deviceMode').value,job_id:summary ? job.id : null,history:history.slice(-6)})});
     if (current!==generation) return;
     const label=data.mode==='reviewed' ? 'Hitungan AI + koreksi pengguna' : data.mode==='facts' ? 'Data analisis AI tersimpan' : data.mode==='manual' ? 'Koreksi manual pengguna' : data.mode==='guide' ? 'Panduan kemampuan aplikasi' : `${data.mode==='lora' ? 'Qwen lokal + LoRA pilot' : 'Qwen lokal · base model'} · ${data.seconds} detik${data.device ? ' · '+(data.device.startsWith('cuda') ? 'GPU' : 'CPU') : ''}`;
     addMessage('assistant',data.answer,label+(data.truncated ? ' · batas panjang respons tercapai' : ''),data.evidence); history.push({role:'user',content:message},{role:'assistant',content:data.answer.slice(0,2000)}); history=history.slice(-6);
   } catch(error) { showError('chatError',error.message); }
-  finally { sending=false; $('sendChat').disabled=false; $('clearChat').disabled=false; syncControls(); $('chatStatus').textContent=''; }
+  finally { sending=false; $('sendChat').disabled=false; $('clearChat').disabled=false; syncControls(); $('chatStatus').textContent=''; stopThinkingOrb(); }
 };
 $('chatInput').addEventListener('keydown',event => { if (event.key==='Enter' && !event.shiftKey) {event.preventDefault(); $('chatForm').requestSubmit();} });
 for (const button of document.querySelectorAll('[data-question]')) button.onclick = () => { $('chatInput').value=button.dataset.question; $('chatForm').requestSubmit(); };
@@ -611,8 +661,14 @@ $('retryJob').onclick=async()=>{try{const data=await api(`/api/jobs/${job.id}/re
 $('cancelJob').onclick=async()=>{try{await api(`/api/jobs/${job.id}/cancel`,{method:'POST'});}catch(error){showError('uploadError',error.message);}};
 const themeMedia=matchMedia('(prefers-color-scheme: dark)');
 try {$('themeSelect').value=localStorage.getItem('video-theme') || 'system';} catch {}
-function applyTheme() {const choice=$('themeSelect').value; document.documentElement.dataset.theme=choice==='system' ? (themeMedia.matches ? 'dark' : 'light') : choice; try {localStorage.setItem('video-theme',choice);} catch {}}
-$('themeSelect').onchange=applyTheme; themeMedia.addEventListener('change',()=>{if($('themeSelect').value==='system')applyTheme();}); applyTheme();
+function applyTheme() {
+ const choice=$('themeSelect').value,dark=choice==='system'?themeMedia.matches:choice==='dark';
+ document.documentElement.dataset.theme=dark?'dark':'light';
+ $('themeToggleBtn').setAttribute('aria-checked',String(dark));
+ try {localStorage.setItem('video-theme',choice);} catch {}
+}
+$('themeSelect').onchange=applyTheme;themeMedia.addEventListener('change',()=>{if($('themeSelect').value==='system')applyTheme();});applyTheme();
+$('themeToggleBtn').onclick=()=>{$('themeSelect').value=document.documentElement.dataset.theme==='dark'?'light':'dark';applyTheme();};
 let trainingPoll=null;
 async function refreshTraining(resume=true) {
   const current=generation;
@@ -661,6 +717,8 @@ $('reanalyzeButton').onclick=async()=>{if(!job || !summary)return; showError('up
 syncMetadata();
 (async () => {
   await workspaceAuth.ready;
-  try { const health=await api('/api/health'); $('systemStatus').textContent=health.vision_ready && health.chat_ready ? `Model lokal siap · ${health.device.startsWith('cuda') ? 'RTX / CUDA' : 'CPU'}${health.adapter_ready ? ' · LoRA' : ''}` : 'Model belum lengkap · lihat README'; await refreshTraining(); const jobs=await refreshHistory(); if (jobs.length) { const preferred=jobs.find(j=>['queued','processing','cancelling'].includes(j.status)) || jobs.find(j=>j.status==='done') || jobs[0]; $('historySelect').value=preferred.id; await selectJob(preferred.id); } }
-  catch(error) { $('systemStatus').textContent='Server tidak terhubung'; showError('uploadError',error.message); }
+  startLoginCrowd();
+  try { const health=await api('/api/health'); $('systemStatus').textContent=health.vision_ready && health.chat_ready ? `Model lokal siap · ${health.device.startsWith('cuda') ? 'RTX / CUDA' : 'CPU'}${health.adapter_ready ? ' · LoRA' : ''}` : 'Model belum lengkap · lihat README'; await refreshTraining(); const jobs=await refreshHistory(); if (jobs.length) { const preferred=jobs.find(j=>['queued','processing','cancelling'].includes(j.status)) || jobs.find(j=>j.status==='done') || jobs[0]; $('historySelect').value=preferred.id; await selectJob(preferred.id); } workspaceAuth.finishLoading(); }
+  catch(error) { $('systemStatus').textContent='Server tidak terhubung'; showError('uploadError',error.message); workspaceAuth.finishLoading('Studio belum dapat dimuat. '+error.message); }
+  finally {stopLoginCrowd();}
 })();

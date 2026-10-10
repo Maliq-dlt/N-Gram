@@ -236,9 +236,16 @@ def home():
 
 @app.get("/assets/{name}")
 def ui_asset(name: str):
-    if name not in {"dashboard.css", "dashboard.js", "auth.js", "theme.js"}:
+    if name not in {
+        "dashboard.css",
+        "dashboard.js",
+        "auth.js",
+        "theme.js",
+        "brand.svg",
+        "crowd.png",
+    }:
         raise HTTPException(404, "File UI tidak ditemukan.")
-    path = runtime.INDEX.parent / (name if name.endswith(".js") else "assets/dashboard.css")
+    path = runtime.INDEX.parent / (name if name.endswith(".js") else "assets/" + name)
     if not path.is_file():
         raise HTTPException(503, "Asset UI belum dibangun. Jalankan npm ci dan npm run build.")
     return FileResponse(path)

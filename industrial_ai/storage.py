@@ -56,6 +56,9 @@ class Store:
                     id TEXT PRIMARY KEY, username TEXT NOT NULL UNIQUE,
                     password TEXT NOT NULL, role TEXT NOT NULL CHECK(role IN ('admin','reviewer','viewer')),
                     workspace_id TEXT NOT NULL REFERENCES workspaces(id), active INTEGER NOT NULL DEFAULT 1);
+                CREATE TABLE IF NOT EXISTS user_profiles(
+                    user_id TEXT PRIMARY KEY REFERENCES users(id),
+                    display_name TEXT, avatar BLOB);
                 CREATE TABLE IF NOT EXISTS sessions(
                     digest TEXT PRIMARY KEY, user_id TEXT NOT NULL REFERENCES users(id),
                     csrf TEXT NOT NULL, expires_at INTEGER NOT NULL);
@@ -333,6 +336,28 @@ class Store:
             if row
             else None
         )
+
+    def profile(self, user_id):
+        with self.connection() as db:
+            row = db.execute(
+                "SELECT display_name,avatar FROM user_profiles WHERE user_id=?", (user_id,)
+            ).fetchone()
+        return dict(row) if row else {"display_name": None, "avatar": None}
+
+    def update_profile(self, user_id, *, display_name=None, avatar=None, change_avatar=False):
+        def operation(db):
+            if not db.execute("SELECT 1 FROM users WHERE id=? AND active=1", (user_id,)).fetchone():
+                raise ValueError("User not found.")
+            db.execute("INSERT OR IGNORE INTO user_profiles(user_id) VALUES(?)", (user_id,))
+            if display_name is not None:
+                db.execute(
+                    "UPDATE user_profiles SET display_name=? WHERE user_id=?",
+                    (display_name, user_id),
+                )
+            if change_avatar:
+                db.execute("UPDATE user_profiles SET avatar=? WHERE user_id=?", (avatar, user_id))
+
+        self._write(operation, "profile.update", user_id=user_id)
 
     def revoke(self, token):
         digest = hashlib.sha256(token.encode()).hexdigest()

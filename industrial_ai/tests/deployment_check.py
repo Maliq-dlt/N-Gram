@@ -111,6 +111,23 @@ def main():
                         "Server failed to start; inspect " + str(base / "server.log")
                     )
                 time.sleep(0.2)
+            for asset, mime in (("brand.svg", "image/svg+xml"), ("crowd.png", "image/png")):
+                with client.open(origin + "/assets/" + asset, timeout=5) as response:
+                    check(response.status == 200, "anonymous asset " + asset)
+                    check(response.headers.get_content_type() == mime, "asset MIME " + asset)
+                    check(
+                        response.read() == (ROOT / "assets" / asset).read_bytes(),
+                        "asset bytes " + asset,
+                    )
+                    check(
+                        response.headers.get("X-Content-Type-Options") == "nosniff",
+                        "asset headers " + asset,
+                    )
+            try:
+                client.open(origin + "/assets/studio.sqlite3", timeout=5)
+                raise AssertionError("unknown asset must be denied")
+            except HTTPError as error:
+                check(error.code == 404, "asset allowlist denies unknown file")
             check(request("/api/jobs")[0] == 401, "anonymous jobs denied")
             status, owner, headers = request(
                 "/api/auth/login", {"username": "deployment-owner", "password": password}

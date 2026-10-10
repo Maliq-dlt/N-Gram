@@ -224,3 +224,22 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
+
+UI references and local adaptations (2026-10-10)
+============================================================
+21st.dev component sources reviewed; native DOM/CSS/Canvas adaptations:
+- anark17r, AI thinking orb and input (33953): https://21st.dev/@anark17r/components/ai-thiking-orb-and-input
+- ddoemonn, Password Strength (23542): https://21st.dev/@ddoemonn/components/password-strength
+- preetsuthar17, Modern & Stunning sign in (2060): https://21st.dev/@preetsuthar17/components/modern-stunning-sign-in
+- axai-kaizoku, Animated Theme Toggle (9362): https://21st.dev/@axai-kaizoku/components/animated-theme-toggle
+- profitsalesorg-crypto, ProMotor Wow theme: https://21st.dev/community/themes/promotor-wow-1784919270278
+
+Crowd animation: native Canvas adaptation of Skiper UI skiper39 by reuno-ui /
+@gurvinder-singh02, inspired by https://codepen.io/zadvorsky/pen/xxwbBQV.
+Skiper UI permits free personal/commercial use and modification with attribution.
+See https://21st.dev/@reuno-ui/components/skiper39 and https://gxuri.me
+Illustrations (assets/crowd.png): Open Peeps by Pablo Stanley, CC0 1.0.
+https://www.openpeeps.com/ and https://creativecommons.org/publicdomain/zero/1.0/
+Source sprite: https://cdn.21st.dev/assets/localized/abdb8990a7bef8c2f5af3e45f0a3c969c4b0603fba8be92e81347de4ea4e1ed7.png
+Logo: original Video Insight Split V geometric SVG, chosen by the user.

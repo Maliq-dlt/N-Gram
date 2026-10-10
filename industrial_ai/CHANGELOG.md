@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-10
+
+- Login dan dashboard dirapikan mengikuti referensi 21st.dev; logo Split V,
+  tema ProMotor Wow dan terang lembut, toggle tema di samping avatar.
+- Orb chat serta loading kerumunan mengikuti request/pemuatan nyata, mendukung
+  reduced motion dan membatalkan callback animasi yang sudah kedaluwarsa.
+- Nama tampilan/foto profil disimpan privat per akun di SQLite; foto dibatasi,
+  didekode dan dinormalisasi tanpa metadata. Meter password aksesibel.
+- Tidak ada kredensial tertanam, signup/SSO contoh, feed CCTV contoh, atau
+  klaim operasional yang tidak dibuktikan. Data/video dan kontrol anotasi tetap.
+- CI menambahkan regression profil serta lifecycle animasi; distribusi memuat
+  logo dan ilustrasi lokal dengan atribusi.
+
 ## 2026-10-09
 
 - Profil inline menampilkan identitas akun/workspace nyata secara readonly.

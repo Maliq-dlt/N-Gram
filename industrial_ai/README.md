@@ -332,3 +332,19 @@ video asal pada split yang sama, termasuk setelah analisis ulang.
 [Panduan kontribusi dan tes](../CONTRIBUTING.md) · [Keamanan](../SECURITY.md) ·
 [Lisensi dan atribusi](../NOTICE.md). SQLite stdlib tidak memerlukan Redis atau database server. Laravel tidak diperlukan
 untuk boundary akses ini. Roadmap CCTV live/OCR/wajah tetap terpisah dari fitur demo.
+
+
+### Profil dan tampilan
+
+Avatar di kanan atas membuka profil: ganti nama tampilan, unggah foto statis
+(JPG/PNG/WebP, maksimum 2 MiB dan 4 MP), atau ubah password. Nama/foto tersimpan
+pada akun server dan bertahan setelah refresh. Password memakai hash scrypt;
+perubahan mencabut sesi lain dan merotasi sesi/CSRF aktif tanpa menutup video.
+
+Toggle di sebelah avatar mengubah terang/gelap; pilihan **Ikuti sistem** ada
+di profil. Orb muncul di kolom chat ketika jawaban diproses. Kerumunan karakter
+saat login hanya tampil selama workspace dimuat, tanpa indikator persentase
+buatan. Tidak ada signup publik; akun tim dibuat administrator.
+
+Referensi dan atribusi: [design](docs/DESIGN.md),
+[logo](docs/brand/guidelines.md), [verifikasi UI](docs/VERIFICATION_UI.md), [lisensi UI](assets/THIRD_PARTY_LICENSES.txt).

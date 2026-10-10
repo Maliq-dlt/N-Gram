@@ -4,16 +4,22 @@ from __future__ import annotations
 
 import argparse
 import getpass
+import hashlib
 import hmac
+import io
 import json
 import os
+import unicodedata
+import warnings
 from contextvars import ContextVar
 from pathlib import Path
+from typing import Annotated
 from urllib.parse import urlsplit
 
-from fastapi import HTTPException, Request
-from fastapi.responses import JSONResponse
-from pydantic import BaseModel, Field
+from fastapi import File, HTTPException, Request, UploadFile
+from fastapi.responses import JSONResponse, Response
+from PIL import Image, ImageOps, UnidentifiedImageError
+from pydantic import BaseModel, Field, field_validator
 
 import runtime
 from storage import Store
@@ -167,10 +173,16 @@ def same_origin(request: Request) -> bool:
 
 def session_response(data: dict) -> dict:
     user = data.get("user", data)
+    profile = store().profile(user["id"])
+    avatar = profile["avatar"]
     return {
         "user": {
             "id": user["id"],
             "username": user["username"],
+            "display_name": profile["display_name"] or user["username"],
+            "avatar_url": "/api/auth/avatar?v=" + hashlib.sha256(avatar).hexdigest()
+            if avatar
+            else None,
             "role": user["role"],
             "tenant_id": user["workspace_id"],
             "tenant_name": user["tenant_name"],
@@ -187,6 +199,50 @@ class Login(BaseModel):
 class Password(BaseModel):
     current_password: str = Field(min_length=1, max_length=256)
     new_password: str = Field(min_length=12, max_length=256)
+
+
+class Profile(BaseModel):
+    display_name: str = Field(min_length=1, max_length=80)
+
+    @field_validator("display_name")
+    @classmethod
+    def valid_name(cls, value):
+        if not value.strip() or any(unicodedata.category(c).startswith("C") for c in value):
+            raise ValueError("Nama tampilan tidak boleh kosong atau memuat karakter kontrol.")
+        return value.strip()
+
+
+MAX_AVATAR = 2 * 1024 * 1024
+
+
+def normalize_avatar(data: bytes) -> bytes:
+    if not data or len(data) > MAX_AVATAR:
+        raise HTTPException(413, "Foto profil maksimal 2 MiB.")
+    try:
+        with warnings.catch_warnings():
+            warnings.simplefilter("error", Image.DecompressionBombWarning)
+            with Image.open(io.BytesIO(data)) as source:
+                if source.format not in {"JPEG", "PNG", "WEBP"}:
+                    raise ValueError("format")
+                if source.width * source.height > 4_000_000 or getattr(source, "n_frames", 1) != 1:
+                    raise ValueError("dimensions")
+                source.load()
+                image = ImageOps.exif_transpose(source).convert("RGBA")
+                image.info.clear()
+                image.thumbnail((512, 512))
+                output = io.BytesIO()
+                image.save(output, format="PNG")
+                return output.getvalue()
+    except (
+        ValueError,
+        OSError,
+        UnidentifiedImageError,
+        Image.DecompressionBombError,
+        Image.DecompressionBombWarning,
+    ) as error:
+        raise HTTPException(
+            422, "Gunakan foto JPEG, PNG, atau WebP statis maksimal 4 megapiksel."
+        ) from error
 
 
 class NewUser(BaseModel):
@@ -244,6 +300,8 @@ def install(app, max_upload: int):
                         "/api/chat",
                         "/api/auth/logout",
                         "/api/auth/password",
+                        "/api/auth/profile",
+                        "/api/auth/avatar",
                     }:
                         raise HTTPException(403, "Viewer hanya dapat membaca hasil.")
                 # Annotation playback has many small requests; expensive work has its own compute lock.
@@ -252,6 +310,8 @@ def install(app, max_upload: int):
             if unsafe:
                 length = request.headers.get("content-length", "")
                 limit = max_upload + 1024 * 1024 if path == "/api/jobs" else 1024 * 1024
+                if path == "/api/auth/avatar":
+                    limit = MAX_AVATAR + 64 * 1024
                 if not length.isdigit():
                     raise HTTPException(411, "Ukuran permintaan wajib diketahui.")
                 if int(length) > limit:
@@ -333,6 +393,32 @@ def install(app, max_upload: int):
             path="/",
         )
         return response
+
+    @app.patch("/api/auth/profile")
+    def update_profile(data: Profile):
+        store().update_profile(actor()["id"], display_name=data.display_name)
+        return session_response(actor())
+
+    @app.put("/api/auth/avatar")
+    async def update_avatar(file: Annotated[UploadFile, File()]):
+        try:
+            avatar = normalize_avatar(await file.read(MAX_AVATAR + 1))
+        finally:
+            await file.close()
+        store().update_profile(actor()["id"], avatar=avatar, change_avatar=True)
+        return session_response(actor())
+
+    @app.delete("/api/auth/avatar")
+    def remove_avatar():
+        store().update_profile(actor()["id"], change_avatar=True)
+        return session_response(actor())
+
+    @app.get("/api/auth/avatar")
+    def avatar():
+        data = store().profile(actor()["id"])["avatar"]
+        if data is None:
+            raise HTTPException(404, "Foto profil belum tersedia.")
+        return Response(data, media_type="image/png")
 
     @app.get("/api/admin/users")
     def users():

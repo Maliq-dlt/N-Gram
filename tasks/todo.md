@@ -106,3 +106,14 @@ Gate fase lengkap tidak dicentang hanya karena sebagian implementasi tersedia.
 
 Bobot/adapter tidak diunggah. Clone baru memakai Qwen dasar; fine-tuning lokal
 tersedia secara terpisah. Hasil lama tidak dihapus atau ditimpa oleh publikasi.
+
+
+## Perbaikan referensi UI — 2026-10-10
+
+- [x] Login nyata tanpa kredensial publik dan pendaftaran contoh.
+- [x] Logo Split V dipilih pengguna; sumber SVG dan panduan di docs/brand.
+- [x] Tema gelap/terang lembut, toggle di header, opsi mengikuti sistem di profil.
+- [x] Nama/foto profil disimpan melalui API terotorisasi ke SQLite.
+- [x] Indikator password, pengungkapan password dan rotasi sesi tetap berfungsi.
+- [x] Orb lokal dalam chat dan loading kerumunan selama proses yang sebenarnya.
+- [x] Regression profil/animasi masuk CI; aset lokal masuk wheel/sdist.

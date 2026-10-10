@@ -23,3 +23,28 @@ Radio native sebagai segmented control mode hasil, diadaptasi dari referensi 21s
 - https://21st.dev/@originui/components/dropdown-menu (393): source reviewed; avatar/identity grouping adapted into a profile destination with native HTML, no Radix dependency.
 - https://github.com/emilkowalski/skills: apple-design installed locally for this task.
 - C:/Users/malik/.agents/skills/impeccable/SKILL.md: product register, distill, layout.
+
+## Revisi UI 2026-10-10
+
+Login memakai kartu ringkas dari referensi modern-stunning-sign-in, dengan akses
+admin yang nyata dan tanpa registrasi/SSO contoh. Initial signed-out mencegah
+flash dashboard sebelum sesi dipastikan. Split V dipilih pengguna sebagai logo.
+
+Dark mengikuti token ProMotor Wow (background 228 33% 3%, panel 228 28% 6%,
+primary 221 87% 53%); terang memakai putih dingin yang lembut. Toggle sun/moon
+di header berdampingan dengan profil; pilihan sistem tetap tersedia di profil.
+
+Orb berisi titik pada bola berputar hanya selama request chat; tempatnya di
+kolom chat tanpa overlay pada video. Loading login memakai kerumunan Open Peeps
+yang diadaptasi dari Skiper39, terikat pemuatan workspace sebenarnya. Tidak ada
+progress atau jeda buatan. Semua loop berhenti saat selesai/gagal; reduced-motion
+menampilkan pose statis dan callback gambar terlambat dibatalkan secara logis.
+
+Nama dan avatar merupakan data akun di SQLite, bukan localStorage. Avatar harus
+JPEG/PNG/WebP statis <=2 MiB dan <=4 MP, dinormalisasi menjadi PNG <=512px tanpa
+metadata. Password meter adalah saran kekuatan dengan deteksi pola umum,
+segmen animasi, checklist serta pengumuman aksesibel. Batas server 12-256
+karakter dan rotasi scrypt/session/CSRF tetap otoritatif.
+
+Sumber rinci dan atribusi: assets/THIRD_PARTY_LICENSES.txt. Panduan logo:
+docs/brand/guidelines.md. Tidak menambahkan React/Motion/GSAP untuk adaptasi native ini.

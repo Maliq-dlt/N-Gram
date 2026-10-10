@@ -1,5 +1,5 @@
 declare function setView(view:string):Promise<boolean>;
-interface WorkspaceUser {id:string;username:string;role:'admin'|'reviewer'|'viewer';tenant_id:string;tenant_name:string}
+interface WorkspaceUser {id:string;username:string;role:'admin'|'reviewer'|'viewer';tenant_id:string;tenant_name:string;display_name:string;avatar_url:string|null}
 interface AuthSession {user:WorkspaceUser;csrf_token:string}
 const workspaceAuth=(()=>{
  let session:AuthSession|null=null;
@@ -8,29 +8,53 @@ const workspaceAuth=(()=>{
  function el<T extends HTMLElement>(id:string,type:{new():T}):T{const node=document.getElementById(id);if(!(node instanceof type))throw new Error(`Missing element ${id}`);return node;}
  const gate=el('authGate',HTMLElement);
  document.getElementById('reviewSvg')?.addEventListener('pointerdown',event=>{if(session?.user.role==='viewer'){event.preventDefault();event.stopImmediatePropagation();}},true);
- function showLogin():void{session=null;gate.hidden=false;document.body.classList.add('signed-out');el('loginUsername',HTMLInputElement).focus();}
+ function showLogin():void{session=null;el('loginTransitionLoader',HTMLElement).hidden=true;gate.hidden=false;document.body.classList.add('signed-out');el('loginUsername',HTMLInputElement).focus();}
  function applyRole():void{if(session?.user.role!=='viewer')return;document.getElementById('reviewSvg')?.setAttribute('aria-label','Kotak anotasi tersimpan. Akun viewer hanya dapat melihat.');for(const id of ['newVideoButton','emptyUploadButton','uploadButton','reanalyzeButton','retryJob','cancelJob','saveReview','suggestBoxes','applyBoxButton','learnDetector','exportCorrectedVideo','cancelExport','cancelLearning','startTraining','openReview','prepareCorrections','resultCorrections','reviewPlayback','boxControls','metadataControls']){const node=document.getElementById(id);if((node instanceof HTMLButtonElement||node instanceof HTMLFieldSetElement||node instanceof HTMLInputElement)&&!node.disabled)node.disabled=true;}for(const node of document.querySelectorAll<HTMLButtonElement>('[data-view=annotation]')){if(!node.disabled)node.disabled=true;node.title='Viewer dapat melihat hasil; koreksi membutuhkan reviewer.';}for(const node of document.querySelectorAll<HTMLButtonElement>('#boxList button'))if(!node.disabled)node.disabled=true;}
  async function request(input:RequestInfo|URL,init:RequestInit={}):Promise<Response>{const headers=new Headers(init.headers),method=(init.method||'GET').toUpperCase();if(!['GET','HEAD','OPTIONS'].includes(method)){if(!session){showLogin();throw new Error('Silakan masuk kembali.');}const url=input instanceof Request?input.url:String(input);if(session.user.role==='viewer'&&!url.includes('/api/auth/')&&url!=='/api/chat')throw new Error('Akun viewer hanya dapat melihat hasil.');headers.set('X-CSRF-Token',session.csrf_token);}const response=await nativeFetch(input,{...init,headers,credentials:'same-origin'});if(response.status===401)showLogin();return response;}
- async function readSession(response:Response):Promise<AuthSession>{const data:unknown=await response.json();if(!response.ok)throw new Error(typeof data==='object'&&data!==null&&'detail'in data?String(data.detail):'Tidak dapat masuk.');if(typeof data!=='object'||data===null||!('user'in data)||!('csrf_token'in data))throw new Error('Respons sesi tidak valid.');const user:unknown=data.user;if(typeof user!=='object'||user===null||!('role'in user)||!['admin','reviewer','viewer'].includes(String(user.role))||typeof data.csrf_token!=='string'||!data.csrf_token)throw new Error('Respons sesi tidak valid.');for(const field of ['id','username','tenant_id','tenant_name'])if(!(field in user)||typeof Reflect.get(user,field)!=='string')throw new Error('Respons akun tidak valid.');return data as AuthSession;}
+ async function readSession(response:Response):Promise<AuthSession>{const data:unknown=await response.json();if(!response.ok)throw new Error(typeof data==='object'&&data!==null&&'detail'in data?String(data.detail):'Tidak dapat masuk.');if(typeof data!=='object'||data===null||!('user'in data)||!('csrf_token'in data))throw new Error('Respons sesi tidak valid.');const user:unknown=data.user;if(typeof user!=='object'||user===null||!('role'in user)||!['admin','reviewer','viewer'].includes(String(user.role))||typeof data.csrf_token!=='string'||!data.csrf_token)throw new Error('Respons sesi tidak valid.');for(const field of ['id','username','tenant_id','tenant_name'])if(!(field in user)||typeof Reflect.get(user,field)!=='string')throw new Error('Respons akun tidak valid.');if(!('display_name'in user)||typeof user.display_name!=='string'||!('avatar_url'in user)||(user.avatar_url!==null&&(typeof user.avatar_url!=='string'||!/^\/api\/auth\/avatar\?v=[a-f0-9]+$/.test(user.avatar_url))))throw new Error('Respons profil tidak valid.');return data as AuthSession;}
  function renderProfile():void {
    if(!session)return;
-   const user=session.user,initials=Array.from(user.username.trim()).slice(0,2).join('').toLocaleUpperCase('id');
-   for(const id of ['profileAvatar','accountAvatar'])el(id,HTMLElement).textContent=initials;
-   el('accountIdentity',HTMLElement).textContent=user.username;
+   const user=session.user,name=user.display_name||user.username;
+   for(const id of ['profileAvatar','accountAvatar']){
+     const node=el(id,HTMLElement);node.textContent=Array.from(name.trim()).slice(0,2).join('').toLocaleUpperCase('id');
+     node.style.backgroundImage=user.avatar_url?`url("${user.avatar_url}")`:'';
+     node.classList.toggle('has-custom-avatar',Boolean(user.avatar_url));
+   }
+   el('accountIdentity',HTMLElement).textContent=name;
+   el('profileDisplayName',HTMLElement).textContent=name;
+   el('profileNameInput',HTMLInputElement).value=user.display_name;
    el('profileUsername',HTMLElement).textContent=user.username;
    el('profileWorkspace',HTMLElement).textContent=user.tenant_name;
    el('profileRole',HTMLElement).textContent={admin:'Administrator',reviewer:'Reviewer',viewer:'Viewer'}[user.role];
  }
- function signedIn(value:AuthSession):void{if(entered){location.reload();return;}entered=true;session=value;gate.hidden=true;document.body.classList.remove('signed-out');renderProfile();applyRole();}
+ function signedIn(value:AuthSession):void{
+   if(entered){location.reload();return;}
+   entered=true;session=value;gate.hidden=true;
+   el('loginTransitionLoader',HTMLElement).hidden=false;
+   renderProfile();applyRole();
+ }
+ function finishLoading(error?:string):void{
+   if(!session)return;
+   const loader=el('loginTransitionLoader',HTMLElement);
+   if(error){const status=el('loginTransitionStatus',HTMLElement);status.textContent=error;const retry=document.getElementById('loginTransitionRetry');if(retry){retry.hidden=false;retry.focus();}return;}
+   loader.hidden=true;document.body.classList.remove('signed-out');applyRole();(document.getElementById('workspaceTitle')||document.getElementById('mainContent'))?.focus();
+ }
  const ready=(async()=>{try{signedIn(await readSession(await nativeFetch('/api/auth/session',{credentials:'same-origin'})));}catch{showLogin();await new Promise<void>(resolve=>document.addEventListener('workspace-login',()=>resolve(),{once:true}));}})();
  el('loginForm',HTMLFormElement).onsubmit=async event=>{event.preventDefault();const button=el('loginSubmit',HTMLButtonElement),error=el('loginError',HTMLElement);button.disabled=true;error.hidden=true;try{signedIn(await readSession(await nativeFetch('/api/auth/login',{method:'POST',credentials:'same-origin',headers:{'Content-Type':'application/json'},body:JSON.stringify({username:el('loginUsername',HTMLInputElement).value,password:el('loginPassword',HTMLInputElement).value})})));el('loginPassword',HTMLInputElement).value='';document.dispatchEvent(new Event('workspace-login'));}catch(reason:unknown){error.textContent=reason instanceof Error?reason.message:'Tidak dapat masuk.';error.hidden=false;}finally{button.disabled=false;}};
  el('logoutButton',HTMLButtonElement).onclick=async()=>{try{const response=await request('/api/auth/logout',{method:'POST'});if(!response.ok)throw new Error('Gagal keluar.');location.reload();}catch(reason:unknown){const alert=el('authError',HTMLElement);alert.textContent=reason instanceof Error?reason.message:'Gagal keluar.';alert.hidden=false;}};
  const passwordForm=el('passwordForm',HTMLFormElement);
  const passwordSubmit=el('passwordSubmit',HTMLButtonElement);
- let passwordPending=false;
+ let passwordPending=false,profilePending=false;
+ function syncProfilePending():void{
+   const pending=passwordPending||profilePending;passwordSubmit.disabled=pending;
+   for(const id of ['saveNameBtn','removeAvatarBtn','avatarFileInput']){const node=el(id,HTMLElement);if(pending)node.setAttribute('disabled','');else node.removeAttribute('disabled');}
+ }
  function resetPasswordForm():void {
    passwordForm.reset();
+   for(const id of ['currentPassword','newPassword','confirmPassword'])el(id,HTMLInputElement).type='password';
+   for(const button of document.querySelectorAll<HTMLButtonElement>('[data-password-target]')){button.setAttribute('aria-pressed','false');button.setAttribute('aria-label','Tampilkan password');}
    el('confirmPassword',HTMLInputElement).setCustomValidity('');
+   updatePasswordMeter('');
    el('passwordStatus',HTMLElement).textContent='';
  }
  el('profileButton',HTMLButtonElement).onclick=async()=>{
@@ -39,7 +63,7 @@ const workspaceAuth=(()=>{
  el('confirmPassword',HTMLInputElement).oninput=()=>el('confirmPassword',HTMLInputElement).setCustomValidity('');
  passwordForm.onsubmit=async event=>{
    event.preventDefault();
-   if(passwordPending)return;
+   if(passwordPending||profilePending)return;
    const status=el('passwordStatus',HTMLElement),confirmation=el('confirmPassword',HTMLInputElement);
    const newPassword=el('newPassword',HTMLInputElement).value;
    status.textContent='';
@@ -49,7 +73,7 @@ const workspaceAuth=(()=>{
    }
    confirmation.setCustomValidity('');
    if(!passwordForm.reportValidity())return;
-   passwordPending=true;passwordSubmit.disabled=true;
+   passwordPending=true;syncProfilePending();
    try {
      const response=await request('/api/auth/password',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({current_password:el('currentPassword',HTMLInputElement).value,new_password:newPassword})});
      const nextSession=await readSession(response);
@@ -58,9 +82,82 @@ const workspaceAuth=(()=>{
      status.textContent='Password diperbarui. Sesi lain telah keluar; Anda tetap masuk di sini.';
    } catch(reason:unknown) {
      status.textContent=reason instanceof Error?reason.message:'Gagal mengubah password.';
-   } finally {passwordPending=false;passwordSubmit.disabled=false;}
+   } finally {passwordPending=false;syncProfilePending();}
  };
  new MutationObserver(applyRole).observe(document.body,{subtree:true,attributes:true,attributeFilter:['disabled'],childList:true});
+ // Adapted from 21st.dev ddoemonn/password-strength: rules, pattern detection, segmented meter and debounced live feedback.
+ function evaluatePassword(val:string){
+   const COMMON=/^(?:password|passw0rd|qwerty|letmein|welcome|admin|iloveyou|monkey|dragon|abc123|111111|123123|123456)/i;
+   const RUN=/(.)\1{3,}/;
+   const RUN_UP=/(?:0123|1234|2345|3456|4567|5678|6789|abcd|bcde|cdef|defg|qwer|wert|erty|asdf)/i;
+   const SYMBOL=/[!-/:-@[-`{-~]/;
+   const rules=[
+     {id:'ruleLen',met:val.length>=12},
+     {id:'ruleCase',met:/[a-z]/.test(val)&&/[A-Z]/.test(val)},
+     {id:'ruleDigit',met:/\d/.test(val)},
+     {id:'ruleSymbol',met:SYMBOL.test(val)}
+   ];
+   const passed=rules.filter(r=>r.met).length;
+   const guessable=val.length>0&&(COMMON.test(val)||RUN.test(val)||RUN_UP.test(val));
+   const score=val.length===0?0:guessable?1:Math.min(rules.length,Math.max(1,passed));
+   const labels=['Kosong','Lemah','Cukup','Baik','Sangat Kuat'];
+   return {score,label:labels[Math.min(score,4)],rules,guessable};
+ }
+ let announcementTimer:number|undefined;
+ function updatePasswordMeter(val:string,prefix=''){
+   if(typeof document==='undefined')return;
+   const res=evaluatePassword(val);
+   const meter=document.getElementById(prefix+'passwordMeter');
+   if(!meter)return;
+   meter.setAttribute('aria-valuemin','0');meter.setAttribute('aria-valuemax','4');meter.setAttribute('aria-valuenow',String(res.score));meter.setAttribute('aria-valuetext',res.label);
+   window.clearTimeout(announcementTimer);const announcement=el('passwordStrengthAnnouncement',HTMLElement);if(!val)announcement.textContent='';else announcementTimer=window.setTimeout(()=>{announcement.textContent=`Kekuatan password: ${res.label}.${res.guessable?' Pola mudah ditebak.':''}`;},700);
+   meter.className='password-meter '+(res.score<=1?'meter--danger':res.score<=2?'meter--caution':'meter--safe');
+   const cells=meter.querySelectorAll('.password-meter-cell');
+   cells.forEach((cell,idx)=>{
+     if(idx<res.score)cell.classList.add('filled');
+     else cell.classList.remove('filled');
+   });
+   const label=meter.querySelector('.password-meter-label');
+   if(label)label.textContent=res.score===0?'Kosong':res.label;
+   const common=meter.querySelector<HTMLElement>('.password-meter-common');
+   if(common)common.hidden=!res.guessable;
+   for(const r of res.rules){
+     const item=document.getElementById(prefix+r.id);
+     if(item){
+       item.className='password-rule-item '+(r.met?'met':'');
+       const icon=item.querySelector('.password-rule-icon');
+       if(icon)icon.textContent=r.met?'✓':'○';
+     }
+   }
+ }
+ async function saveProfile(input:string,init:RequestInit,statusId:string,success:string):Promise<void>{
+   if(profilePending||passwordPending)return;
+   profilePending=true;
+   const status=el(statusId,HTMLElement);status.textContent='Menyimpan...';
+   syncProfilePending();
+   try{session=await readSession(await request(input,init));renderProfile();status.textContent=success;}
+   catch(reason:unknown){status.textContent=reason instanceof Error?reason.message:'Gagal menyimpan profil.';}
+   finally{profilePending=false;syncProfilePending();}
+ }
+ el('newPassword',HTMLInputElement).addEventListener('input',event=>updatePasswordMeter((event.target as HTMLInputElement).value));
+ el('avatarFileInput',HTMLInputElement).addEventListener('change',()=>{
+   const input=el('avatarFileInput',HTMLInputElement),file=input.files?.[0];
+   if(!file||!session)return;
+   if(file.size>2*1024*1024||!['image/png','image/jpeg','image/webp'].includes(file.type)){el('avatarStatus',HTMLElement).textContent='Pilih PNG, JPEG, atau WebP maksimal 2 MB.';input.value='';return;}
+   const body=new FormData();body.append('file',file);
+   void saveProfile('/api/auth/avatar',{method:'PUT',body},'avatarStatus','Foto profil disimpan.').finally(()=>{input.value='';});
+ });
+ el('removeAvatarBtn',HTMLButtonElement).addEventListener('click',()=>void saveProfile('/api/auth/avatar',{method:'DELETE',headers:{'Content-Type':'application/json'},body:'{}'},'avatarStatus','Foto profil dihapus.'));
+ el('saveNameBtn',HTMLButtonElement).addEventListener('click',()=>{
+   const name=el('profileNameInput',HTMLInputElement).value.trim();
+   if(!name||Array.from(name).length>80){el('nameSaveStatus',HTMLElement).textContent='Nama tampilan wajib diisi, maksimal 80 karakter.';return;}
+   void saveProfile('/api/auth/profile',{method:'PATCH',headers:{'Content-Type':'application/json'},body:JSON.stringify({display_name:name})},'nameSaveStatus','Nama tampilan disimpan.');
+ });
+ for(const button of document.querySelectorAll<HTMLButtonElement>('[data-password-target]'))button.addEventListener('click',()=>{const id=button.dataset.passwordTarget;if(!id)return;const input=el(id,HTMLInputElement),show=input.type==='password';input.type=show?'text':'password';button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'Sembunyikan password':'Tampilkan password');});
+ el('toggleLoginPassword',HTMLButtonElement).addEventListener('click',()=>{
+   const input=el('loginPassword',HTMLInputElement),button=el('toggleLoginPassword',HTMLButtonElement),show=input.type==='password';
+   input.type=show?'text':'password';button.setAttribute('aria-pressed',String(show));button.setAttribute('aria-label',show?'Sembunyikan password':'Tampilkan password');
+ });
  // ponytail: playback/editor remains JavaScript; migrate feature contracts when they change.
- return {ready,request,applyRole,resetPasswordForm,renderProfile};
+ return {ready,request,applyRole,resetPasswordForm,renderProfile,finishLoading};
 })();

@@ -4,7 +4,7 @@
   "version": "0.1.0",
   "scripts": {
     "build": "tsc && tailwindcss -i ui.css -o assets/dashboard.css --minify",
-    "check": "node --check dashboard.js && node --check theme.js && node tests/playback_check.cjs && node tests/tracking_playback_check.cjs && node tests/auth_check.cjs && node tests/result_mode_check.cjs && node tests/profile_check.cjs",
+    "check": "node --check dashboard.js && node --check theme.js && node tests/playback_check.cjs && node tests/tracking_playback_check.cjs && node tests/auth_check.cjs && node tests/result_mode_check.cjs && node tests/profile_check.cjs && node tests/animation_check.cjs",
     "setup": "powershell -NoProfile -File ./instal.ps1",
     "start": "powershell -NoProfile -File ./jalankan.ps1",
     "typecheck": "tsc --noEmit"

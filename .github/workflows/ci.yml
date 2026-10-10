@@ -96,6 +96,7 @@ jobs:
           .venv/bin/ruff format --check .
           .venv/bin/ty check access.py storage.py app.py vision.py review.py operations.py corrections.py detector_training.py video_finetune.py setup_models.py
           .venv/bin/python tests/storage_check.py
+          .venv/bin/python tests/profile_api_check.py
           .venv/bin/python tests/security_check.py
           .venv/bin/python tests/deployment_check.py
           .venv/bin/python tests/self_check.py
