@@ -45,3 +45,7 @@ line-length = 100
 
 [dependency-groups]
 dev = ["httpx>=0.28", "ruff>=0.12", "ty>=0.0.1", "build>=1.2"]
+
+[tool.ty.environment]
+# The N-gram dependency is installed editable from the repository parent.
+extra-paths = [".."]
